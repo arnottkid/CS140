@@ -1,0 +1,917 @@
+<title>CS140 Lecture notes -- Review</title>
+<body bgcolor=ffffff>
+<UL>
+<h1>CS140 Lecture notes -- Review</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI>Directory: <b>~jplank/cs140/notes/Review</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Review>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Review</b></a>
+<LI> Original lecture notes: January, 2011
+<LI> Last modification date: <i>
+Tue Aug 20 13:00:19 EDT 2019
+</i>
+</UL>
+<hr>
+
+<h2>make</h2>
+
+The program <b>make</b> performs automatic compilation.  If you see a <b>makefile</b>
+in one of my directories, then, when you copy the files, you can remake the executables
+by typing:
+
+<pre>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f core *.o forget-clear forget-nothing forget-read hw1 hw2 printemall readone readten-bad readten-good readtwo rt2 rt3 rt4 ncnl badeof good-eof-1 good-eof-2 a.out
+UNIX> <font color=darkred><b>make</b></font>
+g++  -o forget-clear forget-clear.cpp
+g++  -o forget-nothing forget-nothing.cpp
+g++  -o forget-read forget-read.cpp
+g++  -o hw1 hw1.cpp
+g++  -o hw2 hw2.cpp
+g++  -o printemall printemall.cpp
+g++  -o readone readone.cpp
+g++  -o readten-bad readten-bad.cpp
+g++  -o readten-good readten-good.cpp
+g++  -o readtwo readtwo.cpp
+g++  -o rt2 rt2.cpp
+g++  -o rt3 rt3.cpp
+g++  -o rt4 rt4.cpp
+g++  -o ncnl ncnl.cpp
+g++  -o badeof badeof.cpp
+g++  -o good-eof-1 good-eof-1.cpp
+g++  -o good-eof-2 good-eof-2.cpp
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+
+<h2>We walk before we run</h2>
+
+Let's review C++ from cs102.  We'll start with our "Hello World" program
+from the last lecture -- <b><a href=hw1.cpp>hw1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+int main()
+{
+  cout &lt;&lt; "Hello world!" &lt;&lt; endl;
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+Every line of this program except the <b>cout</b> line contains stuff that you need
+in every program.  The "#include" tells the compiler where to get information about
+<b>cout</b>.  The "using namespace std" tells the compiler to use all of the global
+variables and type definitions that are "standard" in C++.  In this instance, we are
+using "cout" and "endl", which are "standard."
+<p>
+When your program is executed by the operating system, control starts in the <b>main()</b>
+procedure, which you must as a procedure that returns an integer.  
+It is also a good idea to return 0 at the end of your <b>main()</b> routine.
+This is because the operating system will interpret this value when your program ends,
+and having it return 0 signifies to the operating system that all has gone ok.
+
+<p>
+As we did last class, we can compile this to <b>a.out</b> and run it, or we can use the
+compiler's <b>-o</b> flag to name the executable something else:
+
+<pre>
+UNIX> <font color=darkred><b>g++ hw1.cpp</b></font>           <font color=blue># Compile to a.out</font>
+UNIX> <font color=darkred><b>./a.out</b></font>               <font color=blue># Run it.</font>
+Hello world!
+UNIX> <font color=darkred><b>g++ -o hw1 hw1.cpp</b></font>    <font color=blue># Compile to hw</font>
+UNIX> <font color=darkred><b>./hw1</b></font>                 <font color=blue># Run it</font>
+Hello world!
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+We don't have to use <b>endl</b> to print the newline character -- using "\n" in a 
+string accomplishes the same purpose, as shown in
+<b><a href=hw2.cpp>hw2.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+int main()
+{
+  cout &lt;&lt; "Hello world!\n" ;
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+Using <b>endl</b> vs. "\n" is personal preference. 
+<p>
+<b>cout</b> is convenient because it recognizes the types of what you want to 
+print automatically.  When you give it an integer, it recognizes it as an 
+integer and prints it accordingly.  This is as opposed to <b>printf</b> (which we'll go over
+later), which requires you to specify the types of what you're printing.
+<p>
+So, for example, 
+<b><a href=printemall.cpp>printemall.cpp</a></b> has <b>cout</b> print strings, string
+variables and integer variables, all in one statement:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Show how cout prints variables with different types. */</font>
+
+int main()
+{
+  int i;
+  string s;
+
+  i = 2;
+  s = " times";
+
+  cout &lt;&lt; "Love me " &lt;&lt; i &lt;&lt; s &lt;&lt; ", baby\n";
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o printemall printemall.cpp</b></font>
+UNIX> <font color=darkred><b>./printemall</b></font>
+Love me 2 times, baby
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h2>Forgive me father, for I have cin'd</h2>
+
+We get input from the terminal with <b>cin</b>, which works a lot like
+<b>cout</b>.  We call input from the terminal "standard input." 
+For example, 
+<b><a href=readone.cpp>readone.cpp</a></b>
+reads one integer from standard input and prints it out:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Read one integer from standard input and print it. */</font>
+
+int main()
+{
+  int i;
+
+  cin &gt;&gt; i;
+  cout &lt;&lt; "I is " &lt;&lt; i &lt;&lt; endl;
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+Running it and typing 50 gives us the expected output:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o readone readone.cpp</b></font>
+UNIX> <font color=darkred><b>./readone</b></font>
+<font color=darkred><b>50</b></font>
+I is 50
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<b>Cin</b> does not care about whitespace or lines.  For example, if we
+make two consecutive <b>cin</b> statements, we can put the two integers on the
+same line, different lines, have space in front, leading zeroes, etc.
+This is
+<b><a href=readtwo.cpp>readtwo.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Read an integer and print it.
+   Read a second integer and print it. */</font>
+
+int main()
+{
+  int i, j;
+
+  cin &gt;&gt; i;
+  cout &lt;&lt; "I is " &lt;&lt; i &lt;&lt; endl;
+
+  cin &gt;&gt; j;
+  cout &lt;&lt; "J is " &lt;&lt; j &lt;&lt; endl;
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+Here are several examples of entering two integers:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o readtwo readtwo.cpp</b></font>
+UNIX> <font color=darkred><b>./readtwo</b></font>
+<font color=darkred><b>1 2</b></font>
+I is 1
+J is 2
+UNIX> <font color=darkred><b>./readtwo</b></font>
+<font color=darkred><b>1</b></font>
+I is 1
+<font color=darkred><b>2</b></font>
+J is 2
+UNIX> <font color=darkred><b>./readtwo</b></font>
+
+
+
+
+<font color=darkred><b>                  0000001 </b></font>
+I is 1
+
+
+<font color=darkred><b>            -2</b></font>
+J is -2
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+You can "redirect standard input from a file."  This means that instead of
+reading from the terminal, <b>cin</b> will read from a file.  You do this 
+by putting "< <i>filename</i>" in the command that runs the executable:
+(<b>cat</b> prints the file to the terminal):
+
+<pre>
+UNIX> <font color=darkred><b>cat input-1.txt</b></font>
+11
+22
+UNIX> <font color=darkred><b>./readtwo < input-1.txt</b></font>
+I is 11
+J is 22
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can also use the command <b>echo</b> to print its arguments and then a 
+"pipe" (vertical bar) to have the output of <b>echo</b> be the input to
+the next program.  We'll enter 11 and 22 into our program that way below.
+(The pipe and file redirection are Unix constructs that are <i>very</i>
+powerful.  You will grow to love them):
+
+<pre>
+UNIX> <font color=darkred><b>echo 11 22</b></font>
+11 22
+UNIX> <font color=darkred><b>echo 11 22 | ./readtwo</b></font>
+I is 11
+J is 22
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Now, what happens when you don't enter an integer?  For example, in the first
+call below, we call <b>rt2</b> with a blank line as input, and in the second
+call, we input a non-number followed by a numer:
+
+<pre>
+UNIX> <font color=darkred><b>echo "" | ./readtwo</b></font>
+I is 0
+J is 4196288
+UNIX> <font color=darkred><b>echo Fred 44 | ./readtwo</b></font>
+I is 0
+J is 4196288
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+In both cases, <b>i</b> becomes 0 and <b>j</b> becomes 4196288.
+This is because in both cases, the first <b>cin</b> call failed, and <b>i</b>
+and <b>j</b> are left uninitialized.  The values are random, and vary from 
+machine to machine.  You can't count on integers being initialized to zero,
+so be careful with uninitialized variables!  
+<p>
+With the first call, it's pretty clear why both <b>cin</b> calls failed --
+there was no input.  However, with the second one, you might think that 
+since the second value is a number, the second <b>cin</b> call should succeed
+and <b>j</b> should become 44.  This doesn't happen, because once <b>cin</b>
+fails, you have to "clear" it by calling <b>cin.clear()</b> to get it to work properly.
+But first, how do you determine that <b>cin</b> failed?  You do that by putting the
+<b>cin</b> call into an <b>if</b> statement -- each <b>cin</b> statement is actually a boolean
+value that returns <tt>true</tt> if the <b>cin</b> statement succeeded and <tt>false</tt> if it failed.
+<p>
+We do that in 
+<b><a href=rt2.cpp>rt2.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Read in two integers and error check whether you were successful. */</font>
+
+int main()
+{
+  int i, j;
+
+  if (cin &gt;&gt; i) {
+    cout &lt;&lt; "I is " &lt;&lt; i &lt;&lt; endl;
+  } else {
+    cout &lt;&lt; "Bad cin call reading i -- calling cin.clear()\n";
+    cin.clear();
+  }
+
+  if (cin &gt;&gt; j) {
+    cout &lt;&lt; "J is " &lt;&lt; j &lt;&lt; endl;
+  } else {
+    cout &lt;&lt; "Bad cin call reading j -- calling cin.clear()\n";
+    cin.clear();
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+Of course, when we run it, it doesn't really work as expected:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o rt2 rt2.cpp</b></font>
+UNIX> <font color=darkred><b>echo Fred 44 | ./rt2</b></font>
+Bad cin call reading i -- calling cin.clear()
+Bad cin call reading j -- calling cin.clear()
+UNIX> 
+</pre>
+
+The second <b>cin</b> call failed just like the first one did.
+This is because when you call <b>cin.clear()</b>
+it resets <b>cin</b>, but it is still trying to read "Fred".  You have to go ahead
+and read the erroneous integer as a string before moving on.  The better version is
+in <b><a href=rt3.cpp>rt3.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Reading two integers, testing for failures, and then
+   reading the offending non-integer as a string to move
+   onto the next integer. */</font>
+
+int main()
+{
+  int i, j;
+  string s;
+
+  if (cin &gt;&gt; i) {
+    cout &lt;&lt; "I is " &lt;&lt; i &lt;&lt; endl;
+  } else {
+    cout &lt;&lt; "Bad cin call reading i -- calling cin.clear()\n";
+    cin.clear();
+    cin &gt;&gt; s;       <font color=blue>// Here's where we read the string</font>
+  }
+
+  if (cin &gt;&gt; j) {
+    cout &lt;&lt; "J is " &lt;&lt; j &lt;&lt; endl;
+  } else {
+    cout &lt;&lt; "Bad cin call reading j -- calling cin.clear()\n";
+    cin.clear();
+    cin &gt;&gt; s;
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+Now, the second <b>cin</b> call reads <b>j</b> successfully:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o rt3 rt3.cpp</b></font>
+UNIX> <font color=darkred><b>echo Fred 44 | ./rt3 </b></font>
+Bad cin call reading i -- calling cin.clear()
+J is 44
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Of course, when we call it on the empty file, both <b>cin</b> calls fail.  
+We can detect whether the failures are due to reaching the end of the file by using
+<b>cin.eof()</b> after the failure, as in
+<b><a href=rt4.cpp>rt4.cpp</a></b>:
+
+<b><a href=rt4.cpp>rt4.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Reading two integers, testing for failures, and differentiating
+   whether the failures are due to EOF (end of file), or due to an
+   unsuccessful integere conversion. */</font>
+
+int main()
+{
+  int i, j;
+  string s;
+
+  if (cin &gt;&gt; i) {
+    cout &lt;&lt; "I is " &lt;&lt; i &lt;&lt; endl;
+  } else {
+    if (cin.eof()) return 1;      <font color=blue>// Here's we check for end-of-file, and terminate the program.</font>
+    cout &lt;&lt; "Bad cin call reading i -- calling cin.clear()\n";
+    cin.clear();
+    cin &gt;&gt; s;
+  }
+
+  if (cin &gt;&gt; j) {
+    cout &lt;&lt; "J is " &lt;&lt; j &lt;&lt; endl;
+  } else {
+    if (cin.eof()) return 1;
+    cout &lt;&lt; "Bad cin call reading j -- calling cin.clear()\n";
+    cin.clear();
+    cin &gt;&gt; s;
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o rt4 rt4.cpp</b></font>
+UNIX> <font color=darkred><b>echo "" | ./rt4</b></font>
+UNIX> <font color=darkred><b>echo Fred | ./rt4</b></font>
+Bad cin call reading i -- calling cin.clear()
+UNIX> <font color=darkred><b>echo Fred Wilma | ./rt4</b></font>
+Bad cin call reading i -- calling cin.clear()
+Bad cin call reading j -- calling cin.clear()
+UNIX> <font color=darkred><b>echo Fred 44 | ./rt4</b></font>
+Bad cin call reading i -- calling cin.clear()
+J is 44
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h2>Reading single characters using cin</h2>
+
+If you use <b>cin</b> to read variables that are of type <b>char</b>, it reads in single 
+characters.  For example, the program
+<b><a href=ncnl.cpp>ncnl.cpp</a></b>
+uses <b>cin</b> to read each character of standard input.  It counts the total number
+of characters and the total number of L's.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* - Use cin to read single characters.
+   - Count the total number of characters.
+   - Count the number of L's. */</font>
+
+int main()
+{
+  int nc;      <font color=blue>// Total number of characters</font>
+  int nl;      <font color=blue>// Total number of L's</font>
+  char c;
+
+  nc = 0;
+  nl = 0;
+
+  while (cin &gt;&gt; c) {
+    nc++;
+    if (c == 'L') nl++;
+  }
+
+  cout &lt;&lt; "# of characters: " &lt;&lt; nc &lt;&lt; endl;
+  cout &lt;&lt; "# of L's: " &lt;&lt; nl &lt;&lt; endl;
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we run it on 
+<b><a href=input-mixed.txt>input-mixed.txt</a></b>
+and on 
+<b><a href=ncnl.cpp>ncnl.cpp</a></b>, we see that they have two and four two L's
+respectively.
+
+<pre>
+UNIX> <font color=darkred><b>cat input-mixed.txt</b></font>
+Love me 2 times baby.  Love me twice 2 day.
+UNIX> <font color=darkred><b>./ncnl < input-mixed.txt</b></font>
+# of characters: 33
+# of L's: 2
+UNIX> <font color=darkred><b>./ncnl < ncnl.cpp</b></font>
+# of characters: 308
+# of L's: 4
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The Unix program <b>wc</b> counts lines, words and characters in a file.  When
+we run it on the two input files, we see that the number of characters differs
+from <b>ncnl</b>:
+
+<pre>
+UNIX> <font color=darkred><b>wc input-mixed.txt</b></font>
+ 1 10 44 input-mixed.txt
+UNIX> <font color=darkred><b>wc ncnl.cpp</b></font>
+ 25  87 444 ncnl.cpp
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<b>wc</b> reports that <b>input-mixed.txt</b> has 44 characters, yet <b>ncnl</b>
+only read 33.  Why?  The reason is because when <b>cin</b> reads characters, it
+doesn't read "whitespace" -- spaces, tabs and newlines.  If you count the number
+of non-whitespace characters in <b>input-mixed.txt</b>, you'll see that it has 33.
+
+
+<hr>
+<h2>Four common cin errors: #1 -- "!cin"</h2>
+
+The first common error is exemplified by the program in
+<b><a href=readten-bad.cpp>readten-bad.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* A program that tries to use !cin to test for an error. */</font>
+
+int main()
+{
+  int i, n1;
+
+  for (i = 0; i &lt; 10; i++) {
+    if (!cin &gt;&gt; n1) {
+      cout &lt;&lt; "Done\n";
+      return 0;
+    }
+    cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " equals " &lt;&lt; n1 &lt;&lt; endl;
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+The intent of this program is to read ten integers and print them out.  If one of the <b>cin</b>
+calls fails, then the program should exit prematurely, printing "Done."  However, let's run it
+on exactly 10 integers:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o readten-bad readten-bad.cpp</b></font>
+UNIX> <font color=darkred><b>echo 10 11 12 13 14 15 16 17 18 19 | ./readten-bad</b></font>
+Number 0 equals 4096
+Number 1 equals 4096
+Number 2 equals 4096
+Number 3 equals 4096
+Number 4 equals 4096
+Number 5 equals 4096
+Number 6 equals 4096
+Number 7 equals 4096
+Number 8 equals 4096
+Number 9 equals 4096
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Hmmm.  The bad line is
+<p><center><table border=3 cellpadding=3><td><pre>
+    if (!cin &gt;&gt; n1) {
+</pre></td></table></center><p>
+
+The boolean "not" operator (!) is being applied only to <b>cin</b>, and not to the entire 
+expression.  This is an "order of operations" thing -- (!) has higher precedence than (>>).
+The bad part about this mistake is that the program compiles legally -- evidently you can
+negate <b>cin</b>.  Perhaps I should look up what it does, but I'm not going to -- it seems
+like a bad idea regardless of its meaning.
+<p>
+To fix this, you must parenthesize as in 
+<b><a href=readten-good.cpp>readten-good.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* A program that does not negate cin, but instead negates
+   the whole boolean expression.  It reads in up to ten numbers, 
+   printing "Done" and exiting when it fails to read a number. */</font>
+
+int main()
+{
+  int i, n1;
+
+  for (i = 0; i &lt; 10; i++) {
+    if (!(cin &gt;&gt; n1)) {            <font color=blue>// Here is the correct line.</font>
+      cout &lt;&lt; "Done\n";
+      return 0;
+    }
+    cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " equals " &lt;&lt; n1 &lt;&lt; endl;
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+This one works as it should:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o readten-good readten-good.cpp</b></font>
+UNIX> <font color=darkred><b>echo 10 11 12 13 14 15 16 17 18 19 | ./readten-good</b></font>
+Number 0 equals 10
+Number 1 equals 11
+Number 2 equals 12
+Number 3 equals 13
+Number 4 equals 14
+Number 5 equals 15
+Number 6 equals 16
+Number 7 equals 17
+Number 8 equals 18
+Number 9 equals 19
+UNIX> <font color=darkred><b>echo 55 66 | ./readten-good</b></font>
+Number 0 equals 55
+Number 1 equals 66
+Done
+UNIX> <font color=darkred><b>echo 44 Fred | ./readten-good</b></font>
+Number 0 equals 44
+Done
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr><h2>Four common cin errors: #2 -- cin.eof() is <i>not</i> proactive!</h2>
+
+I've seen this one on tests so many times that I have to address it here.  <b>cin.eof()</b>
+does not return TRUE when you have reached the end of the file.  It returns TRUE when you have
+tried to read something, and that has failed because you are at the end of the file.  That's
+a subtle distinction, but very important.  
+<p>
+Take a look at
+<b><a href=badeof.cpp>badeof.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* An example of making a mistake testing for the end of file.  This is because
+  cin.eof() tells you if your last reading command failed because you are at the end of file.  It
+  does not tell you whether you are at the end of the file now, and your next reading command will
+  fail because of that. */</font>
+
+int main()
+{
+  string s;
+  int i;
+
+  i = 0;
+  while (!cin.eof()) {
+    i++;
+    cin &gt;&gt; s;
+    cout &lt;&lt; "String " &lt;&lt; i &lt;&lt; " is " &lt;&lt; s &lt;&lt; endl;
+  }
+  return 0;
+}
+</pre></td></table></center><p>
+
+This is the type of erroneous code I see on tests.  The intent of this program is to 
+number the words on standard input and print them out.  However, it has a bug regarding
+<b>cin.eof()</b>:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o badeof badeof.cpp</b></font>
+UNIX> <font color=darkred><b>echo Fred Wilma | ./badeof</b></font>
+String 1 is Fred
+String 2 is Wilma
+String 3 is Wilma
+UNIX> <font color=darkred><b>echo "" | ./badeof</b></font>
+String 1 is 
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Both times, the program prints an extra line.  In the first case, it is because after
+the program reads both words, 
+the <b>"if (!cin.eof())"</b> statement returns true.  It returns true because you haven't
+tried to read the word yet and failed.  So, in this case, "<b>cin &gt;&gt; s</b>" fails, 
+and <b>s</b> remains the same, which is why that last line says "<b>String 3 is Wilma</b>".
+Since the <b>cin</b> statement failed, the next <b>cin.eof()</b> now returns <tt>false</tt>, 
+and the program exits.  
+<p>
+I like to say that <b>cin.eof()</b> and <b>cin.fail()</b> are not proactive, but reactive.
+They are only true when a previous <b>cin</b> statement failed, and they are telling you why.
+<p>
+Below are two ways to write the program correctly.  The first uses <b>cin.eof()</b>
+correctly, and the second doesn't bother using <b>cin.eof()</b> at all.  Personally,
+I like the second better because it's less convoluted.
+
+<center>
+<table border=3 cellpadding=3><td valign=top>
+<b><a href=good-eof-1.cpp>good-eof-1.cpp</a></b>:
+
+<pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+int main()
+{
+  string s;
+  int i;
+
+  i = 0;
+  cin &gt;&gt; s;
+  while (!cin.eof()) {
+    i++;
+    cout &lt;&lt; "String " &lt;&lt; i &lt;&lt; " is " &lt;&lt; s &lt;&lt; endl;
+    cin &gt;&gt; s;
+  }
+  return 0;
+}
+</pre>
+</td><td valign=top>
+<b><a href=good-eof-2.cpp>good-eof-2.cpp</a></b>
+
+<pre>#include &lt;iostream&gt;
+using namespace std;
+
+int main()
+{
+  string s;
+  int i;
+
+  i = 0;
+  while (cin &gt;&gt; s) {
+    i++;
+    cout &lt;&lt; "String " &lt;&lt; i &lt;&lt; " is " &lt;&lt; s &lt;&lt; endl;
+  }
+  return 0;
+}
+</pre>
+</td></table></center><p>
+
+
+<hr><h2>Four common cin errors: #3 -- cin reads words and not lines</h2>
+
+Mistake #3 is when you think that <b>cin</b> works on lines, forgetting that it works on 
+a word-by-word basis:
+
+<pre>
+UNIX> <font color=darkred><b>cat input-twenty.txt</b></font>
+10 110
+11 109
+12 108
+13 107
+14 106
+15 105
+16 104
+17 103
+18 102
+19 101
+UNIX> <font color=darkred><b>./readten-good < input-twenty.txt</b></font>
+Number 0 equals 10
+Number 1 equals 110
+Number 2 equals 11
+Number 3 equals 109
+Number 4 equals 12
+Number 5 equals 108
+Number 6 equals 13
+Number 7 equals 107
+Number 8 equals 14
+Number 9 equals 106
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The program is working fine -- <b>cin</b> reads words, not lines.
+<p>
+<hr><h2>Four common cin errors: #4 -- Clearing cin when it fails</h2>
+
+The last error is forgetting to clear <b>cin</b> and re-read bad input.  The
+program 
+<b><a href=forget-clear.cpp>forget-clear.cpp</a></b>
+attempts to read ten numbers and flag when a number is not read correctly:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This program attempts to read ten numbers and flag when a number is not read correctly.
+   It doesn't work, though, because it doesn't clear cin and then read the non-number 
+   as a string. */</font>
+
+int main()
+{
+  int i, n1;
+
+  for (i = 0; i &lt; 10; i++) {
+    if (!(cin &gt;&gt; n1)) {
+      cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " entered incorrectly\n";
+    } else {
+      cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " equals " &lt;&lt; n1 &lt;&lt; endl;
+    }
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we run it on 
+<b><a href=input-mixed.txt>input-mixed.txt</a></b>, numbers 2 and 8 should be correct, while
+the rest are not.  However, since we don't clear <b>cin</b>, each <b>cin</b> statement
+returns that it read incorrectly:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o forget-clear forget-clear.cpp</b></font>
+UNIX> <font color=darkred><b>cat input-mixed.txt</b></font>
+Love me 2 times baby.  Love me twice 2 day.
+UNIX> <font color=darkred><b>./forget-clear < input-mixed.txt</b></font>
+Number 0 entered incorrectly
+Number 1 entered incorrectly
+Number 2 entered incorrectly
+Number 3 entered incorrectly
+Number 4 entered incorrectly
+Number 5 entered incorrectly
+Number 6 entered incorrectly
+Number 7 entered incorrectly
+Number 8 entered incorrectly
+Number 9 entered incorrectly
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+When you try to fix this mistake, you need to remember to both clear <b>cin</b>, and
+then read the offending word.  The program
+<b><a href=forget-read.cpp>forget-read.cpp</a></b>
+remembers to do <b>cin.clear()</b>, but then each successive <b>cin</b> statement
+tries to read the same word ("Love"), and returns that it read incorrectly:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This tries to read 10 numbers, flagging a failure.  However, it doesn't
+   work, because when you have a failed conversion, you need to read the
+   failed word, in addition to doing clear(). */</font>
+
+int main()
+{
+  int i, n1;
+
+  for (i = 0; i &lt; 10; i++) {
+    if (!(cin &gt;&gt; n1)) {
+      cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " entered incorrectly\n";
+      cin.clear();
+    } else {
+      cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " equals " &lt;&lt; n1 &lt;&lt; endl;
+    }
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o forget-read forget-read.cpp</b></font>
+UNIX> <font color=darkred><b>./forget-read < input-mixed.txt</b></font>
+Number 0 entered incorrectly
+Number 1 entered incorrectly
+Number 2 entered incorrectly
+Number 3 entered incorrectly
+Number 4 entered incorrectly
+Number 5 entered incorrectly
+Number 6 entered incorrectly
+Number 7 entered incorrectly
+Number 8 entered incorrectly
+Number 9 entered incorrectly
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Finally, the program 
+<b><a href=forget-nothing.cpp>forget-nothing.cpp</a></b>
+reads the offending word after clearing <b>cin</b>, and also detects
+when input has ended, because that's when reading the string fails:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This program reads 10 numbers, identifying when it
+   reads a non-number, and also eof. */</font>
+
+int main()
+{
+  int i, n1;
+  string s;
+
+  for (i = 0; i &lt; 10; i++) {
+    if (!(cin &gt;&gt; n1)) {
+      cin.clear();
+      if (!(cin &gt;&gt; s)) return 0;       <font color=blue>// This reads the number and detects EOF</font>
+      cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " entered incorrectly\n";
+    } else {
+      cout &lt;&lt; "Number " &lt;&lt; i &lt;&lt; " equals " &lt;&lt; n1 &lt;&lt; endl;
+    }
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+When we run it, it correctly identifies numbers 2 and 8 as numbers.  The second
+run identifies that there are only two lines -- one incorrect and one correct.
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o forget-nothing forget-nothing.cpp</b></font>
+UNIX> <font color=darkred><b>./forget-nothing < input-mixed.txt</b></font>
+Number 0 entered incorrectly
+Number 1 entered incorrectly
+Number 2 equals 2
+Number 3 entered incorrectly
+Number 4 entered incorrectly
+Number 5 entered incorrectly
+Number 6 entered incorrectly
+Number 7 entered incorrectly
+Number 8 equals 2
+Number 9 entered incorrectly
+UNIX> <font color=darkred><b>./forget-nothing Fred 44</b></font>
+Number 0 entered incorrectly
+Number 1 equals 44
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
