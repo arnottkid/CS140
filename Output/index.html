@@ -1,0 +1,477 @@
+<title>CS140 Lecture notes -- Output</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Output</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI>Directory: <b>~jplank/cs140/Notes/Output</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Output>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Output</b></a>
+<LI> Last modification date: <i>
+Wed Jan 19 17:58:05 EST 2011
+</i>
+<hr>
+
+<h3>Cout and cerr</h3>
+
+When your program starts running, the operating system sets up two separate
+output streams for you.  They are called "standard output" and "standard error."
+You write to them using <b>cout</b> and <b>cerr</b> respectively.  For example,
+the program <b><a href=coutcerr.cpp>coutcerr.cpp</a></b> writes one line to 
+<b>cout</b> and one to <b>cerr</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+main()
+{
+  cout &lt;&lt; "Writing this to cout.\n";
+  cerr &lt;&lt; "Writing this to cerr.\n";
+}
+</pre></td></table></center><p>
+
+By default both standard output and standard error go to the terminal,
+so running this without any file redirection results in both lines 
+going to the terminal:
+
+<pre>
+UNIX> <font color=darkred><b>g++ coutcerr.cpp -o coutcerr</b></font>
+UNIX> <font color=darkred><b>coutcerr</b></font>
+Writing this to cout.
+Writing this to cerr.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+However, if you redirect standard output to a file, you see that standard
+error still goes to the terminal.  This is nice because you can alert the
+user to erroneous conditions even he or she is redirecting standard output
+to a file:
+
+<pre>
+UNIX> <font color=darkred><b>coutcerr > output.txt</b></font>
+Writing this to cerr.
+UNIX> <font color=darkred><b>cat output.txt</b></font>
+Writing this to cout.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+With most shells, you can redirect both standard output and standard error
+to a file with "&gt;&amp;":
+
+<pre>
+UNIX> <font color=darkred><b>coutcerr >& output.txt</b></font>
+UNIX> <font color=darkred><b>cat output.txt</b></font>
+Writing this to cout.
+Writing this to cerr.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3> Printf() with numbers</h3>
+
+While <b>cout</b> is convenient, it is also a pain for formatted output.
+When you want to format your output precisely, you should use the C 
+formatting procedure <b>printf()</b>.   <b>Printf()</b> is a weird
+procedure as it can take a variable number of parameters.  The first
+parameter is always a <i>formatting string</i>.  In its simplest form,
+the formatting string has nothing special about it, and it's printed on standard 
+output
+(in <b><a href=hwpf.cpp>hwpf.cpp</a></b>):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+main()
+{
+  printf("Hello world\n");
+}
+</pre></td></table></center><p>
+
+First, when you use <b>printf()</b>, you should include <b>cstdio</b> (the C standard I/O 
+library). The output of this program is pretty obvious:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o hwpf hwpf.cpp</b></font>
+UNIX> <font color=darkred><b>hwpf</b></font>
+Hello world
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You may specify that <b>printf()</b> print additional arguments by putting a
+percent sign in the formatting string with more special formatting commands.
+For example, putting "%d" in the formatting string specifies to print the next
+parameter as an integer.  For example, 
+<b><a href=ints1.cpp>ints1.cpp</a></b> shows a <b>for()</b> loop
+where each <b>printf()</b> statement prints three integers, <i>i</i>, <i>i<sup>2</sup></i>, and
+<i>2i</i>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+main()
+{
+  int i, j;
+
+   for (i = 0; i &lt;= 10; i++) {
+     j = i*i;
+     printf("I is %d - i*i is %d - i*2 is %d\n", i, j, i*2);
+   }
+}
+</pre></td></table></center><p>
+The output is straightforward:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o ints1 ints1.cpp</b></font>
+UNIX> <font color=darkred><b>ints1</b></font>
+I is 0 - i*i is 0 - i*2 is 0
+I is 1 - i*i is 1 - i*2 is 2
+I is 2 - i*i is 4 - i*2 is 4
+I is 3 - i*i is 9 - i*2 is 6
+I is 4 - i*i is 16 - i*2 is 8
+I is 5 - i*i is 25 - i*2 is 10
+I is 6 - i*i is 36 - i*2 is 12
+I is 7 - i*i is 49 - i*2 is 14
+I is 8 - i*i is 64 - i*2 is 16
+I is 9 - i*i is 81 - i*2 is 18
+I is 10 - i*i is 100 - i*2 is 20
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+However, it is ugly.  It's nicer if you can make sure that all those ints print
+with the same number of characters so that they line up.  You do that by putting
+a <i>width</i> specification in front of the 'd' in "%d" (in
+<b><a href=ints2.cpp>ints2.cpp</a></b>):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+main()
+{
+  int i, j;
+
+   for (i = 0; i &lt;= 10; i++) {
+     j = i*i;
+     printf("I is %2d - i*i is %3d - i*2 is %2d\n", i, j, i*2);
+   }
+}
+</pre></td></table></center><p>
+
+This output is much nicer: 
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o ints2 ints2.cpp</b></font>
+UNIX> <font color=darkred><b>ints2</b></font>
+I is  0 - i*i is   0 - i*2 is  0
+I is  1 - i*i is   1 - i*2 is  2
+I is  2 - i*i is   4 - i*2 is  4
+I is  3 - i*i is   9 - i*2 is  6
+I is  4 - i*i is  16 - i*2 is  8
+I is  5 - i*i is  25 - i*2 is 10
+I is  6 - i*i is  36 - i*2 is 12
+I is  7 - i*i is  49 - i*2 is 14
+I is  8 - i*i is  64 - i*2 is 16
+I is  9 - i*i is  81 - i*2 is 18
+I is 10 - i*i is 100 - i*2 is 20
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Each integer is printed with a given number of characters, right justified.
+Printing <b>doubles</b> is more problematic.  (Oh, by the way, we don't use
+<b>float</b>'s in this class.  They are too prone to round-off error.)
+You specify a float with "%lf".  By default, that prints the double to six
+decimal digits.  If you want to specify widths, as we did with <b>int</b>'s
+above, you use "%<i>t.d</i>lf", where <i>t</i> is the total width and <i>d</i>
+is the number of decimal digits.  For example, the following program
+(<b><a href=100-rand.cpp>100-rand.cpp</a></b>) prints 100 random <b>double</b>'s
+between 0 and 100:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+main()
+{
+  int i, j;
+
+  srand48(time(0));
+
+  for (i = 0; i &lt; 10; i++) {
+    for (j = 0; j &lt; 10; j++) {
+      printf(" %5.2lf", drand48()*100);
+    } 
+    printf("\n");
+  }
+}
+</pre></td></table></center><p>
+
+A few things about this program.  First, you must include <b>cstdlib</b>.  Second, 
+the random number generator that I suggest you use is <b>srand48()/drand48()/lrand48()</b>:
+<p>
+<UL>
+<LI> <b>srand48()</b> sets the <i>seed</i> for the random number generator.  Each different
+seed produces a different set of random numbers.  Seeds are nice because you sometimes want
+the same sequence of random numbers to be produced so that you can debug your program.
+Typically, when you want to set a seed to be different each time you run the program, you
+seed it with <b>time(0)</b>, which is the number of seconds since time began (January 1, 1970).
+<p>
+<LI> <b>drand48()</b> returns a random <b>double</b>, uniformly distributed between 0 and 1.
+<p>
+<LI> <b>lrand48()</b> returns a random <b>int</b>, uniformly distributed between 0 and (2<sup>31</sup>-1).
+</UL>
+
+<p>
+The <b>printf()</b> statement says to print each double to a width of 5 characters, right justified,
+with 2 decimal digits:
+
+<pre>
+UNIX> <font color=darkred><b>100-rand</b></font>
+ 76.11 45.29 35.25 40.09 27.20 41.90 27.75 72.27 62.17 96.67
+ 80.62 38.62 88.12 41.94 86.72 93.64  4.25 35.78  8.87 59.27
+ 74.02 23.34 15.66  1.29 12.15 44.43 87.88 10.17 87.21 10.18
+ 45.64 73.67 54.39 51.41 97.11 56.75 59.21 69.43 36.47 72.88
+ 48.08 59.88 64.59 26.68 98.35 97.89 85.15 82.55 34.06 60.39
+ 50.03  6.57 28.37 63.21 20.75 93.94 45.87 26.25 51.77 24.90
+ 41.25 72.24 31.76 44.91 83.14 61.36 81.06 86.61 97.66 65.91
+ 57.82  1.64 42.78 72.49 77.68 49.56  8.33 42.26 78.89 61.34
+ 44.50 67.50 37.95 10.00 21.39 91.21 51.68 45.80 11.31 39.12
+ 87.94 95.23 21.89 83.65 76.09 50.11 29.94 79.93 62.87 44.83
+UNIX> <font color=darkred><b></b></font>
+</pre>
+The <b>printf()</b> statement results in the numbers being aligned in columns.
+If you wait a second and run it again, you get different values:
+
+<pre>
+UNIX> <font color=darkred><b>100-rand</b></font>
+ 91.88 95.38 59.83 64.24  1.21 17.03 17.62 39.94 90.68 63.26
+ 71.98 21.78 68.20 10.62 11.15 22.54 31.40 45.54  8.98 85.70
+ 39.74 45.42 30.63  3.04 13.12 83.20 39.27 57.68 45.46 15.90
+ 41.62 17.57 34.99 97.17 60.36 32.35 59.80 82.19 48.92 55.18
+ 22.02 32.89  9.31  7.01 60.52 49.29 53.47 75.44 86.22 40.51
+ 69.27 32.95 28.21 50.17 45.63 24.21 31.45 87.47 49.86  3.06
+ 10.12  6.42 81.01 52.28 12.77 73.53 84.88 41.18 81.50 65.22
+ 70.62 26.82  3.57 20.18 21.39 83.17 37.94 14.62 18.45 13.74
+  7.01 36.11 71.14 17.12 43.60 60.47 56.38  0.95 72.47 18.16
+ 57.21 80.62 41.74  7.72 59.06 26.75 41.93 33.44 16.87 96.82
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Printf() with Strings, left-justifying</h3>
+
+The handling of strings is a little cumbersome because <b>printf()</b> doesn't
+handle C++ strings.  Instead, it handles C-style strings, which are character
+arrays that are <i>null-terminated</i>.  In other words, their last character
+is the character '\0'.  You don't need to concern yourself with the intricacies
+of C-style strings.  Just remember the following three rules:
+
+<OL>
+<LI> String literals, like "Hello World", are interpreted by the compiler as C-style
+strings.
+<LI> You can convert a C++ string into a C-style string by invoking the method <b>c_str()</b>.
+<LI> You can convert a C-style string to a C++ string with simple assignment.  (I don't do
+     that in this example, but I will very soon).
+</OL>
+
+I'll illustrate with an example that uses <b>printf()</b> to print strings.  
+Suppose you have a file that contains first names, 
+last names and social security numbers, such as
+<b><a href=info-file.txt>info-file.txt</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+Charlie Crossway 286-50-9109
+Molly Needham 825-03-8649
+Molly Nashville 543-73-8293
+Cindy Endgame 003-12-8676
+Tamika Marty 230-97-5641
+John Scar 724-14-6244
+Lazar Argive 258-28-8603
+Blanche Subterfuge 790-84-5341
+Raynoch Sarsaparilla 151-05-7446
+Baine Junta 761-03-0452
+</pre></td></table></center><p>
+
+And suppose you want to print it more nicely, so that first names, last names, and SSN's are
+in their own columns.   Here's some code to do it (<b><a href=ssn-reader.cpp>ssn-reader.cpp</a></b>):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+main()
+{
+  string fn, ln, ssn;
+
+  while (cin &gt;&gt; fn &gt;&gt; ln &gt;&gt; ssn) {
+    printf("%-10s %-13s %11s\n", fn.c_str(), ln.c_str(), ssn.c_str());
+  }
+}
+</pre></td></table></center><p>
+
+With the width specification, I use negative numbers to left-justify the strings, and pad them 
+to 10, 13 and 11 characters respectively:
+
+<pre>
+UNIX> <font color=darkred><b>ssn-reader < info-file.txt</b></font>
+Charlie    Crossway      286-50-9109
+Molly      Needham       825-03-8649
+Molly      Nashville     543-73-8293
+Cindy      Endgame       003-12-8676
+Tamika     Marty         230-97-5641
+John       Scar          724-14-6244
+Lazar      Argive        258-28-8603
+Blanche    Subterfuge    790-84-5341
+Raynoch    Sarsaparilla  151-05-7446
+Baine      Junta         761-03-0452
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Chars, octal and hexadecimal</h3>
+
+Three additional format specifications are "%c" to print characters, "%o" to print octal,
+and "%x" to print hexadecimal.  First, the <i>ASCII character set</i> is a mapping from 
+integers to printable characters.  For example, 'A' is 65, 'a' is 97 and '0' is 48.  
+Using "%c" says to print an integer value as a character, using its ASCII value.
+An example is in 
+<b><a href=printchars.cpp>printchars.cpp</a></b>, which prints out all characters from 32 to 127:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+main()
+{
+  int i, j;
+
+  for (i = 32; i &lt; 128; i += 8) {
+    for (j = 0; j &lt; 8; j++) {
+      printf("%3d: '%c'  ", i+j, i+j);
+    }
+    printf("\n");
+  }
+}
+</pre></td></table></center><p>
+
+Observe that <i>i</i> is an <b>int</b> and not a <b>char</b>, but the code works fine.  
+The reason it works is because "%c" prints the character based on the ASCII value of
+a number, and <b>char</b>'s and <b>int</b>'s are both numbers.
+<p>
+Here's the output:
+
+<pre>
+UNIX> <font color=darkred><b>g++ printchars.cpp -o printchars</b></font>
+UNIX> <font color=darkred><b>printchars</b></font>
+ 32: ' '   33: '!'   34: '"'   35: '#'   36: '$'   37: '%'   38: '&'   39: '''  
+ 40: '('   41: ')'   42: '*'   43: '+'   44: ','   45: '-'   46: '.'   47: '/'  
+ 48: '0'   49: '1'   50: '2'   51: '3'   52: '4'   53: '5'   54: '6'   55: '7'  
+ 56: '8'   57: '9'   58: ':'   59: ';'   60: '<'   61: '='   62: '>'   63: '?'  
+ 64: '@'   65: 'A'   66: 'B'   67: 'C'   68: 'D'   69: 'E'   70: 'F'   71: 'G'  
+ 72: 'H'   73: 'I'   74: 'J'   75: 'K'   76: 'L'   77: 'M'   78: 'N'   79: 'O'  
+ 80: 'P'   81: 'Q'   82: 'R'   83: 'S'   84: 'T'   85: 'U'   86: 'V'   87: 'W'  
+ 88: 'X'   89: 'Y'   90: 'Z'   91: '['   92: '\'   93: ']'   94: '^'   95: '_'  
+ 96: '`'   97: 'a'   98: 'b'   99: 'c'  100: 'd'  101: 'e'  102: 'f'  103: 'g'  
+104: 'h'  105: 'i'  106: 'j'  107: 'k'  108: 'l'  109: 'm'  110: 'n'  111: 'o'  
+112: 'p'  113: 'q'  114: 'r'  115: 's'  116: 't'  117: 'u'  118: 'v'  119: 'w'  
+120: 'x'  121: 'y'  122: 'z'  123: '{'  124: '|'  125: '}'  126: '~'  127: ''  
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+One nice thing about ASCII is that the upper case, lower case and decimal characters are all contiguously
+numbered.  Therefore, you can do math on the numbers with logical results.  For example, if <i>i</i>
+is a lower case letter, you can convert it to an upper case letter with: <b>i + ('A'-'a')</b>.
+
+<p>
+When you specify a character, such as 'A' in a program, the compiler simply turns it into its 
+ASCII integer.  Thus, 'A' really equals 65.  It's just easier to read it as 'A'.
+<p>
+The lower ASCII values are some of the weirder characters, like TAB, BACKSPACE and NEWLINE.
+<p>
+There are two other ways to print out integers -- as octal with "%o", and as hexadecimal with "%x".
+By convention, when you specify an integer with a preceding '0', the C++ compiler treats it as
+octal, or base eight.  When you specify an integer with a preceding "0x", the C++ compiler treats
+it as hexadecimal, or base sixteen, with the characters 'a' through 'f' corresponding to the
+digits from 10 through 15.  
+<p>
+Look at an example program in 
+<b><a href=weirdints.cpp>weirdints.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+main()
+{
+  int i;
+
+  printf(" 010 is equal to: %2d   0%02o  0x%02x\n", 010, 010, 010);
+  printf("0x10 is equal to: %2d   0%02o  0x%02x\n", 0x10, 0x10, 0x10);
+
+  printf("\n");
+
+  for (i = 0; i &lt; 32; i++) {
+    printf("    %2d  0%02o  0x%02x", i, i, i);
+    if (i%4 == 3) printf("\n");
+  }
+}
+</pre></td></table></center><p>
+
+The first line shows that "010" is interpreted by the C++ compiler as 10 in octal, 
+which is equal to 8 in decimal, and 0x8 in hexadecimal.  The second line shows that "0x10"
+is interpreted as 10 in hexadecimal, which is 16 in decimal, and 20 in octal.  The
+remaining lines show the values from 0 to 31 in decimal, octal and hexadecimal:
+
+<pre>
+UNIX> <font color=darkred><b>g++ weirdints.cpp -o weirdints</b></font>
+UNIX> <font color=darkred><b>weirdints</b></font>
+ 010 is equal to:  8   010  0x08
+0x10 is equal to: 16   020  0x10
+
+     0  000  0x00     1  001  0x01     2  002  0x02     3  003  0x03
+     4  004  0x04     5  005  0x05     6  006  0x06     7  007  0x07
+     8  010  0x08     9  011  0x09    10  012  0x0a    11  013  0x0b
+    12  014  0x0c    13  015  0x0d    14  016  0x0e    15  017  0x0f
+    16  020  0x10    17  021  0x11    18  022  0x12    19  023  0x13
+    20  024  0x14    21  025  0x15    22  026  0x16    23  027  0x17
+    24  030  0x18    25  031  0x19    26  032  0x1a    27  033  0x1b
+    28  034  0x1c    29  035  0x1d    30  036  0x1e    31  037  0x1f
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Octal is useful as a way to show bits in groups of three.  For example, 0644
+is equal to 110 100 100 in binary.  Sometimes that is convenient.
+<p>
+Hexadecimal is much more convenient, because 16 = 2<sup>4</sup>, which means
+that you can represent a byte with exactly two digits in hexadecimal.  For
+that reason, hexadecimal is used to represent pointers in programs (You'll see
+more of that later in your career).  As another example, sometimes 
+computer routers are identified by six-byte ID numbers.  Often you see these
+id's represented by bytes in hexadecimal separated by colons, such as
+"00:19:e3:d8:5c:64".  The hexadecimal makes reading the bytes convenient.
+
+<p>
+A final detail of 
+<b><a href=weirdints.cpp>weirdints.cpp</a></b> -- the <b>printf()</b> statement is:
+
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    printf("    %2d  0%02o  0x%02x", i, i, i);
+</pre></td></table></center><p>
+
+When you put a zero in front of a width specification, that says to pad the number
+to the given number of digits, and put in leading zeros instead of spaces.  Without
+that specification, the number zero would have been printed as "0x 0"  instead of "0x00".
+
+

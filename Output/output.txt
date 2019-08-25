@@ -1,0 +1,2 @@
+Writing this to cout.
+Writing this to cerr.
