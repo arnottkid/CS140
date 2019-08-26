@@ -1,9 +1,10 @@
+/* Print the character values of numbers from 32 to 127, in eight columns. */
+
 #include <iostream>
 #include <cstdio>
-#include <cstdlib>
 using namespace std;
 
-main()
+int main()
 {
   int i, j;
 
@@ -13,4 +14,5 @@ main()
     }
     printf("\n");
   }
+  return 0;
 }

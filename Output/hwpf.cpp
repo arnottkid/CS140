@@ -1,8 +1,9 @@
-#include <iostream>
-#include <cstdio>
-using namespace std;
+/* This program uses printf() instead of cout to print hello world. */
 
-main()
+#include <cstdio>
+
+int main()
 {
   printf("Hello world\n");
+  return 0;
 }

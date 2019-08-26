@@ -1,13 +1,21 @@
-#include <iostream>
+/* This is the same as ints1.cpp, except:
+
+     - We print i and 2*i with a field width of two characters.
+     - We print i*i with a field width of three characters.
+
+   In that way, they all line up in nice, neat columns. */
+
 #include <cstdio>
 using namespace std;
 
-main()
+int main()
 {
   int i, j;
 
-   for (i = 0; i <= 10; i++) {
-     j = i*i;
-     printf("I is %2d - i*i is %3d - i*2 is %2d\n", i, j, i*2);
-   }
+  for (i = 0; i <= 10; i++) {
+    j = i*i;
+    printf("I is %2d - i*i is %3d - i*2 is %2d\n", i, j, i*2);
+//               ^^^          ^^^          ^^^
+  }
+  return 0;
 }

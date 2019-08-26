@@ -1,13 +1,14 @@
 <title>CS140 Lecture notes -- Output</title>
 <body bgcolor=ffffff>
 <h1>CS140 Lecture notes -- Output</h1>
-<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
 <LI>Directory: <b>~jplank/cs140/Notes/Output</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Output>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Output</b></a>
+<LI> Original Notes: <i> 2009 or so, maybe.</i>
 <LI> Last modification date: <i>
-Wed Jan 19 17:58:05 EST 2011
+Sun Aug 25 11:51:00 EDT 2019
 </i>
 <hr>
 
@@ -20,23 +21,28 @@ the program <b><a href=coutcerr.cpp>coutcerr.cpp</a></b> writes one line to
 <b>cout</b> and one to <b>cerr</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* A program that writes to the two default output streams: 
+
+   - cout to standard output
+   - cerr to standard error. */</font>
+
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   cout &lt;&lt; "Writing this to cout.\n";
   cerr &lt;&lt; "Writing this to cerr.\n";
+  return 0;
 }
 </pre></td></table></center><p>
-
 By default both standard output and standard error go to the terminal,
 so running this without any file redirection results in both lines 
 going to the terminal:
 
 <pre>
 UNIX> <font color=darkred><b>g++ coutcerr.cpp -o coutcerr</b></font>
-UNIX> <font color=darkred><b>coutcerr</b></font>
+UNIX> <font color=darkred><b>./coutcerr</b></font>
 Writing this to cout.
 Writing this to cerr.
 UNIX> <font color=darkred><b></b></font>
@@ -70,31 +76,37 @@ UNIX> <font color=darkred><b></b></font>
 <h3> Printf() with numbers</h3>
 
 While <b>cout</b> is convenient, it is also a pain for formatted output.
-When you want to format your output precisely, you should use the C 
+When I want to format my output precisely, I use the C 
 formatting procedure <b>printf()</b>.   <b>Printf()</b> is a weird
 procedure as it can take a variable number of parameters.  The first
 parameter is always a <i>formatting string</i>.  In its simplest form,
 the formatting string has nothing special about it, and it's printed on standard 
-output
-(in <b><a href=hwpf.cpp>hwpf.cpp</a></b>):
+output (in <b><a href=hwpf.cpp>hwpf.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;cstdio&gt;
-using namespace std;
+<font color=blue>/* This program uses printf() instead of cout to print hello world. */</font>
 
-main()
+#include &lt;cstdio&gt;
+
+int main()
 {
   printf("Hello world\n");
+  return 0;
 }
 </pre></td></table></center><p>
 
-First, when you use <b>printf()</b>, you should include <b>cstdio</b> (the C standard I/O 
-library). The output of this program is pretty obvious:
+You'll note that I included <b>&lt;cstdio&gt</b> instead of 
+<b>&lt;iostream&gt</b>, because <b>printf()</b> is defined in the C stdio library.
+I also omitted the <b>"using namespace std"</b>, because the only thing I'm using
+in this program is <b>printf()</b>, and it is part of C and not C++.  Typically,
+though, you use so much from the "std" namespace that you have to include the
+<b>"using namespace std"</b> statement.
+
+The output of this program is pretty obvious:
 
 <pre>
 UNIX> <font color=darkred><b>g++ -o hwpf hwpf.cpp</b></font>
-UNIX> <font color=darkred><b>hwpf</b></font>
+UNIX> <font color=darkred><b>./hwpf</b></font>
 Hello world
 UNIX> <font color=darkred><b></b></font>
 </pre>
@@ -102,17 +114,19 @@ UNIX> <font color=darkred><b></b></font>
 You may specify that <b>printf()</b> print additional arguments by putting a
 percent sign in the formatting string with more special formatting commands.
 For example, putting "%d" in the formatting string specifies to print the next
-parameter as an integer.  For example, 
+parameter as an integer.  The program 
 <b><a href=ints1.cpp>ints1.cpp</a></b> shows a <b>for()</b> loop
 where each <b>printf()</b> statement prints three integers, <i>i</i>, <i>i<sup>2</sup></i>, and
 <i>2i</i>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
+<font color=blue>/* Use printf() to print out each number, i, from 0 to 10, 
+   along with its square and its double. */</font>
+   
 #include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   int i, j;
 
@@ -120,6 +134,7 @@ main()
      j = i*i;
      printf("I is %d - i*i is %d - i*2 is %d\n", i, j, i*2);
    }
+   return 0;
 }
 </pre></td></table></center><p>
 The output is straightforward:
@@ -147,21 +162,28 @@ a <i>width</i> specification in front of the 'd' in "%d" (in
 <b><a href=ints2.cpp>ints2.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
+<font color=blue>/* This is the same as ints1.cpp, except:
+
+     - We print i and 2*i with a field width of two characters.
+     - We print i*i with a field width of three characters.
+
+   In that way, they all line up in nice, neat columns. */</font>   
+
 #include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   int i, j;
 
-   for (i = 0; i &lt;= 10; i++) {
-     j = i*i;
-     printf("I is %2d - i*i is %3d - i*2 is %2d\n", i, j, i*2);
-   }
+  for (i = 0; i &lt;= 10; i++) {
+    j = i*i;
+    printf("I is %2d - i*i is %3d - i*2 is %2d\n", i, j, i*2);
+<font color=blue>//               ^^^          ^^^          ^^^</font>
+  }
+  return 0;
 }
 </pre></td></table></center><p>
-
 This output is much nicer: 
 
 <pre>
@@ -187,90 +209,59 @@ Printing <b>doubles</b> is more problematic.  (Oh, by the way, we don't use
 You specify a float with "%lf".  By default, that prints the double to six
 decimal digits.  If you want to specify widths, as we did with <b>int</b>'s
 above, you use "%<i>t.d</i>lf", where <i>t</i> is the total width and <i>d</i>
-is the number of decimal digits.  For example, the following program
-(<b><a href=100-rand.cpp>100-rand.cpp</a></b>) prints 100 random <b>double</b>'s
-between 0 and 100:
+is the number of decimal digits.  
+For example, the following program 
+(<b><a href=pieln10.cpp>pieln10.cpp</a></b>)
+prints <i>pi</i>, <i>e</i> and the natual log of 10, 
+each of which will have seven total digits, five after the decimal point:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
+<font color=blue>/* Print pi, e, and the natual log of 10, each with 7 total digits, 5 after the decimal point. */</font>
+
+#include &lt;cmath&gt;
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 using namespace std;
 
-main()
+int main()
 {
-  int i, j;
+  double pi, e, ln10;
 
-  srand48(time(0));
+  pi   = acos(-1.0);  <font color=blue>// I figure at this point, you might enjoy some high school math.</font>
+  e    = exp(1.0);    <font color=blue>// exp(x) returns e to the x-th power</font>
+  ln10 = log(10.0);   <font color=blue>// The poorly named log(x) returns the natural log of x.</font>
+ 
+  printf("pi:   %7.5lf\n", pi);
+  printf("e:    %7.5lf\n", e);
+  printf("ln10: %7.5lf\n", ln10);
 
-  for (i = 0; i &lt; 10; i++) {
-    for (j = 0; j &lt; 10; j++) {
-      printf(" %5.2lf", drand48()*100);
-    } 
-    printf("\n");
-  }
+  return 0;
 }
 </pre></td></table></center><p>
 
-A few things about this program.  First, you must include <b>cstdlib</b>.  Second, 
-the random number generator that I suggest you use is <b>srand48()/drand48()/lrand48()</b>:
-<p>
-<UL>
-<LI> <b>srand48()</b> sets the <i>seed</i> for the random number generator.  Each different
-seed produces a different set of random numbers.  Seeds are nice because you sometimes want
-the same sequence of random numbers to be produced so that you can debug your program.
-Typically, when you want to set a seed to be different each time you run the program, you
-seed it with <b>time(0)</b>, which is the number of seconds since time began (January 1, 1970).
-<p>
-<LI> <b>drand48()</b> returns a random <b>double</b>, uniformly distributed between 0 and 1.
-<p>
-<LI> <b>lrand48()</b> returns a random <b>int</b>, uniformly distributed between 0 and (2<sup>31</sup>-1).
-</UL>
 
-<p>
-The <b>printf()</b> statement says to print each double to a width of 5 characters, right justified,
-with 2 decimal digits:
+Here's the output:
 
 <pre>
-UNIX> <font color=darkred><b>100-rand</b></font>
- 76.11 45.29 35.25 40.09 27.20 41.90 27.75 72.27 62.17 96.67
- 80.62 38.62 88.12 41.94 86.72 93.64  4.25 35.78  8.87 59.27
- 74.02 23.34 15.66  1.29 12.15 44.43 87.88 10.17 87.21 10.18
- 45.64 73.67 54.39 51.41 97.11 56.75 59.21 69.43 36.47 72.88
- 48.08 59.88 64.59 26.68 98.35 97.89 85.15 82.55 34.06 60.39
- 50.03  6.57 28.37 63.21 20.75 93.94 45.87 26.25 51.77 24.90
- 41.25 72.24 31.76 44.91 83.14 61.36 81.06 86.61 97.66 65.91
- 57.82  1.64 42.78 72.49 77.68 49.56  8.33 42.26 78.89 61.34
- 44.50 67.50 37.95 10.00 21.39 91.21 51.68 45.80 11.31 39.12
- 87.94 95.23 21.89 83.65 76.09 50.11 29.94 79.93 62.87 44.83
+UNIX> <font color=darkred><b>g++ -o pieln10 pieln10.cpp </b></font>
+UNIX> <font color=darkred><b>./pieln10</b></font>
+pi:   3.14159
+e:    2.71828
+ln10: 2.30259
 UNIX> <font color=darkred><b></b></font>
 </pre>
-The <b>printf()</b> statement results in the numbers being aligned in columns.
-If you wait a second and run it again, you get different values:
 
-<pre>
-UNIX> <font color=darkred><b>100-rand</b></font>
- 91.88 95.38 59.83 64.24  1.21 17.03 17.62 39.94 90.68 63.26
- 71.98 21.78 68.20 10.62 11.15 22.54 31.40 45.54  8.98 85.70
- 39.74 45.42 30.63  3.04 13.12 83.20 39.27 57.68 45.46 15.90
- 41.62 17.57 34.99 97.17 60.36 32.35 59.80 82.19 48.92 55.18
- 22.02 32.89  9.31  7.01 60.52 49.29 53.47 75.44 86.22 40.51
- 69.27 32.95 28.21 50.17 45.63 24.21 31.45 87.47 49.86  3.06
- 10.12  6.42 81.01 52.28 12.77 73.53 84.88 41.18 81.50 65.22
- 70.62 26.82  3.57 20.18 21.39 83.17 37.94 14.62 18.45 13.74
-  7.01 36.11 71.14 17.12 43.60 60.47 56.38  0.95 72.47 18.16
- 57.21 80.62 41.74  7.72 59.06 26.75 41.93 33.44 16.87 96.82
-UNIX> <font color=darkred><b></b></font>
-</pre>
+How did I know what those math functions were?  They are part of the math library of C, 
+which is defined there in <b>&lt;cmath&gt;</b>.  You can see a listing of the functions
+at <a href=https://en.wikipedia.org/wiki/C_mathematical_functions>https://en.wikipedia.org/wiki/C_mathematical_functions</a>.  
 
 <hr>
-<h3>Printf() with Strings, left-justifying</h3>
+<h3>Printf() with strings, left-justifying</h3>
 
 The handling of strings is a little cumbersome because <b>printf()</b> doesn't
 handle C++ strings.  Instead, it handles C-style strings, which are character
 arrays that are <i>null-terminated</i>.  In other words, their last character
-is the character '\0'.  You don't need to concern yourself with the intricacies
-of C-style strings.  Just remember the following three rules:
+is the character '\0'.  You won't need to concern yourself with the intricacies
+of C-style strings until you take CS360.  Just remember the following three rules:
 
 <OL>
 <LI> String literals, like "Hello World", are interpreted by the compiler as C-style
@@ -302,17 +293,22 @@ And suppose you want to print it more nicely, so that first names, last names, a
 in their own columns.   Here's some code to do it (<b><a href=ssn-reader.cpp>ssn-reader.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program reads three words at a time -- first name, last name, and social
+   security number (as a string, not as a number).  It then prints them, each in
+   its own column. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   string fn, ln, ssn;
 
   while (cin &gt;&gt; fn &gt;&gt; ln &gt;&gt; ssn) {
     printf("%-10s %-13s %11s\n", fn.c_str(), ln.c_str(), ssn.c_str());
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -320,7 +316,7 @@ With the width specification, I use negative numbers to left-justify the strings
 to 10, 13 and 11 characters respectively:
 
 <pre>
-UNIX> <font color=darkred><b>ssn-reader < info-file.txt</b></font>
+UNIX> <font color=darkred><b>./ssn-reader < info-file.txt</b></font>
 Charlie    Crossway      286-50-9109
 Molly      Needham       825-03-8649
 Molly      Nashville     543-73-8293
@@ -345,12 +341,13 @@ An example is in
 <b><a href=printchars.cpp>printchars.cpp</a></b>, which prints out all characters from 32 to 127:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Print the character values of numbers from 32 to 127, in eight columns. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 using namespace std;
 
-main()
+int main()
 {
   int i, j;
 
@@ -360,6 +357,7 @@ main()
     }
     printf("\n");
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -407,24 +405,30 @@ Look at an example program in
 <b><a href=weirdints.cpp>weirdints.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program demonstrates octal and hexadecimal numbers, both as
+   literals in C++, and when printed with printf(). */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 using namespace std;
 
-main()
+int main()
 {
-  int i;
+  int i, j;
 
   printf(" 010 is equal to: %2d   0%02o  0x%02x\n", 010, 010, 010);
   printf("0x10 is equal to: %2d   0%02o  0x%02x\n", 0x10, 0x10, 0x10);
 
   printf("\n");
 
+  <font color=blue>/* Print the numbers from 0 to 31 in octal and in hex.  
+     Print four numbers per row. */</font>
+
   for (i = 0; i &lt; 32; i++) {
     printf("    %2d  0%02o  0x%02x", i, i, i);
     if (i%4 == 3) printf("\n");
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
