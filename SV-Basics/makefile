@@ -1,37 +1,29 @@
-# +mkmake+ -- Everything after this line is automatically generated
+EXECUTABLES = string-basic mytail1 mytail2 reverse vec1 vec2 getline
 
-EXECUTABLES = mytail1 mytail2 mytail3 reverse vec1 vec2 getline string-basic
+CFLAGS ?= -Wall -Wextra
 
 all: $(EXECUTABLES)
 
 clean:
 	rm -f core *.o $(EXECUTABLES) a.out
 
-.SUFFIXES: .cpp .o
-.cpp.o:
-	g++ $(CFLAGS) -c $*.cpp
+string-basic: string-basic.cpp
+	g++ $(CFLAGS) -o string-basic string-basic.cpp
 
+getline: getline.cpp
+	g++ $(CFLAGS) -o getline getline.cpp
 
-string-basic: string-basic.o
-	g++ $(CFLAGS) -o string-basic string-basic.o
+mytail1: mytail1.cpp
+	g++ $(CFLAGS) -o mytail1 mytail1.cpp
 
-getline: getline.o
-	g++ $(CFLAGS) -o getline getline.o
+mytail2: mytail2.cpp
+	g++ $(CFLAGS) -o mytail2 mytail2.cpp
 
-mytail1: mytail1.o
-	g++ $(CFLAGS) -o mytail1 mytail1.o
+reverse: reverse.cpp
+	g++ $(CFLAGS) -o reverse reverse.cpp
 
-mytail2: mytail2.o
-	g++ $(CFLAGS) -o mytail2 mytail2.o
+vec1: vec1.cpp
+	g++ $(CFLAGS) -o vec1 vec1.cpp
 
-mytail3: mytail3.o
-	g++ $(CFLAGS) -o mytail3 mytail3.o
-
-reverse: reverse.o
-	g++ $(CFLAGS) -o reverse reverse.o
-
-vec1: vec1.o
-	g++ $(CFLAGS) -o vec1 vec1.o
-
-vec2: vec2.o
-	g++ $(CFLAGS) -o vec2 vec2.o
+vec2: vec2.cpp
+	g++ $(CFLAGS) -o vec2 vec2.cpp

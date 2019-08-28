@@ -8,17 +8,15 @@
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/SV-Basics</b></a>
 <LI> Notes created in 2011
 <LI> Last modification date: <i>
-Tue Jan 14 09:20:22 EST 2014
+Mon Aug 26 11:28:04 EDT 2019
 </i>
 <hr>
 
 <h3>String Basics</h3>
 
 Strings are a fundamental class supported by C++ to do text processing.
-Although most installations won't require you to include &lt;string&gt; for your
-programs to compile, it can't hurt, so it's not a bad habit to acquire.
 <p>
-Strings in C++ are very natural, so you can often write programs with them
+They are very natural, so you can often write programs with them
 without thinking about it too much.  For example, the following program 
 (<b><a href=string-basic.cpp>string-basic.cpp</a></b>)
 illustrates many functionalities with strings:
@@ -35,31 +33,41 @@ illustrates many functionalities with strings:
 
 <p>I'm assuming that all of this is review from CS102.
 
+<b><a href=string-basic.cpp>string-basic.cpp</a></b>
+
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program illustrates some basical functionalities with strings. */</font>
+
 #include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;cstdlib&gt;
 #include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   string a, b, c;
-  int i;
+  size_t i;
+
+  <font color=blue>/* String assignment from literals. */</font>
 
   a = "LIGHTNING";
   b = "Lightning";
   c = "Strikes";
+
+  <font color=blue>/* Printing out strings and their sizes. */</font>
 
   cout &lt;&lt; "a: " &lt;&lt; a &lt;&lt; " -- " &lt;&lt; a.size() &lt;&lt; " characters." &lt;&lt; endl;
   cout &lt;&lt; "b: " &lt;&lt; b &lt;&lt; " -- " &lt;&lt; b.size() &lt;&lt; " characters." &lt;&lt; endl;
   cout &lt;&lt; "c: " &lt;&lt; c &lt;&lt; " -- " &lt;&lt; c.size() &lt;&lt; " characters." &lt;&lt; endl;
   cout &lt;&lt; endl;
 
+  <font color=blue>/* Modifying a string. */</font>
+
   printf("Changing all but the first character of a to lower case:\n\n");
 
   for (i = 1; i &lt; a.size(); i++) a[i] += ('a' - 'A');
   cout &lt;&lt; "Changed a to: " &lt;&lt; a &lt;&lt; endl &lt;&lt; endl;
+
+  <font color=blue>/* Testing equality and comparison. */</font>
 
   printf("Testing equality: (a == b): %d.  (a == c): %d.  (b == c): %d\n", (a == b), (a == c), (b == c));
 
@@ -68,6 +76,8 @@ main()
   printf("Comparison:       (a &lt;  b): %d.  (a &lt;  c): %d.  (b &lt;  c): %d\n", (a &lt;  b), (a &lt;  c), (b &lt;  c));
   printf("Comparison:       (a &gt;  b): %d.  (a &gt;  c): %d.  (b &gt;  c): %d\n", (a &gt;  b), (a &gt;  c), (b &gt;  c));
   cout &lt;&lt; endl;
+
+  <font color=blue>/* Showing how addition is overloaded to do string concatenation. */</font>
 
   a = b + c;
   cout &lt;&lt; "a = b + c: a is now: " &lt;&lt; a &lt;&lt; endl;
@@ -117,10 +127,13 @@ process input.  However, here, we simply read lines of standard input with
 <b>getline()</b> (this in <b><a href=getline.cpp>getline.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program uses getline() to read lines of text, and print their line numbers and size. */</font>
+
 #include &lt;iostream&gt;
+#include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   int ln, len;
@@ -131,6 +144,7 @@ main()
     len = s.size();
     printf("Line %2d - Size: %3d - %s\n", ln, len, s.c_str());
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -138,30 +152,18 @@ Running it, we see that it works as promised:
 
 <pre>
 UNIX> <font color=darkred><b>g++ -o getline getline.cpp</b></font>
-UNIX> <font color=darkred><b>cat input.txt</b></font>
+UNIX> <font color=darkred><b>head -n 5 input.txt</b></font>                        <font color=blue># head -n x prints the first x lines of a file.</font>
 Give me a weapon of power, which no one else may hold,
 Defend the Gods with honor, To lead the BRAVE and BOLD
 
     LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
     LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-
-Bequeathed to me by Odin, Molded by the Dwarfs
-MINE! This shimmering mallet, The Symbol of the Norse
-
-    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-UNIX> <font color=darkred><b>getline < input.txt</b></font>
+UNIX> <font color=darkred><b>head -n 5 input.txt | ./getline</b></font>
 Line  1 - Size:  54 - Give me a weapon of power, which no one else may hold,
 Line  2 - Size:  54 - Defend the Gods with honor, To lead the BRAVE and BOLD
 Line  3 - Size:   0 - 
 Line  4 - Size:  45 -     LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
 Line  5 - Size:  45 -     LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-Line  6 - Size:   0 - 
-Line  7 - Size:  46 - Bequeathed to me by Odin, Molded by the Dwarfs
-Line  8 - Size:  53 - MINE! This shimmering mallet, The Symbol of the Norse
-Line  9 - Size:   0 - 
-Line 10 - Size:  45 -     LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-Line 11 - Size:  45 -     LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -172,12 +174,11 @@ Vectors are the simplest part of the Standard Template Library (STL).  There's
 a lot of linguistic hocus pocus that has to go on for the STL to work as it does.
 We won't concern ourselves with that in this class, but we will teach you how to 
 make use of the library effectively.   Vectors are a general-purpose array class.
-They differ from C arrays in many important ways, and they are easier to use.
-To use a vector, you include <b>vector</b>, and then you declare a vector as 
+To use a vector, you include <b>&lt;vector&gt;</b>, and then you declare a vector as 
 follows:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-vector &lt;<b>TYPE</b>&gt; <b>variable-name(s)</b>
+vector &lt;<b>TYPE</b>&gt; <b>variable-name(size)</b>  <font color=blue>// The size is optional</font>
 </pre></td></table></center><p>
 
 The <b>TYPE</b> can be a basic type like <b>int</b> or <b>double</b>, or it can 
@@ -190,34 +191,52 @@ A very simple example program is in
 <b><a href=vec1.cpp>vec1.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* A simple program to show the basics of vectors:
+     - Declaring them.
+     - Checking their size
+     - Resizing
+     - Setting values;
+ */</font>
+
 #include &lt;cstdio&gt;
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;int&gt; v1;
   vector &lt;double&gt; v2(10);
-  int i;
+  size_t i;
 
-  printf("V1's size: %ld.  V2's size: %ld\n", v1.size(), v2.size());
-     <font color=darkblue> // It is unfortunate that size() returns a "long", so you must use "%ld".
-      // We'll talk about it in class</font>
+  <font color=blue>/* Print out v1's size and v2's size.  It is unfortunate that size() returns
+     an "size_t", which is an unsigned long, instead of an int, so you must use
+     "%lu" or "%ld" instead of %d inside printf().  We'll talk about it in class.  */</font>
+
+  printf("V1's size: %lu.  V2's size: %lu\n", v1.size(), v2.size());
+
+  <font color=blue>/* Resize the vectors and print out the new sizes. */</font>
 
   v1.resize(5);
   v2.resize(8);
+  printf("V1's size: %lu.  V2's size: %lu\n", v1.size(), v2.size());
 
-  printf("V1's size: %ld.  V2's size: %ld\n", v1.size(), v2.size());
+  <font color=blue>/* Set the vectors' values, and print them out. */</font>
 
   for (i = 0; i &lt; v1.size(); i++) v1[i] = 10 + i;
   for (i = 0; i &lt; v2.size(); i++) v2[i] = 20.3 + i;
 
-  printf("V1:"); for (i = 0; i &lt; v1.size(); i++) printf(" %d", v1[i]); printf("\n");
-  printf("V2:"); for (i = 0; i &lt; v2.size(); i++) printf(" %.1lf", v2[i]); printf("\n");
+  printf("V1:"); 
+  for (i = 0; i &lt; v1.size(); i++) printf(" %d", v1[i]); 
+  printf("\n");
+
+  printf("V2:"); 
+  for (i = 0; i &lt; v2.size(); i++) printf(" %.1lf", v2[i]);
+  printf("\n");
+
+  return 0;
 }
 </pre></td></table></center><p>
-
 This program declares an empty integer vector <b>v1</b> and a ten-element
 double vector <b>v2</b>, and prints their sizes.  It then resizes the 
 vectors to five and eight and prints their sizes again.  It then initializes
@@ -225,7 +244,7 @@ the elements of <b>v1</b> and <b>v2</b> in two <b>for</b> loops and prints out t
 two vectors.  Straightforward stuff:
 
 <pre>
-UNIX> <font color=darkred><b>vec1</b></font>
+UNIX> <font color=darkred><b>./vec1</b></font>
 V1's size: 0.  V2's size: 10
 V1's size: 5.  V2's size: 8
 V1: 10 11 12 13 14
@@ -234,9 +253,10 @@ UNIX> <font color=darkred><b></b></font>
 </pre>
 
 One note -- when you print a <b>size()</b> with <b>printf()</b>, you need to 
-specify "%ld" instead of "%d".  This is because sizes are 64-bit quantities.  
-If you don't do it, you will
-get a compiler warning.
+specify "%lu" or "%ld" instead of "%d".  This is because sizes are 64-bit, unsigned quantities.  
+If you don't do it, you will get a compiler warning.  Similarly, you'll want to declare
+<b>i</b> to be a <b>size_t</b>, which again is an unsigned long. Otherwise, you'll get
+compiler warnings when you compare <b>i</b> to <b>v1.size()</b>.
 
 <p>
 When you create array elements, default values are placed in there.  For example,
@@ -248,36 +268,49 @@ Take a careful look at
 <b><a href=vec2.cpp>vec2.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program shows some subtleties of resizing vectors. */</font>
+
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;int&gt; v1;
-  vector &lt;double&gt; v2;
-  int i;
+  size_t i;
+
+  <font color=blue>/* Start with two v1.resizes, setting new elements to 22 and 33. */</font>
 
   v1.resize(5, 22);
   v1.resize(8, 33);
 
+  printf("Initial V1:            ");
   for (i = 0; i &lt; v1.size(); i++) printf(" %d", v1[i]); 
   printf("\n");
+
+  <font color=blue>/* Chop it down to six elements. */</font>
 
   v1.resize(6);
+  printf("v1.resize(6):          ");
   for (i = 0; i &lt; v1.size(); i++) printf(" %d", v1[i]); 
   printf("\n");
+
+  <font color=blue>/* Now resize to 10 elements, setting the new ones to 44. */</font>
 
   v1.resize(10, 44);
+  printf("v1.resize(10, 44):     ");
   for (i = 0; i &lt; v1.size(); i++) printf(" %d", v1[i]); 
   printf("\n");
 
-  v2.resize(10, drand48());
+  <font color=blue>/* Does this add 5 new random elements, or 5 copies of one random element? */</font>
+
+  v1.resize(15, rand());
+  printf("v1.resize(15, rand()): ");
+  for (i = 0; i &lt; v1.size(); i++) printf(" %d", v1[i]); 
   printf("\n");
-  for (i = 0; i &lt; v1.size(); i++) printf(" %4.2lf", v2[i]); 
-  printf("\n");
+
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -287,12 +320,11 @@ a question -- will only the new elements be 33, or will all of them?  Look
 at the output:
 
 <pre>
-UNIX> <font color=darkred><b>vec2</b></font>
- 22 22 22 22 22 33 33 33
- 22 22 22 22 22 33
- 22 22 22 22 22 33 44 44 44 44
-
- 0.40 0.40 0.40 0.40 0.40 0.40 0.40 0.40 0.40 0.40
+UNIX> <font color=darkred><b>./vec2</b></font>
+Initial V1:             22 22 22 22 22 33 33 33
+v1.resize(6):           22 22 22 22 22 33
+v1.resize(10, 44):      22 22 22 22 22 33 44 44 44 44
+v1.resize(15, rand()):  22 22 22 22 22 33 44 44 44 44 16807 16807 16807 16807 16807
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -300,38 +332,48 @@ Only the new ones are given values.  The third <b>resize()</b> removes two
 elements, and then the fourth increases the size from 6 to 10, putting
 the value of 44 into the new elements.
 <p>
-The last <b>resize()</b> changes <b>v2</b>'s size from 0 to ten, setting
-<b>drand48()</b> as the default.  As you see above, that chooses one random 
-value and puts it into every element.  Perhaps you thought it would put random
-elements throughout <b>v2</b> -- that doesn't happen because <b>drand48()</b>
-is only called once, and its one return value is what is passed to <b>resize()</b>.
+The last <b>resize()</b> adds 5 new elements and gives them a default of <b>rand()</b>,
+which is a random integer.  You may wonder, will that create five different random numbers,
+or five copies of one random number?  It is the latter, because the <b>resize()</b> command
+simply calls <b>rand()</b> once, and its return value is passed to the <b>resize()</b> 
+command.
+
+<i>(BTW, I will discuss random numbers later in class).</i>
 
 <hr>
 <h3>push_back(), reverse, tail</h3>
 
 Two canonical vector programs are <b>reverse.cpp</b> and <b>mytail.cpp</b>.
 The first is really simple -- it prints out the lines of standard input in 
-reverse order.  You need a data struture like a vector to do this, because you 
+reverse order.  You need a data structure like a vector to do this, because you 
 can't print the first line of output until you've read the last line of input,
 and you have to store all of those lines somewhere.  
 <p>
 Here's
-<b><a href=reverse.cpp>reverse.cpp</a></b>
+<b><a href=reverse.cpp>reverse.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;cstdio&gt;
+<font color=blue>/* This program uses a vector to print standard input in reverse order. */</font>
+
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;string&gt; lines;
   int i;
   string s;
 
+  <font color=blue>/* Read every line of standard input into a vector called lines. */</font>
+
   while (getline(cin, s)) lines.push_back(s);
+
+  <font color=blue>/* Now print lines in reverse order. */</font>
+
   for (i = lines.size()-1; i &gt;= 0; i--) cout &lt;&lt; lines[i] &lt;&lt; endl;
+
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -340,10 +382,7 @@ a vector.  <b>push_back()</b> is guaranteed to run quickly, and it is much
 more convenient than resizing the array.  
 <p>
 To show <b>reverse</b> running, I first call <b>cat -n</b> on <b>input.txt</b>.
-That prints <b>input.txt</b> to the screen with line numbers.  The second command
-uses a "pipe" -- which specifies to have standard output of one command be standard
-input of another.  That turns out to be a very powerful feature of Unix -- one that
-you will use frequently:
+That prints <b>input.txt</b> to the screen with line numbers.  
 
 <pre>
 UNIX> <font color=darkred><b>cat -n input.txt</b></font>
@@ -358,7 +397,7 @@ UNIX> <font color=darkred><b>cat -n input.txt</b></font>
      9	
     10	    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
     11	    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-UNIX> <font color=darkred><b>cat -n input.txt | reverse</b></font>
+UNIX> <font color=darkred><b>cat -n input.txt | ./reverse</b></font>
     11	    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
     10	    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
      9	
@@ -373,35 +412,66 @@ UNIX> <font color=darkred><b>cat -n input.txt | reverse</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
+You may have noticed that I didn't use a <b>size_t</b> for <b>i</b>, but instead used
+an <b>int</b>.  That's because <b>size_t's</b> are unsigned quantities, and therefore cannot
+assume negative values.  If you try to use a <b>size_t</b> for <b>i</b>, you'll get a 
+compiler warning:
 
+<pre>
+<font color=darkred><b>reverse.cpp:19:30: warning: comparison of unsigned expression >= 0 is always true</b></font>
+      [-Wtautological-compare]
+  for (i = lines.size()-1; i >= 0; i--) cout << lines[i] << endl;
+</pre>
+ 
+Do you think it's a good thing that when <b>i</b> is a <b>size_t</b>, that it can't be
+set to -1?  I personally don't, but no one asked me.  Be aware of it, and pay attention to
+the warnings emitted by the compiler.
+
+<p>
 The second program performs the same functionality as the <b>tail</b> command -- 
 it prints out the last ten lines of standard input.  We can write a simple version
 of <b>tail</b> that is like <b>reverse.cpp</b>.  It reads all of the lines into 
-a vector and then prints out just the last ten.  It's in 
+a vector and then prints out just the last ten lines.  It's in 
 <b><a href=mytail1.cpp>mytail1.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;cstdio&gt;
+<font color=blue>/* This program prints out the last ten lines of a file, (or the whole file if it 
+   has fewer than ten lines).  It reads all of the lines into a vector, and then
+   prints out the last ten entries. */</font>
+
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;string&gt; lines;
-  int i;
+  size_t i;
   string s;
 
+  <font color=blue>/* Read each line into the vector */</font>
+
   while (getline(cin, s)) lines.push_back(s);
-  i = lines.size()-10;
-  if (i &lt; 0) i = 0;
+
+  <font color=blue>/* Compute the first line to print */</font>
+
+  if (lines.size() &lt; 10) {
+    i = 0;
+  } else {
+    i = lines.size()-10;
+  }
+
+  <font color=blue>/* And then print the lines. */</font>
+
   for ( ; i &lt; lines.size(); i++) cout &lt;&lt; lines[i] &lt;&lt; endl;
+
+  return 0;
 }
 </pre></td></table></center><p>
-
 We need the <b>if</b> statement to handle files that are smaller than 10 lines.
-If we didn't have the <b>if</b> statement, <i>i</i> would be less than zero,
-and our program would have a bug.  Hopefully that bug would be manifested by a
+If we didn't have the <b>if</b> statement, then who knows what <i>i</i> would be
+when we set it to <b>lines.size()-10</b>, because <b>size_t's</b> can't have negative
+values.  Hopefully that bug would be manifested by a
 segmentation violation, but you never know.  Since we've put in that <b>if</b>
 statement, there is no bug:
 
@@ -427,7 +497,7 @@ UNIX> <font color=darkred><b></b></font>
 
 I'll contend, though, that <b>mytail1.cpp</b> is not as good of a program
 as it could be.  Why?  Consider
-what happens if you call it on a file 1,000,000 lines.  You are storing all
+what happens if you call it on a file with 1,000,000 lines.  You are storing all
 1,000,000 lines, but you are only printing the last ten.  That's a big
 waste of memory!
 <p>
@@ -435,16 +505,23 @@ This problem is fixed in
 <b><a href=mytail2.cpp>mytail2.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program also prints out the last ten lines of standard input, however unlike
+   mytail1.cpp, it only stores ten lines, rather than the entire file.  You keep track 
+   of the total number of lines in the variable "ln", and you simply keep overwriting
+   the strings in the "lines" vector, until you get to the end of the file. */</font>
+
 #include &lt;cstdio&gt;
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;string&gt; lines;
   int i, ln;
   string s;
+
+  <font color=blue>/* Read the lines into elements 0 through 9 of the vector "lines." */</font>
 
   ln = 0;
   while (getline(cin, s)) {
@@ -455,50 +532,45 @@ main()
     }    
     ln++;
   }
+
+  <font color=blue>/* Set i to be (ln-10), or 0 if we haven't read ten lines. */</font>
+
   i = ln-10;
   if (i &lt; 0) i = 0;
+
+  <font color=blue>/* Now print out the last ten lines. */</font>
+
   for ( ; i &lt; ln; i++) cout &lt;&lt; lines[i%10] &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
-
 Once <b>lines</b> becomes ten elements long, we no longer call <b>push_back()</b>, but
 instead replace the oldest element with <b>s</b>.  When reading is done, we have the
 last ten lines, but not always starting at element 0.  To print them out, we need to 
-find the array element for each of the last ten lines.  Consider line <b>l</b>.  If it
-is in the array, it will be in element <b>l%10</b>.  Thus, if the file has <b>ln</b> total 
+find the array element for each of the last ten lines.  Consider line <b>x</b>.  If it
+is in the array, it will be in element <b>x%10</b>.  Thus, if the file has <b>ln</b> total 
 lines and <b>ln &gt; 10</b>, then we want to print out lines <b>ln-10</b> to <b>ln-1</b>.
 The <b>for</b> loop that ends the program does just that.
 <p>
-<h3>Put this bug in the back of your head</h3>
+<h3>The compiler flags -Wall and -Wextra</h3>
 
-I'll explain this in class.  I won't test you on this, but remember it, because it will
-happen to you someday (I'll go over it again later as well).
-<p>
-<b><a href=mytail3.cpp>mytail3.cpp</a></b> is identical to 
-<b><a href=mytail1.cpp>mytail1.cpp</a></b>, except the <b>for</b> loop is as follows:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-  for (i = (lines.size()-10 &lt; 0) ? 0 : lines.size()-10 ; i &lt; lines.size(); i++) {
-    cout &lt;&lt; lines[i] &lt;&lt; endl;
-  }
-</pre></td></table></center><p>
-
-Take a look at the following output:
+You can put some extra flags on the command line when you compile, which will have the 
+compiler emit more warnings than it normally does.  I have done this in the makefile:
 
 <pre>
-UNIX> <font color=darkred><b>cat input.txt | mytail3</b></font>
-Defend the Gods with honor, To lead the BRAVE and BOLD
-
-    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-
-Bequeathed to me by Odin, Molded by the Dwarfs
-MINE! This shimmering mallet, The Symbol of the Norse
-
-    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-    LIGHTNING STRIKES LIGHTNING STRIKES AGAIN
-UNIX> <font color=darkred><b>head -n 5 input.txt | mytail3</b></font>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f core *.o string-basic mytail1 mytail2 reverse vec1 vec2 getline a.out
+UNIX> <font color=darkred><b>make</b></font>
+g++ -Wall -Wextra -o string-basic string-basic.cpp
+g++ -Wall -Wextra -o mytail1 mytail1.cpp
+g++ -Wall -Wextra -o mytail2 mytail2.cpp
+g++ -Wall -Wextra -o reverse reverse.cpp
+g++ -Wall -Wextra -o vec1 vec1.cpp
+g++ -Wall -Wextra -o vec2 vec2.cpp
+g++ -Wall -Wextra -o getline getline.cpp
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-Do you see a problem?  Again, we'll go over this in class, because it is confusing.  And evil.
+I recommend doing this, and then I recommend making sure that your programs don't emit
+warnings when you compile them.  It can be a pain to fix your code so that it doesn't
+emit warnings, but in doing so, you often catch bugs, so it's worth it.
