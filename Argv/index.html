@@ -1,0 +1,505 @@
+<title>CS140 Lecture notes -- Argc/Argv and Stringstreams</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Argc/Argv and Stringstreams</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI>Directory: <b>~jplank/cs140/Notes/Argv</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Argv>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Argv</b></a>
+<LI> Last modification date: <i>
+Mon Jan 21 10:55:15 EST 2013
+</i>
+<hr>
+
+<h3>Argc and argv</h3>
+
+You may give <b>main()</b> two parameters, which are conventionally named
+<b>argc</b> and <b>argv</b>.  They are usually declared as follows:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+int main(int argc, char **argv)
+</pre></td></table></center><p>
+
+<b>Argc</b> is an integer.  It stores the number of arguments on the command
+line when the program was called.  This includes the name of the program itself.
+<p>
+<b>Argv</b> looks weird, but what it is is an array of C-style strings.  Sometimes
+you see it declared as "<b>char *argv[]</b>," which is equivalent to the above.
+Element <b>argv[i]</b> will be a c style string containing the <i>i-th</i> 
+command line argument.  These are defined from 0 through <b>argc-1</b>.
+<p>
+For example, the program 
+<b><a href=argc.cpp>argc.cpp</a></b>
+prints out <b>argc</b>, and then each element of <b>argv</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+main(int argc, char **argv)
+{
+  int i;
+
+  printf("Argc is %d\n", argc);
+  printf("\n");
+  for (i = 0; i &lt; argc; i++) {
+    printf("argv[%d] = %s\n", i, argv[i]);
+  }
+}
+</pre></td></table></center><p>
+
+A few examples are straightforward:
+
+<pre>
+UNIX> <font color=darkred><b>g++ argc.cpp -o argc</b></font>
+UNIX> <font color=darkred><b>argc</b></font>
+Argc is 1
+
+argv[0] = argc
+UNIX> <font color=darkred><b>argc 5</b></font>
+Argc is 2
+
+argv[0] = argc
+argv[1] = 5
+UNIX> <font color=darkred><b>argc They call me Mellow Yellow - quite right, Slick</b></font>
+Argc is 10
+
+argv[0] = argc
+argv[1] = They
+argv[2] = call
+argv[3] = me
+argv[4] = Mellow
+argv[5] = Yellow
+argv[6] = -
+argv[7] = quite
+argv[8] = right,
+argv[9] = Slick
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+And now a few non-straightforward examples that have mostly do to with the Unix shell.
+If you perform redirection of standard input or standard output, those specifications 
+are stripped out by the shell and are not included in <b>argc/argv</b>:
+
+<pre>
+UNIX> <font color=darkred><b>argc < argc.cpp</b></font>
+Argc is 1
+
+argv[0] = argc
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can even put those specifications at the beginning of the command -- it matters not:
+
+<pre>
+UNIX> <font color=darkred><b>> output.txt argc < argc.cpp Shaft</b></font>
+UNIX> <font color=darkred><b>cat output.txt</b></font>
+Argc is 2
+
+argv[0] = argc
+argv[1] = Shaft
+UNIX> <font color=darkred><b>< output.txt argc 1 2 3 > output2.txt 4 5 6</b></font>
+UNIX> <font color=darkred><b>cat output2.txt</b></font>
+Argc is 7
+
+argv[0] = argc
+argv[1] = 1
+argv[2] = 2
+argv[3] = 3
+argv[4] = 4
+argv[5] = 5
+argv[6] = 6
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+If you use single or double quotes you can put spaces into single arguments.  You can use 
+single quotes to put double quotes into arguments and vice-versa:
+
+<pre>
+UNIX> <font color=darkred><b>argc "Jim Plank" 'Jim Plank'</b></font>
+Argc is 3
+
+argv[0] = argc
+argv[1] = Jim Plank
+argv[2] = Jim Plank
+UNIX> <font color=darkred><b>argc "They call him 'Thor'"</b></font>
+Argc is 2
+
+argv[0] = argc
+argv[1] = They call him 'Thor'
+UNIX> <font color=darkred><b>argc 'He said, "Quoting, it'"'s quite confusing."'"'</b></font>
+Argc is 2
+
+argv[0] = argc
+argv[1] = He said, "Quoting, it's quite confusing."
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Finally, an asterisk (*) on the command line  performs pattern matching on the file names
+in the current directory.  For example, "*" matches all files.  "*.cpp" matches all files that
+end with ".cpp".  These are then put onto the command line and into argv:
+
+<pre>
+UNIX> <font color=darkred><b>argc *</b></font>
+Argc is 19
+
+argv[0] = argc
+argv[1] = argc
+argv[2] = argc.cpp
+argv[3] = argv1int
+argv[4] = argv1int.cpp
+argv[5] = argv2int
+argv[6] = argv2int.cpp
+argv[7] = argvallint
+argv[8] = argvallint.cpp
+argv[9] = clearing-output
+argv[10] = clearing-output.cpp
+argv[11] = identify_words
+argv[12] = identify_words.cpp
+argv[13] = index.html
+argv[14] = input.txt
+argv[15] = onetoten
+argv[16] = onetoten.cpp
+argv[17] = output2.txt
+argv[18] = output.txt
+UNIX> <font color=darkred><b>argc *.cpp</b></font>
+Argc is 8
+
+argv[0] = argc
+argv[1] = argc.cpp
+argv[2] = argv1int.cpp
+argv[3] = argv2int.cpp
+argv[4] = argvallint.cpp
+argv[5] = clearing-output.cpp
+argv[6] = identify_words.cpp
+argv[7] = onetoten.cpp
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Stringstreams for parsing command line arguments</h3>
+
+Stringstreams are C++ primitives which allow you to treat strings like <b>cin</b> and <b>cout</b>.
+If you want to treat a string <b>s</b> like <b>cin</b>, then you declare an <b>istringstream</b>
+and initialize it with the <b>str()</b> method.  Here's an example that converts <b>argv[1]</b>
+into an <b>istringstream</b> and then uses that to convert <b>argv[1]</b> into an integer.
+It is in
+<b><a href=argv1int.cpp>argv1int.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  istringstream ss;
+  int i;
+
+  if (argc != 2) { cerr &lt;&lt; "usage: argv1int argument\n"; return 1; }
+
+  ss.str(argv[1]);
+  if (!(ss &gt;&gt; i)) {
+    fprintf(stderr, "The argument %s is not an integer.\n", argv[1]);
+    return 1;
+  } 
+
+  printf("Integer: %d\n", i);
+}
+</pre></td></table></center><p>
+
+First, if you want to use <b>printf()</b> to print to standard error, you 
+simply call <b>fprintf()</b> and make the first parameter <b>stderr</b>.
+<p>
+Second, you include <b>sstream</b> to use stringstreams.  You treat <b>ss</b>
+above just like <b>cin</b> to determine whether <b>argv[1]</b> is an integer.
+<p>
+
+<pre>
+UNIX> <font color=darkred><b>g++ argv1int.cpp -o argv1int</b></font>
+UNIX> <font color=darkred><b>argv1int </b></font>
+usage: argv1int argument
+UNIX> <font color=darkred><b>argv1int 8000</b></font>
+Integer: 8000
+UNIX> <font color=darkred><b>argv1int Fred</b></font>
+The argument Fred is not an integer.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+An unfortunate part about a stringstream is that you cannot simply call
+the <b>str()</b> method to set it to another string.  For example, 
+<b><a href=argv2int.cpp>argv2int.cpp</a></b>
+is a logical extension to <b>argv1int.cpp</b> to read <b>argv[1]</b> into <i>i</i>
+and 
+<b>argv[2]</b> into <i>j</i>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  istringstream ss;
+  int i, j;
+
+  if (argc != 3) { cerr &lt;&lt; "usage: argv1int argument argument\n"; return 1; }
+
+  ss.str(argv[1]);
+  if (!(ss &gt;&gt; i)) {
+    fprintf(stderr, "Argument i -- %s is not an integer.\n", argv[1]);
+    return 1;
+  } 
+  printf("Argument i: %d\n", i);
+
+  ss.str(argv[2]);
+  if (!(ss &gt;&gt; j)) {
+    fprintf(stderr, "Argument j -- %s is not an integer.\n", argv[2]);
+    return 1;
+  } 
+  printf("Argument j: %d\n", j);
+}
+</pre></td></table></center><p>
+
+When we run it, it fails on <i>j</i>, even though <b>argv[2]</b> does represent
+an integer:
+
+<pre>
+UNIX> <font color=darkred><b>g++ argv2int.cpp -o argv2int</b></font>
+UNIX> <font color=darkred><b>argv2int 10 20</b></font>
+Argument i: 10
+Argument j -- 20 is not an integer.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+This is because you have to call <b>clear</b> on the stringstream before calling
+<b>ss.str(argv[2])</b>.  That's a drag -- try to remember it so that you don't get
+burnt by it when programming.  To hammer this home, 
+<b><a href=argvallint.cpp>argvallint.cpp</a></b>
+tests each command line argument to see it it is an integer:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  istringstream ss;
+  int i, j;
+
+  for (i = 1; i &lt; argc; i++) {
+    ss.clear();
+    ss.str(argv[i]);
+    if (!(ss &gt;&gt; j)) {
+      printf("Argument %d -- %s is not an integer.\n", i, argv[i]);
+    } else {
+      printf("Argument %d -- %d\n", i, j);
+    }
+  }
+}
+</pre></td></table></center><p>
+
+<pre>
+UNIX> <font color=darkred><b>g++ argvallint.cpp -o argvallint</b></font>
+UNIX> <font color=darkred><b>argvallint 1 2 buckle my shoe. 3 4 get out the door.</b></font>
+Argument 1 -- 1
+Argument 2 -- 2
+Argument 3 -- buckle is not an integer.
+Argument 4 -- my is not an integer.
+Argument 5 -- shoe. is not an integer.
+Argument 6 -- 3
+Argument 7 -- 4
+Argument 8 -- get is not an integer.
+Argument 9 -- out is not an integer.
+Argument 10 -- the is not an integer.
+Argument 11 -- door. is not an integer.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Stringstreams to create strings</h3>
+
+You can use the <b>ostringstream</b> type to create a string using functionality like <b>cout</b>.
+In this case, you simply call  <b>str()</b> to convert the stringstream to a string.
+Here's an example in 
+<b><a href=onetoten.cpp>onetoten.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  ostringstream ss;
+  string s;
+  int i;
+
+  for (i = 1; i &lt; 11; i++) ss &lt;&lt; i &lt;&lt; " ";
+  s = ss.str();
+  cout &lt;&lt; s &lt;&lt; endl;
+}
+</pre></td></table></center><p>
+
+It creates a string containing the numbers 1 through 10 and then prints it out:
+
+<pre>
+UNIX> <font color=darkred><b>g++ onetoten.cpp -o onetoten</b></font>
+UNIX> <font color=darkred><b>onetoten</b></font>
+1 2 3 4 5 6 7 8 9 10 
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+When you want to "reuse" an <b>ostringstream</b>, you need to clear it, <i>and</i>
+to call its <b>str()</b> method with an empty string as its argument.  That resets
+it to be empty.  If you don't do it and you're not ready for it, you'll get some surprising output.
+For example, 
+<b><a href=clearing-output.cpp>clearing-output.cpp</a></b>
+attempts to print out four random integers by first putting them into an <b>ostringstream</b>
+and then printing out the string:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  ostringstream ss, ss2;
+  int i, j;
+
+  srand48(0);
+  printf("Not calling ss.str(\"\"):\n\n");
+  for (i = 0; i &lt; 4; i++) {
+    ss.clear();
+    ss &lt;&lt; "#" &lt;&lt; i &lt;&lt; ": " &lt;&lt; lrand48()%1000 &lt;&lt; "\n";
+    cout &lt;&lt; ss.str();
+  }
+  cout &lt;&lt; endl;
+
+  srand48(0);
+  printf("Calling ss2.str(\"\"):\n\n");
+ 
+  for (i = 0; i &lt; 4; i++) {
+    ss2.clear();
+    ss2.str("");
+    ss2 &lt;&lt; "#" &lt;&lt; i &lt;&lt; ": " &lt;&lt; lrand48()%1000 &lt;&lt; "\n";
+    cout &lt;&lt; ss2.str();
+  }
+}
+</pre></td></table></center><p>
+
+In the first loop, it does not call <b>str("")</b> at the beginning of each iteration,
+and as a result, the same numbers get printed out multiple times.  The second loop
+prints each number exactly once:
+
+<pre>
+UNIX> <font color=darkred><b>clearing-output</b></font>
+Not calling ss.str(""):
+
+#0: 414
+#0: 414
+#1: 240
+#0: 414
+#1: 240
+#2: 554
+#0: 414
+#1: 240
+#2: 554
+#3: 841
+
+Calling ss2.str(""):
+
+#0: 414
+#1: 240
+#2: 554
+#3: 841
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Getline and stringstreams</h3>
+
+As mentioned in the lecture notes on string and vector basics, 
+the procedure <b>getline(cin, s)</b> reads a line of input from standard input and puts
+it into the string <b>s</b>.  Spaces are preserved.  You can combine <b>getline</b> 
+and stringstreams to identify and get access to individual words on each line,
+as in 
+<b><a href=identify_words.cpp>identify_words.cpp</a></b>, which prints out 
+each word on standard input, preceded by its line number and word number.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  istringstream ss;
+  string s;
+  int l, w;
+
+  l = 0;
+  while (getline(cin, s)) {
+    l++;
+    ss.clear();
+    ss.str(s);
+    w = 0;
+    while (ss &gt;&gt; s) {
+      w++;
+      printf("Line %3d, word %3d: %s\n", l, w, s.c_str());
+    }
+    printf("\n");
+  }
+}
+</pre></td></table></center><p>
+
+<pre>
+UNIX> <font color=darkred><b>g++ identify_words.cpp -o identify_words</b></font>
+UNIX> <font color=darkred><b>cat input.txt</b></font>
+There's a port on a western bay
+And it serves a hundred ships a day.
+Lonely sailors pass the time away
+And talk about their homes.
+UNIX> <font color=darkred><b>identify_words < input.txt</b></font>
+Line   1, word   1: There's
+Line   1, word   2: a
+Line   1, word   3: port
+Line   1, word   4: on
+Line   1, word   5: a
+Line   1, word   6: western
+Line   1, word   7: bay
+
+Line   2, word   1: And
+Line   2, word   2: it
+Line   2, word   3: serves
+Line   2, word   4: a
+Line   2, word   5: hundred
+Line   2, word   6: ships
+Line   2, word   7: a
+Line   2, word   8: day.
+
+Line   3, word   1: Lonely
+Line   3, word   2: sailors
+Line   3, word   3: pass
+Line   3, word   4: the
+Line   3, word   5: time
+Line   3, word   6: away
+
+Line   4, word   1: And
+Line   4, word   2: talk
+Line   4, word   3: about
+Line   4, word   4: their
+Line   4, word   5: homes.
+
+UNIX> <font color=darkred><b></b></font>
+</pre>
