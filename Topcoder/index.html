@@ -9,233 +9,273 @@
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Topcoder</b></a>
 <LI> Original notes: January, 2013
 <LI> Last modification date: <i>
-Mon Jan 21 13:20:58 EST 2013
+Wed Aug 28 15:02:27 EDT 2019
 </i>
 </UL>
 <hr>
 In your labs, I will give you one to three topcoder problems to solve.  
-In this set of lecture notes, I will go over an example of how I anticipate that you solve
-a problem.  
+In this set of lecture notes, I will go over an example of doing this, how you 
+sometimes have to fight topcoder, and how you can do a problem without Topcoder's
+servers working.
 <p>
-Suppose in lab, I say to do "SRM 564, D2, 250-pointer".  This is how you do it.  I'm 
-assuming that you already have a topcoder account.  First, go
-to <a href=http://www.topcoder.com/tc><b>www.topcoder.com/tc</b></a>.  The upper lefthand
-corner of the web page will look like:
+Suppose in lab, I say to do the problem "FauxPalindromes".  Often, I will give you 
+a URL to some notes on the problem, for example:
+<a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/index.html>http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/index.html</a>.
+<p>
 
-<p><center><table border=3><td><img src=SS-01.jpg></td></table></center><p>
+This is how I anticipate that you do the problem.  First, you'll need to create an account
+with topcoder.  Then, go to 
+<a href=https://arena.topcoder.com>https://arena.topcoder.com</a>.  You'll see a screen
+something like the following:
 
-Click on the "O(n)," and it will launch the competition applet.  That may require you
-to download some Java software.  Go ahead and do what you have to do.  Once you log in,
-you'll be in the main lobby with a window like this:
+<p><center><table border=3><td><a href=SS-01.jpg><img src=SS-01.jpg width=800></a></td></table></center><p>
+
+Now, move your mouse to the green icon, which is the icon circled below, and click on it.
+That should get you to the "practice problems" page:
+
+<p><center><table border=3><td><img src=SS-02.jpg></td></table></center><p>
+
+The "practice problems" page looks like the screenshot below:
+
+<p><center><table border=3><td><a href=SS-03.jpg><img src=SS-03.jpg width=800></a></td></table></center><p>
+
+Type "FauxPalindromes" into the search bar, and you'll see the problem, click on it, and you'll
+get a screen that looks as follows (As they warn you, this may take a minute or two.  When I 
+was writing these notes, it took over a minute.  Evidently,
+Topcoder uses a server farm of Raspberry Pi's to hold their problems.)
+
+<p><center><table border=3><td><a href=SS-04.jpg><img src=SS-04.jpg width=800></a></td></table></center><p>
+
+Go ahead and read the problem description, including the constraints and examples.
+Think about how to solve it.  My strategy for solving this problem would be as follows:
+
+<UL>
+<LI> First create the string in reverse, and if that is equal to the original string, then
+     return "PALINDROME".
+<LI> Go through the string, and create a new string <b>p</b>, which contains the original
+     string, but without any repeated characters.  In other words, "AAABCC" would become "ABC".
+<LI> Create another string <b>r</b> which is <b>p</b> in reverse.
+<LI> If <b>p</b> equals <b>r</b>, return "FAUX", and if not, return "NOT EVEN FAUX".
+</UL>
+
+Time to start writing the code.  You'll note that there is a section called "Definition", which
+gives you the class and method definitions that you should implement:
 
 <p><center><table border=3><td><img src=SS-05.jpg></td></table></center><p>
 
-Click on "Practice Rooms", then "SRMs", and then find "SRM 564," just like I do below.
-The SRM's are numbered consecutively, so it shouldn't take you too long to find the right one:
+Start off by defining the class, and implementing the method so that it simply returns
+an empty string.  I've done that below (I clicked on the icon to expand the "coding area"):
 
-<p><center><table border=3><td><img src=SS-06.jpg></td></table></center><p>
+<p><center><table border=3><td><a href=SS-06.jpg><img src=SS-06.jpg width=800></a></td></table></center><p>
 
-That will bring you to the competition arena for SRM 564, D2 ("SRM" stands for "single round match.").  Each SRM has two divisions.  Division one is hard, and division two is easier.
-In this class we'll focus on D2 problems for the most part.  Now, the "Select one" drop 
-box typically has three problems to try, with differing point values -- below, I'm choosing
-the 250-point problem:
+Click on "compile" to make sure that you have these details correct.  You'll get a warning
+(since you didn't use the argument "word"), but that's fine.  Now you're ready to actually 
+write code.  Here's my implementation.  The comments are for you, by the way.  I typically don't
+comment when I'm doing Topcoder.  (Oh, and if you click on the picture, you can see the screenshot
+in its full size -- that's true with most of the screenshots here).
 
+<p><center><table border=3><td><a href=SS-07.jpg><img src=SS-07.jpg width=800></a></td></table></center><p>
 
-<p><center><table border=3><td><img src=SS-07.jpg></td></table></center><p>
+Compile this, and then click on the "Test Panel".  This allows you to run your program on the
+examples.  I clicked on the "Click All" button and then ran, and the window brings up that I 
+failed cases two and four.  Crap!!!
 
-This pops up a new window which you may have to mess with to see everything.  However, it
-will have two sub-windows.  One has a problem description, and one has a programming area:
+<p><center><table border=3><td><a href=SS-08.jpg><img src=SS-08.jpg width=400></a></td></table></center><p>
 
-<p><center><table border=3><td><img src=SS-08.jpg></td></table></center><p>
+You can debug however you want. I pretty much knew my error right away -- I'm calling 
+<b>r.push_back(p[i])</b> instead of <b>r.push_back(p[j])</b>.  If you put <b>cout</b> or
+<b>printf()</b> statements into your code, you'll see standard output in the window after
+clicking "Run".  When you're satisfied and you want to submit, then you click "submit"
+and it will tell you how many points you've gotten.  That doesn't mean that your program 
+is right, though.  To see that, click on "Run System Tests".  If all has gone well, then you'll
+see the following:
 
-The problem statement tells you what problem to solve.  In this one, you'll be given 
-a string, and you need to state whether it is a palindrome, a "faux" palindrome, or neither.
+<p><center><table border=3><td><a href=SS-09.jpg><img src=SS-09.jpg width=400></a></td></table></center><p>
 
-If you scroll the top sub-window, you'll see a "Definition".
-
-<p><center><table border=3><td><img src=SS-09.jpg></td></table></center><p>
-
-What this says is that you need to define a C++ class called
-<b>FauxPalindromes</b>, and that class needs to have a public method
-called <b>classifyIt</b>.  It will have one parameter, which is the input string,
-and it must output a string.  
+Otherwise, you'll have to go back, fix your code and resubmit.  When you fail, it doesn't appear
+to tell you why.  That's a drag.  Also, if you want to add test cases to the "Test Panel," click
+on "+Add" and you can create your own test cases.
 <p>
-If you scroll further, you'll see "Constraints," which tell you constraints on the input.
-The constraints are often helpful for finding a solution.  Then after the constraints, 
-you'll see "Examples":
+<hr>
+<h3>Alternatives to the Arena</h3>
 
-<p><center><table border=3><td><img src=SS-10.jpg></td></table></center><p>
-
-The examples are usually very helpful, but beware of proof-by-Cosmo.  It's very easy to
-get all of the examples right and still have a program that's wrong.
+There is a Java applet that you can use as an alternative to the web-based arena.  You can copy
+it from <a href=ContestAppletProd.jnlp>here</a>.  It's *much* better than the arena, and is how
+I prefer to use Topcoder.  This is especially true, because it has a "file-edit" mode, where it
+copies the program to/from my computer, so I can edit with vi and do things the way that I'm used
+to doing it.  The down side to this is that it works and fails sporadically.  I suspect it is no
+longer supported.  Still, it's worth a try.
 <p>
-Now, you want to start coding.  The first thing you need to do is define the class
-and the method, and then below that, implement the method.  I do that below.  My program
-isn't correct, but I just want to get something compiling.  I personally don't like to 
-implement methods inside my class definition.  That's why my implementation is below
-the definition:
-<p>
-You'll also notice that I've changed the name of the parameter twice.  In the problem 
-description, it's "word."  In my class definition, it's "s" and in my implementation, it's
-"w."  That's perfectly fine -- as long as the types match the definition, I can name
-them anything I want.
+Also, on my web pages, I often put enough information for you to do the problem without 
+Topcoder.  That is true with FauxPalindromes.  
+Go to
+<a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/index.html>http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/index.html</a>.  You'll note that
+I have a section called "In Case Topcoder's Servers Are Down," which gives you a description 
+of the problem, and the examples.  Then, I have a few files to help you:
 
-<p><center><table border=3><td><img src=SS-10A.jpg></td></table></center><p>
+<UL>
+<LI> <a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/main.cpp>main.cpp</a>.  This is a C++ file that has a <b>main()</b> with the examples compiled in, and it also
+allows you to enter input on standard input.  
+<LI> <a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/FauxPalindromes.cpp>FauxPalindromes.cpp</a>.  This is a C++ file that has the skeleton of the problem -- it's
+like the version above where we simply defined the class and method, and had the method return
+the empty string.
+<LI> <a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/tests.sh>tests.sh</a>.  This is a shell script that performs a lot of calls to your program, assuming that <b>main.cpp</b> has been compiled to <b>a.out</b>
+<LI> <a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2012/FauxPalindromes/answers.txt>answers.txt</a>.  This is the correct output of <b>tests.sh</b>
+</UL>
 
-I click "Save", to save the program on topcoder's server, and then "Compile" for topcoder's
-server to compile the program.  My compilation doesn't work:
+Go ahead and copy all four of these files to your own directory (right-click the links and do "save link as").  The way you use <b>main.cpp</b> is a little quirky.  As you can see, the first line
+includes "FauxPalindromes.cpp":
 
-<p><center><table border=3><td><img src=SS-11.jpg></td></table></center><p>
+<pre>
+UNIX> <font color=darkred><b>ls -l</b></font>
+total 40
+-rw-r--r--@ 1 jplank  staff   322 Aug 28 17:39 FauxPalindromes.cpp
+-rw-r--r--@ 1 jplank  staff   947 Aug 28 17:39 answers.txt
+-rw-r--r--@ 1 jplank  staff   965 Aug 28 17:39 main.cpp
+-rw-r--r--@ 1 jplank  staff  5614 Aug 28 17:36 tests.sh
+UNIX> <font color=darkred><b>head -n 1 main.cpp</b></font>
+#include "FauxPalindromes.cpp"
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
-String doesn't name a type?  Oh -- I forgot my include statements.  I fix that and 
-my compilation still fails.  You can see my include statements there behind the 
-"compile result" window:
+That is not something you normally want to do, but it is convenient here.  If you compile <b>main.cpp</b>, it will include <b>FauxPalindromes.cpp</b> and compile into an <b>a.out</b> that you can 
+use for testing.  Let's look at <b>FauxPalindromes.cpp</b>
 
-<p><center><table border=3><td><img src=SS-12.jpg></td></table></center><p>
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;list&gt;
+#include &lt;cmath&gt;
+#include &lt;algorithm&gt;
+#include &lt;map&gt;
+#include &lt;set&gt;
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
 
-I have a bug on line 10, and I can't really read what it is.  When I enlarge the 
-"compile result" bug, I see the whole thing:
+class FauxPalindromes {
+  public:
+    string classifyIt(string word);
+};
 
-<p><center><table border=3><td><img src=SS-13.jpg></td></table></center><p>
+string FauxPalindromes::classifyIt(string w)
+{
+  return "";
+}
+</pre></td></table></center><p>
 
-This is one of those frustrating bugs when you're just starting out.  
-It says that <b>ClassifyIt</b> is not defined in the class, but it looks as though
-I've defined it.  The problem is that I've capitalized the "C" in my
-implementation, but not in the class definition.  I go back to the "Problem Statement"
-window and see that the "C" should be lower case, so I fix it.
-<p>
-Now I compile, and I still get the warning that I'm not not using <b>w</b>, but that's
-ok -- I just want to get something compiling.  After you have successfully compiled, you
-can test your program with "Test."  That allows you to test each example, and you can enter
-your own input if you want as well.  Here, I get ready to test Example 0:
+We compile it by compiling <b>main.cpp</b> (which includes it):
 
-<p><center><table border=3><td><img src=SS-14.jpg></td></table></center><p>
+<pre>
+UNIX> <font color=darkred><b>g++ main.cpp</b></font>
+UNIX> <font color=darkred><b>ls -l a.out</b></font>
+-rwxr-xr-x  1 plank  staff  21460 Aug 28 17:42 a.out
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
-I click OK, and it shows me the results:
+Now when we run it, we can give the example number on the command line:
 
-<p><center><table border=3><td><img src=SS-15.jpg></td></table></center><p>
+<pre>
+UNIX> <font color=darkred><b>./a.out 0</b></font>
 
-I got it right!!!!  That's just because ANA happens to be a palindrome.  Obviously,
-if I try example 1 it will fail.  You'll also note that it tells you execution time --
-your program has to run in under 2 seconds.  That can be a challenge with some programs,
-but not this one.
-<p>
-Ok -- I program up a solution with the following strategy (which is incorrect, by the
-way).  I'm going to create a string <b>t</b>, which is created from the non-repeating
-characters of <b>w</b>.  I'll test <b>t</b> to see if it's a palindrome.  If not, I
-return "NOT EVEN FAUX."  If it is, then I test to see if <b>t</b> equals <b>w</b>.  If
-so, then the original is a palindrome, so I return "PALINDROME."  If <b>t</b> doesn't 
-equal <b>w</b>, then it's "FAUX."  
-<p>
-You'll note that I have a <b>cout</b> statement that prints <b>w</b> and <b>t</b>.  Topcoder ignores
-print statements, which is nice.  It compiles with no warnings or errors:
+UNIX> 
+</pre>
 
-<p><center><table border=3><td><img src=SS-17.jpg></td></table></center><p>
+Of course, nothing happened -- it printed the return value of <b>FauxPalindromes::classifyIt()</b>,
+which is the empty string.  Let's modify <b>FauxPalindromes.cpp</b> so that it returns the string
+<i>w</i>:
 
-It works fine on examples 0 and 1 -- here's the output window of example 1.  
-You can see the my <b>cout</b> statement there in "Standard Output":
+<pre>
+UNIX> <font color=darkred><b>vi FauxPalindromes.cpp </b></font>      <font color=blue># Change the program so that it returns w instead of "".</font>
+UNIX> <font color=darkred><b>g++ main.cpp</b></font>
+UNIX> <font color=darkred><b>a.out 0</b></font>
+ANA
+UNIX> <font color=darkred><b>a.out 1</b></font>
+AAAAANNAA
+UNIX> <font color=darkred><b>echo Fred | a.out -</b></font>
+Fred
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
-<p><center><table border=3><td><img src=SS-19.jpg></td></table></center><p>
+Now, let's solve the problem as we did above, changing <b>FauxPalindromes.cpp</b> to:
 
-Since Topcoder competitions are timed, I decide that my program has to be right, so 
-I click "Submit" and submit it.  It tells me that I received 213.41 points!!
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
 
-<p><center><table border=3><td><img src=SS-20.jpg></td></table></center><p>
+class FauxPalindromes 
+{
+  public:
+  string classifyIt(string word);
+};
 
-Now, just because submission is sucessful doesn't mean that your program is correct.
-You need to close your program window and click on "Run System Test," which is
-under "Practice Options:"
+string FauxPalindromes::classifyIt(string word) {
+  string rword, p, r;
+  size_t i;
+  int j;
+  
+  for (j = word.size()-1; j &gt;= 0; j--) rword.push_back(word[j]);     <font color=blue>// rword is the reverse of word.</font>
+  if (word == rword) return "PALINDROME";
+  
+  p.push_back(word[0]);                        <font color=blue>// p is word, but without any repeated characters.</font>
+  for (i = 1; i &lt; word.size(); i++) {
+    if (word[i] != word[i-1]) p.push_back(word[i]);
+  }
 
-<p><center><table border=3><td><img src=SS-21.jpg></td></table></center><p>
+  for (j = p.size()-1; j &gt;= 0; j--) r.push_back(p[j]);         <font color=blue>// r is the reverse of p.</font>
+  if (r == p) return "FAUX";
+  return "NOT EVEN FAUX";
+}
+</pre></td></table></center><p>
 
-Now the Topcoder servers run a battery of tests on your program, and if any test is 
-incorrect, you get a zero.  It's hard on the self-esteem, and it's what has just
-happened to me:
+Now, when we compile <b>main.cpp</b>, it incorporates the changes, and we are getting answers
+correct!
 
-<p><center><table border=3><td><img src=SS-22.jpg></td></table></center><p>
+<pre>
+UNIX> <font color=darkred><b>g++ main.cpp</b></font>
+UNIX> <font color=darkred><b>a.out 0</b></font>
+PALINDROME
+UNIX> <font color=darkred><b>a.out 1</b></font>
+FAUX
+UNIX> <font color=darkred><b>echo ABBA | a.out -</b></font>
+PALINDROME
+UNIX> <font color=darkred><b>echo AAAABA | a.out -</b></font>
+FAUX
+UNIX> <font color=darkred><b>echo Fred | a.out -</b></font>
+NOT EVEN FAUX
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
-Looks like I've got a few cases wrong.  You can double-click on any of the test cases, 
-and it will tell you the input, the expected output and your output:
+We can test ourselves by running <b>tests.sh</b>, and comparing the answers to <b>answers.txt</b>:
 
+<pre>
+UNIX> <font color=darkred><b>sh tests.sh > junk.txt</b></font>
+UNIX> <font color=darkred><b>diff junk.txt answers.txt</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
-<p><center><table border=3><td><img src=SS-23.jpg></td></table></center><p>
+<b>tests.sh</b> is not hard to read -- it just does a test per line:
 
-Yup. That should have returned "FAUX."  
-Test case #3 happens to be an example, so I reopen the programming
-window and test example 3:
-
-<p><center><table border=3><td><img src=SS-24.jpg></td></table></center><p>
-
-Hmmm.  T looks correct, and it is indeed a palindrome.  What gives?  When I probe
-further, I realize that I'm testing <b>w[i]</b> and <b>w[j]</b> inside my
-<b>while</b> loop, when I should be testing 
-<b>t[i]</b> and <b>t[j]</b>.  Duh.  So, I fix it, test example 3, and submit:
-
-<p><center><table border=3><td><img src=SS-25.jpg></td></table></center><p>
-
-You can see the bug fix there in the coding area.  I'm going to be assessed a 10%
-resubmission penalty.  So it goes:
-
-
-<p><center><table border=3><td><img src=SS-26.jpg></td></table></center><p>
-
-177.22 isn't that bad.  I close the window and run the system test again:
-
-
-<p><center><table border=3><td><img src=SS-27.jpg></td></table></center><p>
-
-DANG IT!!!!   I double-click test case 4 and see the following:
-
-<p><center><table border=3><td><img src=SS-28.jpg></td></table></center><p>
-
-Oh.  If the original is a palindrome with repeated letters, you need to report
-that as a palindrome and not a faux palindrome.  My fix for this is, in my opinion,
-inelegant.  Before constructing <b>t</b>, I simply test to see if <b>w</b> is a
-palindrome:
-
-<p><center><table border=3><td><img src=SS-30.jpg></td></table></center><p>
-
-Compile, test, submit.  Yes, another 10% penalty:
-
-<p><center><table border=3><td><img src=SS-31.jpg></td></table></center><p>
-
-That's a sucky score for such an easy program.  Whatever.  
-<p>
-After a few seconds of anxiety, I see that the
-system test has passed:
-
-<p><center><table border=3><td><img src=SS-32.jpg></td></table></center><p>
-
-YAY!
+<pre>
+UNIX> <font color=darkred><b>head tests.sh</b></font>
+echo ICJGJCFGEGHIAFFFFAIHGEGFCJGJC | ./a.out -
+echo ENHPIECCMPEGPJJJPGEPMCEIPHNE | ./a.out -
+echo OOCBCLDNCEMOFDALNLADFOMECNDLCBCOO | ./a.out -
+echo CPPRRXXAGGGKKSUUUMUUUUUSSSKGGAAAXRPC | ./a.out -
+echo JKKKNFKLNFHJJGPIMMMGJGMMIPPGJHFFNLKKFNNKKJJ | ./a.out -
+echo DBBMMMBBIIIMMBDQQMMMMMQQDDBMMIIIBBMMMBBBDD | ./a.out -
+echo BAEBAFFCGDEGDDGEDGCFFABEAB | ./a.out -
+echo DDIAHDCBBDBGDADGBDBBCDHAIDD | ./a.out -
+echo JLDNFNFGEOFNCCNFOEGFNFNDLJ | ./a.out -
+echo KCKAAGMGGIGJJKKKGCDDJCOIIIOOCJDCGKKKJGIGGMMGAAKKCK | ./a.out -
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
 <hr>
-<h2>A few comments about Topcoder</h2>
+<h3>A final aside about including the cpp file</h3>
 
-Ok -- now having gone through that example, I'll make a few comments.  First,
-Topcoder's default editor is awful.  I can guarantee you that this is the last
-time you'll see me use it.  I use the "FileEdit" editor, but there are some others
-that are supported by Topcoder.  You've got to poke around their web pages. 
-I've written some supporting programs too -- they are documented in my
-CS302 topcoder page: <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs302/topcoder.html>http://web.eecs.utk.edu/~jplank/plank/classes/cs302/topcoder.html</a>.  I don't really care
-if you use them or not, but you'll probably want to use something better than 
-Topcoder's default editor.
-<p>
-Topcoder problems utilize two skills: problem solving and programming.  Typically, the
-hard part is the problem solving, and often pencil and paper are better tools for solving
-the problem than a computer.  When you've solved the problem, you have to program it.
-For me, that part is usually  trivial once I've figured out how to solve the problem.
-For you, it will be harder, because you are learning, but I want you to get practice.
-This is why we do Topcoder in labs.
-<p>
-A final caveat.  Topcoder has two flaws as a teaching device.  The first is that you're so focused
-on speed that you write icky programs.  For example, in the program above, I should have
-written a palindrome testing procedure.  Then I could call it on <b>w</b>, 
-then if necessary create <b>t</b> and call it on <b>t</b>.  That would be cleaner, and
-it would be less bug prone because I'm not writing two separate palindrome testers.  
-I'm not too worried about this flaw.  You should know when you're writing bad code for speed,
-and when you should slow down to write good code.  I.e., your homeworks should have good code.
-<p>
-The second flaw is that you have a mistake, and instead of slowing down to figure it out,
-you simply make random changes to your program until it passes the system test.  When you 
-do that, you are not learning anything, so I really want to recommend that you don't do it.
-Slow down, and figure out what's wrong.  
+That "<b>#include "FauxPalindromes.cpp</b>" statement is something you don't see every day, and
+that is for good reason.  In general, it's a bad thing to do, so <i>please</i> don't do it in your
+code, and if you do end up doing it, please don't say that I taught it to you.  It will make both
+you and me look bad...
