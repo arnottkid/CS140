@@ -103,7 +103,8 @@ There is a Java applet that you can use as an alternative to the web-based arena
 it from <a href=ContestAppletProd.jnlp>here</a>.  It's *much* better than the arena, and is how
 I prefer to use Topcoder.  This is especially true, because it has a "file-edit" mode, where it
 copies the program to/from my computer, so I can edit with vi and do things the way that I'm used
-to doing it.  The down side to this is that it works and fails sporadically.  I suspect it is no
+to doing it.  It also shows you the inputs that cause you to fail the system test.  
+The down side to this is that it works and fails sporadically.  I suspect it is no
 longer supported.  Still, it's worth a try.
 <p>
 Also, on my web pages, I often put enough information for you to do the problem without 
@@ -189,11 +190,11 @@ which is the empty string.  Let's modify <b>FauxPalindromes.cpp</b> so that it r
 <pre>
 UNIX> <font color=darkred><b>vi FauxPalindromes.cpp </b></font>      <font color=blue># Change the program so that it returns w instead of "".</font>
 UNIX> <font color=darkred><b>g++ main.cpp</b></font>
-UNIX> <font color=darkred><b>a.out 0</b></font>
+UNIX> <font color=darkred><b>./a.out 0</b></font>
 ANA
-UNIX> <font color=darkred><b>a.out 1</b></font>
+UNIX> <font color=darkred><b>./a.out 1</b></font>
 AAAAANNAA
-UNIX> <font color=darkred><b>echo Fred | a.out -</b></font>
+UNIX> <font color=darkred><b>echo Fred | ./a.out -</b></font>
 Fred
 UNIX> <font color=darkred><b></b></font>
 </pre>
@@ -234,15 +235,15 @@ correct!
 
 <pre>
 UNIX> <font color=darkred><b>g++ main.cpp</b></font>
-UNIX> <font color=darkred><b>a.out 0</b></font>
+UNIX> <font color=darkred><b>./a.out 0</b></font>
 PALINDROME
-UNIX> <font color=darkred><b>a.out 1</b></font>
+UNIX> <font color=darkred><b>./a.out 1</b></font>
 FAUX
-UNIX> <font color=darkred><b>echo ABBA | a.out -</b></font>
+UNIX> <font color=darkred><b>echo ABBA | ./a.out -</b></font>
 PALINDROME
-UNIX> <font color=darkred><b>echo AAAABA | a.out -</b></font>
+UNIX> <font color=darkred><b>echo AAAABA | ./a.out -</b></font>
 FAUX
-UNIX> <font color=darkred><b>echo Fred | a.out -</b></font>
+UNIX> <font color=darkred><b>echo Fred | ./a.out -</b></font>
 NOT EVEN FAUX
 UNIX> <font color=darkred><b></b></font>
 </pre>
@@ -273,9 +274,9 @@ UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
-<h3>A final aside about including the cpp file</h3>
+<h3>A final aside about including the cpp file from main.cpp</h3>
 
-That "<b>#include "FauxPalindromes.cpp</b>" statement is something you don't see every day, and
+That <b>#include "FauxPalindromes.cpp"</b> statement is something you don't see every day, and
 that is for good reason.  In general, it's a bad thing to do, so <i>please</i> don't do it in your
 code, and if you do end up doing it, please don't say that I taught it to you.  It will make both
 you and me look bad...
