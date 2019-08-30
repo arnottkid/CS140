@@ -1,42 +1,60 @@
+/* This program illustrates how easy it is to make a copy of a potentially
+   very large data structure.  It creates a 4x5 matrix of doubles, and then
+   creates a copy of it with a single statement.  I then change a few values
+   in the copy to verify that it is indeed a copy. */
+   
 #include <cstdio>
-#include <cstdlib>
 #include <vector>
 #include <iostream>
 using namespace std;
 
-typedef vector <double> DVec;
-
-main()
+int main()
 {
-  vector <DVec> v1, v2;
-  DVec dv;
-  int i, j;
+  vector < vector <double> > v, vcopy;
+  vector <double> dv;
+  double val;
+  size_t i, j;
 
-  srand48(100);
+  /* First create the matrix v.  Mathmatically, entry i,j of v contains (5i+j+1)/9.0.  
+     I's not really important what it contains -- I'm just filling it with some numbers. 
+     Not also that I'm not using resize here, but I'm calling v.push_back() with a
+     vector, which makes a copy of that vector. */
 
+  val = 1.0;
   for (i = 0; i < 4; i++) {
     dv.clear();
-    for (j = 0; j < 5; j++) dv.push_back(drand48()*10);
-    v1.push_back(dv);
+    for (j = 0; j < 5; j++) {
+      dv.push_back(val / 9.000);
+      val++;
+    }
+    v.push_back(dv);
   }
 
-  v2 = v1;
+  /* This single statement makes a copy of v. */
 
-  for (i = 0; i < v2.size(); i++) {
-    for (j = 0; j < v2[i].size(); j += 2) v2[i][j] = 0;
+  vcopy = v;
+
+  /* Zero the elements in the even columns of vcopy. */
+
+  for (i = 0; i < vcopy.size(); i++) {
+    for (j = 0; j < vcopy[i].size(); j += 2) vcopy[i][j] = 0;
   }
   
-  printf("V1:\n\n");
+  /* Now print both v and vcopy */
 
-  for (i = 0; i < v1.size(); i++) {
-    for (j = 0; j < v1[i].size(); j++) printf("%8.3lf", v1[i][j]);
+  printf("V:\n\n");
+
+  for (i = 0; i < v.size(); i++) {
+    for (j = 0; j < v[i].size(); j++) printf("%8.3lf", v[i][j]);
     printf("\n");
   }
   
-  printf("\nV2:\n\n");
+  printf("\nVCopy:\n\n");
 
-  for (i = 0; i < v2.size(); i++) {
-    for (j = 0; j < v2[i].size(); j++) printf("%8.3lf", v2[i][j]);
+  for (i = 0; i < vcopy.size(); i++) {
+    for (j = 0; j < vcopy[i].size(); j++) printf("%8.3lf", vcopy[i][j]);
     printf("\n");
   }
+
+  return 0;
 }

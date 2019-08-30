@@ -1,29 +1,19 @@
-# +mkmake+ -- Everything after this line is automatically generated
+EXEC = pascal vcopy vdm
 
-EXECUTABLES = fred pascal vcopy vdm 
 
-all: $(EXECUTABLES)
+CFLAGS ?= -Wall -Wextra
+
+all: $(EXEC)
 
 clean:
-	rm -f core *.o $(EXECUTABLES) a.out
+	rm -f a.out $(EXEC) *.o
 
-.SUFFIXES: .cpp .o
-.cpp.o:
-	g++ $(CFLAGS) -c $*.cpp
+pascal: pascal.cpp
+	g++ $(CFLAGS) -o pascal pascal.cpp
 
+vcopy: vcopy.cpp
+	g++ $(CFLAGS) -o vcopy vcopy.cpp
 
-fred: fred.o
-	g++ $(CFLAGS) -o fred fred.o
-
-genlines: genlines.o
-	g++ $(CFLAGS) -o genlines genlines.o
-
-pascal: pascal.o
-	g++ $(CFLAGS) -o pascal pascal.o
-
-vcopy: vcopy.o
-	g++ $(CFLAGS) -o vcopy vcopy.o
-
-vdm: vdm.o
-	g++ $(CFLAGS) -o vdm vdm.o
+vdm: vdm.cpp
+	g++ $(CFLAGS) -o vdm vdm.cpp
 
