@@ -483,80 +483,73 @@ UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
-<h3>Getline and stringstreams</h3>
+<h3>Getline and stringstreams - a very useful program:</h3>
 
 As mentioned in the lecture notes on string and vector basics, 
 the procedure <b>getline(cin, s)</b> reads a line of input from standard input and puts
 it into the string <b>s</b>.  Spaces are preserved.  You can combine <b>getline</b> 
 and stringstreams to identify and get access to individual words on each line,
 as in 
-<b><a href=identify_words.cpp>identify_words.cpp</a></b>, which prints out 
-each word on standard input, preceded by its line number and word number.
+<b><a href=identify_words.cpp>identify_words.cpp</a></b>.  This program contains some
+code that I use all the time to process standard input.  It reads a line, and then
+using a stringstream, it creates a vector of the words on the line.  It then 
+prints info and the words:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program contains code that I use all the time, to read a line on 
+   standard input, and then to create a vector of all of the words on the line. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 #include &lt;sstream&gt;
+#include &lt;vector&gt;
 using namespace std;
 
 int main()
 {
-  istringstream ss;
-  string s;
-  int l, w;
+  string line;              <font color=blue>// The line</font>
+  vector &lt;string&gt; sv;       <font color=blue>// This holds the words on the current line</font>
+  int ln;                   <font color=blue>// Line number</font>
+  size_t w;                 <font color=blue>// Word number</font>
+  string s;                 <font color=blue>// Helper</font>
+  istringstream ss;         <font color=blue>// Helper</font>
 
-  l = 0;
-  while (getline(cin, s)) {
-    l++;
+  ln = 0;
+
+  <font color=blue>/* Read the current line and update the line number. */</font>
+
+  while (getline(cin, line)) {
+    ln++;
+
+    <font color=blue>/* Using a stringstream, create the vector of words on the line. */</font>
+
+    sv.clear();
     ss.clear();
-    ss.str(s);
-    w = 0;
-    while (ss &gt;&gt; s) {
-      w++;
-      printf("Line %3d, word %3d: %s\n", l, w, s.c_str());
-    }
+    ss.str(line);
+    while (ss &gt;&gt; s) sv.push_back(s);
+
+    <font color=blue>/* Print the line number, number of words, and the words. */</font>
+
+    printf("Line %d.  # Words: %lu:", ln, sv.size());
+    for (w = 0; w &lt; sv.size(); w++) printf(" %s", sv[w].c_str());
     printf("\n");
   }
+
+  return 0;
 }
 </pre></td></table></center><p>
 
 <pre>
-UNIX> <font color=darkred><b>g++ identify_words.cpp -o identify_words</b></font>
+UNIX> <font color=darkred><b>g++ -Wall -Wextra -o identify_words identify_words.cpp</b></font>
 UNIX> <font color=darkred><b>cat input.txt</b></font>
 There's a port on a western bay
 And it serves a hundred ships a day.
 Lonely sailors pass the time away
 And talk about their homes.
-UNIX> <font color=darkred><b>identify_words < input.txt</b></font>
-Line   1, word   1: There's
-Line   1, word   2: a
-Line   1, word   3: port
-Line   1, word   4: on
-Line   1, word   5: a
-Line   1, word   6: western
-Line   1, word   7: bay
-
-Line   2, word   1: And
-Line   2, word   2: it
-Line   2, word   3: serves
-Line   2, word   4: a
-Line   2, word   5: hundred
-Line   2, word   6: ships
-Line   2, word   7: a
-Line   2, word   8: day.
-
-Line   3, word   1: Lonely
-Line   3, word   2: sailors
-Line   3, word   3: pass
-Line   3, word   4: the
-Line   3, word   5: time
-Line   3, word   6: away
-
-Line   4, word   1: And
-Line   4, word   2: talk
-Line   4, word   3: about
-Line   4, word   4: their
-Line   4, word   5: homes.
-
+UNIX> <font color=darkred><b>./identify_words < input.txt</b></font>
+Line 1.  # Words: 7: There's a port on a western bay
+Line 2.  # Words: 8: And it serves a hundred ships a day.
+Line 3.  # Words: 6: Lonely sailors pass the time away
+Line 4.  # Words: 5: And talk about their homes.
 UNIX> <font color=darkred><b></b></font>
 </pre>
