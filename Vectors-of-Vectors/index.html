@@ -1,0 +1,316 @@
+<title>CS140 Lecture notes -- Vectors of Vectors</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Vectors of Vectors</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI>Directory: <b>~jplank/cs140/notes/Vectors-of-Vectors</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Vectors-of-Vectors>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Vectors-of-Vectors</b></a>
+<LI> Last modification date: <i>
+Mon Jan 23 16:15:34 EST 2012
+</i>
+<hr>
+
+Interestingly, vectors of strings don't seem to give students problems; however
+vectors of vectors do, and the two are really not fundamentally different.  This
+lecture gives you some practice with vectors of vectors.
+<p>
+Let's suppose that I want to represent a matrix of integers in 
+C++.  The best way to do that, is to use a vector of integer vectors.  
+<p>
+First, let me introduce you to <b>typedef</b>.  It is a way in C/C++ to rename a 
+data type with your own name.  For example, take a look at
+<b><a href=fred.cpp>fred.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+typedef int Fred;
+
+main()
+{
+  Fred i;
+
+  i = 5;
+
+  cout &lt;&lt; "The Fred named i is equal to " &lt;&lt; i &lt;&lt; endl;
+}
+</pre></td></table></center><p>
+
+The <b>typedef</b> statement says that you can declare a variable to be
+of type "Fred," and that when you do it, it will be an <b>int</b>.  Thus,
+when we declare <b>"Fred i"</b>, that is the same as saying <b>"int i"</b>:
+<p>
+
+<pre>
+UNIX> <font color=darkred><b>fred</b></font>
+The Fred named i is equal to 5
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+While <b>Fred</b>'s aren't very useful, <b>typedef</b>'s are extremely useful.
+The program <b><a href=vdm.cpp>vdm.cpp</a></b> shows how we can use a <b>typedef</b>
+to declare a vector of integer vectors:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+typedef vector &lt;int&gt; IVec;
+
+main(int argc, char **argv)
+{
+  int r, c, p, i, j, base, val;
+  istringstream ss;
+  vector &lt;IVec&gt; vdm;
+
+  if (argc != 4) { cerr &lt;&lt; "usage: vdm rows cols prime\n"; exit(1); }
+
+  ss.clear(); ss.str(argv[1]); if (!(ss &gt;&gt; r)) { cerr &lt;&lt; "Bad rows\n"; exit(1); }
+  ss.clear(); ss.str(argv[2]); if (!(ss &gt;&gt; c)) { cerr &lt;&lt; "Bad cols\n"; exit(1); } 
+  ss.clear(); ss.str(argv[3]); if (!(ss &gt;&gt; p)) { cerr &lt;&lt; "Bad prime\n"; exit(1); }
+
+  vdm.resize(r);
+  for (i = 0; i &lt; vdm.size(); i++) {
+    base = i+1;
+    val = 1;
+    for (j = 0; j &lt; c; j++) {
+      vdm[i].push_back(val);
+      val = (val * base) % p;
+    }
+  }
+
+  for (i = 0; i &lt; vdm.size(); i++) {
+    for (j = 0; j &lt; vdm[i].size(); j++) printf(" %4d", vdm[i][j]);
+    cout &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+
+This program takes three command line arguments: <i>r</i>, <i>c</i> and <i>p</i>.
+It then creates a <b>r * c</b> "Vandermonde" matrix over the field defined by the
+prime number <i>p</i>?  What's a "field?"   In this case, it is the numbers 0 through <i>p-1</i>,
+where addition, subtraction and multiplication are all modulo <i>p</i>.  Division 
+is defined to be the inverse of multiplication, but don't worry about it, since it doesn't
+really matter in this lecture.
+<p>
+A <i>Vandermonde</i> matrix is one that has the value <i>(i+1)<sup>j</sup></i> in row <i>i</i> and
+column <i>j</i> (everything is zero-indexed).  It has some very special properties concerning
+invertibility of submatrices, but again, we don't care too much -- we just want to create
+one and print it.
+<p>
+Take a look at how <b>vdm</b> is defined: <b>vector <IVec> vdm</b>.  What's an <b>IVec</b>?  Well,
+it has been created to equal a <b>vector <int></b>.  Thus, <b>vdm</b> is a vector of vectors.
+We initialize it first by calling <b>vdm.resize(r)</b>.  This makes it have <b>r</b> elements, each 
+of which is an empty vector.  
+In the first <b>four</b> loop, we initialize the elements -- for each row <i>i</i>, we first put <i>base<sup>0</sup></i> = 1 
+into the first element of <b>vdm[i]</b>.  Then we put in <i>base = base<sup>1</sup></i>, and then
+successive powers of <i>base</i>, all modulo <i>p</i>.  When we're done, we should have an <b>r * c</b>
+Vandermonde matrix.  The second set of <b>for</b> loops prints it out. 
+
+<pre>
+UNIX> <font color=darkred><b>vdm 1 1 101</b></font>
+    1
+UNIX> <font color=darkred><b>vdm 3 3 101</b></font>
+    1    1    1
+    1    2    4
+    1    3    9
+UNIX> <font color=darkred><b>vdm 3 5 101</b></font>
+    1    1    1    1    1
+    1    2    4    8   16
+    1    3    9   27   81
+UNIX> <font color=darkred><b>vdm 3 5 7</b></font>
+    1    1    1    1    1
+    1    2    4    1    2
+    1    3    2    6    4
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You should be able to verify to yourselves that all of the above matrices are Vandermonde matrices 
+in their given fields.
+<p>
+<h3>Vectors of Vectors don't have to represent rectangular matrices</h3>
+
+There's nothing that says we have to make each of the sub-vectors the same size.  
+For example, consider Pascal's triangle.  This is a triangle of numbers
+as pictured below:
+
+<p><center><table border=3><td><img src=Pascals-Triangle-1.jpg width=400></td></table></center><p>
+
+The numbers are arranged in rows, where row <i>i</i> has <i>i+1</i> elements (as always, our
+lives are zero-indexed).  The first and last element in each row is equal to one.  
+Each other element is the sum of the two elements above it.  Suppose we want to write
+a program to generate Pascal's triangle in a data structure.  One easy way to do 
+this is to generate it as a vector of integer vectors, where element <i>i</i> of the
+vector is a vector containing the elements of row <i>i</i>.  We can visualize it below:
+
+<p><center><table border=3><td><img src=Pascals-Triangle-2.jpg width=420></td></table></center><p>
+
+Scanning for a pattern, let's consider the <i>j</i>-th element in row <i>i</i>.  
+If it is the first or last element in the row, it will equal one.  Otherwise, you can 
+see from the picture that it is equal to the sum of elements <i>j-1</i> and <i>j</i> in row <i>i-1</i>. 
+That gives us a nice way to construct the triangle.  The code is in 
+<b><a href=pascal.cpp>pascal.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+typedef vector &lt;int&gt; IVec;
+
+main(int argc, char **argv)
+{
+  int r, i, j;
+  istringstream ss;
+  vector &lt;IVec&gt; pascal;
+
+  if (argc != 2) { cerr &lt;&lt; "usage: pascal rows\n"; exit(1); }
+
+  ss.clear();  
+  ss.str(argv[1]); 
+  if (!(ss &gt;&gt; r)) { cerr &lt;&lt; "Bad rows\n"; exit(1); }
+
+  pascal.resize(r);
+  for (i = 0; i &lt; pascal.size(); i++) {
+    for (j = 0; j &lt;= i; j++) {
+      if (j == 0 || j == i) {
+        pascal[i].push_back(1);
+      } else {
+        pascal[i].push_back(pascal[i-1][j-1] + pascal[i-1][j]);
+      }
+    }
+  }
+
+  for (i = 0; i &lt; pascal.size(); i++) {
+    for (j = 0; j &lt; pascal[i].size(); j++) printf(" %4d", pascal[i][j]);
+    cout &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+When we run it, it's pictured a little differently than above, but you should
+see that it is clearly the same triangle:
+
+<pre>
+UNIX> <font color=darkred><b>pascal 10</b></font>
+    1
+    1    1
+    1    2    1
+    1    3    3    1
+    1    4    6    4    1
+    1    5   10   10    5    1
+    1    6   15   20   15    6    1
+    1    7   21   35   35   21    7    1
+    1    8   28   56   70   56   28    8    1
+    1    9   36   84  126  126   84   36    9    1
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Making Copies of Things</h3>
+
+In C++, you can make a copy of an aggregate data structure with a simple
+assignment statement.  We've seen it before with strings.  The program 
+below,
+<b><a href=vcopy.cpp>vcopy.cpp</a></b>, illustrates it with a larger 
+data structure:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+typedef vector &lt;double&gt; DVec;
+
+main()
+{
+  vector &lt;DVec&gt; v1, v2;
+  DVec dv;
+  int i, j;
+
+  srand48(100);
+
+  for (i = 0; i &lt; 4; i++) {
+    dv.clear();
+    for (j = 0; j &lt; 5; j++) dv.push_back(drand48()*10);
+    v1.push_back(dv);
+  }
+
+  v2 = v1;
+
+  for (i = 0; i &lt; v2.size(); i++) {
+    for (j = 0; j &lt; v2[i].size(); j += 2) v2[i][j] = 0;
+  }
+  
+  printf("V1:\n\n");
+
+  for (i = 0; i &lt; v1.size(); i++) {
+    for (j = 0; j &lt; v1[i].size(); j++) printf("%8.3lf", v1[i][j]);
+    printf("\n");
+  }
+  
+  printf("\nV2:\n\n");
+
+  for (i = 0; i &lt; v2.size(); i++) {
+    for (j = 0; j &lt; v2[i].size(); j++) printf("%8.3lf", v2[i][j]);
+    printf("\n");
+  }
+}
+</pre></td></table></center><p>
+
+The first few lines create a vector of vectors of doubles.  We can think of
+it as a (4 * 5) matrix of doubles.  The next statement: <b>"v2 = v1"</b>
+is one that is not legal in C.  It is in C++ though -- it makes a copy of 
+<b>v1</b> and puts it into <b>v2</b>.  You can see that in the subsequent
+code that sets all the even indexed columns of <b>v2</b> to zero, and then
+prints out both matrices:
+
+<pre>
+UNIX> <font color=darkred><b>vcopy</b></font>
+V1:
+
+   2.511   2.089   9.409   4.225   3.959
+   3.826   2.317   5.355   5.332   8.629
+   9.624   3.154   7.360   6.547   0.503
+   4.538   8.065   6.558   8.119   8.299
+
+V2:
+
+   0.000   2.089   0.000   4.225   0.000
+   0.000   2.317   0.000   5.332   0.000
+   0.000   3.154   0.000   6.547   0.000
+   0.000   8.065   0.000   8.119   0.000
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Since <b>v2</b> is a copy of <b>v1</b>, changing <b>v2</b> does not affect <b>v1</b>.
+You'll hear me prattle on about memory a lot in this class, and this feature of C++
+is in my opinion a very dangerous one, because it allows you to consume tons of memory
+with very simple statements.  If <b>v1</b> were a (1024 * 1024) matrix instead of a (4 * 5)
+matrix, that one statement would consume 8 MB of memory.  In one operation!  I bring it
+up because I want you to pay attention to the memory usage of your programs!
+
+<p>
+There is another large copy operation in 
+<b><a href=vcopy.cpp>vcopy.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  for (i = 0; i &lt; 4; i++) {
+    dv.clear();
+    for (j = 0; j &lt; 5; j++) dv.push_back(drand48()*10);
+    v1.push_back(dv);
+  }
+</pre></td></table></center><p>
+
+That <b>v1.push_back(dv)</b> call makes a copy of <b>dv</b>.  If it didn't make a 
+copy, all of the rows of <b>v1</b> would be the same.
