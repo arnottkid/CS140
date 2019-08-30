@@ -63,6 +63,7 @@ Take a look at the code:
 
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
+#include &lt;cstdio&gt;
 #include &lt;sstream&gt;
 using namespace std;
 
@@ -79,10 +80,10 @@ int main(int argc, char **argv)
   <font color=blue>/* Error check the command line.  I usually don't like to put multiple statements
      on a single line like this, but with error checking, it's cleaner. */</font>
 
-  if (argc != 4) { cerr &lt;&lt; "usage: vdm rows cols prime\n"; exit(1); }
-  ss.clear(); ss.str(argv[1]); if (!(ss &gt;&gt; r)) { cerr &lt;&lt; "Bad rows\n"; exit(1); }
-  ss.clear(); ss.str(argv[2]); if (!(ss &gt;&gt; c)) { cerr &lt;&lt; "Bad cols\n"; exit(1); } 
-  ss.clear(); ss.str(argv[3]); if (!(ss &gt;&gt; p)) { cerr &lt;&lt; "Bad prime\n"; exit(1); }
+  if (argc != 4) { cerr &lt;&lt; "usage: vdm rows cols prime\n"; return 1; }
+  ss.clear(); ss.str(argv[1]); if (!(ss &gt;&gt; r)) { cerr &lt;&lt; "Bad rows\n"; return 1; }
+  ss.clear(); ss.str(argv[2]); if (!(ss &gt;&gt; c)) { cerr &lt;&lt; "Bad cols\n"; return 1; } 
+  ss.clear(); ss.str(argv[3]); if (!(ss &gt;&gt; p)) { cerr &lt;&lt; "Bad prime\n"; return 1; }
 
   <font color=blue>/* First create all of the elements of the matrix. */</font>
 
@@ -110,6 +111,8 @@ int main(int argc, char **argv)
   return 0;
 }
 </pre></td></table></center><p>
+
+
 To start with, take a look at the way I declare the vector of vectors:
 
 <p><center><table border=3 cellpadding=3><td><pre>
@@ -199,8 +202,8 @@ int main(int argc, char **argv)
 
   <font color=blue>/* Error check the command line. */</font>
 
-  if (argc != 2) { cerr &lt;&lt; "usage: pascal rows\n"; exit(1); }
-  ss.clear();  ss.str(argv[1]); if (!(ss &gt;&gt; r)) { cerr &lt;&lt; "Bad rows\n"; exit(1); }
+  if (argc != 2) { cerr &lt;&lt; "usage: pascal rows\n"; return 1; }
+  ss.clear();  ss.str(argv[1]); if (!(ss &gt;&gt; r)) { cerr &lt;&lt; "Bad rows\n"; return 1; }
 
   <font color=blue>/* Create an entry in the vector for each row.  Then add values to each row
      by using push_back() with either the value one, or the sum of two values

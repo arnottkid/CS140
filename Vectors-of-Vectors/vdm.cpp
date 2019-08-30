@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cstdio>
 #include <sstream>
 using namespace std;
 
@@ -23,10 +24,10 @@ int main(int argc, char **argv)
   /* Error check the command line.  I usually don't like to put multiple statements
      on a single line like this, but with error checking, it's cleaner. */
 
-  if (argc != 4) { cerr << "usage: vdm rows cols prime\n"; exit(1); }
-  ss.clear(); ss.str(argv[1]); if (!(ss >> r)) { cerr << "Bad rows\n"; exit(1); }
-  ss.clear(); ss.str(argv[2]); if (!(ss >> c)) { cerr << "Bad cols\n"; exit(1); } 
-  ss.clear(); ss.str(argv[3]); if (!(ss >> p)) { cerr << "Bad prime\n"; exit(1); }
+  if (argc != 4) { cerr << "usage: vdm rows cols prime\n"; return 1; }
+  ss.clear(); ss.str(argv[1]); if (!(ss >> r)) { cerr << "Bad rows\n"; return 1; }
+  ss.clear(); ss.str(argv[2]); if (!(ss >> c)) { cerr << "Bad cols\n"; return 1; } 
+  ss.clear(); ss.str(argv[3]); if (!(ss >> p)) { cerr << "Bad prime\n"; return 1; }
 
   /* First create all of the elements of the matrix. */
 

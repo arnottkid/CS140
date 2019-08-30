@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 
   /* Error check the command line. */
 
-  if (argc != 2) { cerr << "usage: pascal rows\n"; exit(1); }
-  ss.clear();  ss.str(argv[1]); if (!(ss >> r)) { cerr << "Bad rows\n"; exit(1); }
+  if (argc != 2) { cerr << "usage: pascal rows\n"; return 1; }
+  ss.clear();  ss.str(argv[1]); if (!(ss >> r)) { cerr << "Bad rows\n"; return 1; }
 
   /* Create an entry in the vector for each row.  Then add values to each row
      by using push_back() with either the value one, or the sum of two values
