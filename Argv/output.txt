@@ -1,4 +1,7 @@
 Argc is 2
 
-argv[0] = argc
+argv[0] = ./argc
+argv[1] = Shaft
+
+argv[0] = ./argc
 argv[1] = Shaft

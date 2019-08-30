@@ -1,13 +1,14 @@
 <title>CS140 Lecture notes -- Argc/Argv and Stringstreams</title>
 <body bgcolor=ffffff>
 <h1>CS140 Lecture notes -- Argc/Argv and Stringstreams</h1>
-<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
 <LI>Directory: <b>~jplank/cs140/Notes/Argv</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Argv>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Argv</b></a>
+<LI> Original Notes -- 2011-ish
 <LI> Last modification date: <i>
-Mon Jan 21 10:55:15 EST 2013
+Wed Aug 28 18:03:02 EDT 2019
 </i>
 <hr>
 
@@ -30,106 +31,135 @@ command line argument.  These are defined from 0 through <b>argc-1</b>.
 <p>
 For example, the program 
 <b><a href=argc.cpp>argc.cpp</a></b>
-prints out <b>argc</b>, and then each element of <b>argv</b>:
+prints out <b>argc</b>, and then each element of <b>argv</b>, first using <b>printf()</b>
+with the C-style strings, and then by copying them to C++ strings and using <b>cout</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program introduces you to argc and argv.  They are parameters to main(), and
+   tell you the number of words on the command line, and what those words are.  Note
+   that argc is always at least one, and argv[0] is usually the name of the program. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 using namespace std;
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   int i;
+  string s;
+
+  <font color=blue>/* Print argc. */</font>
 
   printf("Argc is %d\n", argc);
   printf("\n");
+
+  <font color=blue>/* Print argv using printf() and c-style strings. */</font>
+
   for (i = 0; i &lt; argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
   }
+  printf("\n");
+
+  <font color=blue>/* Print argv by copying each argument to a C++ string and printing it with cout. */</font>
+
+  for (i = 0; i &lt; argc; i++) {
+    s = argv[i];
+    cout &lt;&lt; "argv[" &lt;&lt; i &lt;&lt; "] = " &lt;&lt; s &lt;&lt; endl;
+  }
+  return 0;
 }
 </pre></td></table></center><p>
-
 A few examples are straightforward:
 
 <pre>
-UNIX> <font color=darkred><b>g++ argc.cpp -o argc</b></font>
-UNIX> <font color=darkred><b>argc</b></font>
+UNIX> <font color=darkred><b>./argc </b></font>
 Argc is 1
 
-argv[0] = argc
-UNIX> <font color=darkred><b>argc 5</b></font>
+argv[0] = ./argc
+
+argv[0] = ./argc
+UNIX> <font color=darkred><b>./argc 5</b></font>
 Argc is 2
 
-argv[0] = argc
+argv[0] = ./argc
 argv[1] = 5
-UNIX> <font color=darkred><b>argc They call me Mellow Yellow - quite right, Slick</b></font>
-Argc is 10
 
-argv[0] = argc
-argv[1] = They
-argv[2] = call
-argv[3] = me
-argv[4] = Mellow
-argv[5] = Yellow
-argv[6] = -
-argv[7] = quite
-argv[8] = right,
-argv[9] = Slick
+argv[0] = ./argc
+argv[1] = 5
+UNIX> <font color=darkred><b>./argc - Fred . +</b></font>
+Argc is 5
+
+argv[0] = ./argc
+argv[1] = -
+argv[2] = Fred
+argv[3] = .
+argv[4] = +
+
+argv[0] = ./argc
+argv[1] = -
+argv[2] = Fred
+argv[3] = .
+argv[4] = +
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 And now a few non-straightforward examples that have mostly do to with the Unix shell.
 If you perform redirection of standard input or standard output, those specifications 
 are stripped out by the shell and are not included in <b>argc/argv</b>:
 
 <pre>
-UNIX> <font color=darkred><b>argc < argc.cpp</b></font>
+UNIX> <font color=darkred><b>./argc < argc.cpp </b></font>
 Argc is 1
 
-argv[0] = argc
+argv[0] = ./argc
+
+argv[0] = ./argc
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
 You can even put those specifications at the beginning of the command -- it matters not:
 
 <pre>
-UNIX> <font color=darkred><b>> output.txt argc < argc.cpp Shaft</b></font>
+UNIX> <font color=darkred><b>> output.txt ./argc < argc.cpp Shaft </b></font>
 UNIX> <font color=darkred><b>cat output.txt</b></font>
 Argc is 2
 
-argv[0] = argc
+argv[0] = ./argc
 argv[1] = Shaft
-UNIX> <font color=darkred><b>< output.txt argc 1 2 3 > output2.txt 4 5 6</b></font>
-UNIX> <font color=darkred><b>cat output2.txt</b></font>
-Argc is 7
 
-argv[0] = argc
-argv[1] = 1
-argv[2] = 2
-argv[3] = 3
-argv[4] = 4
-argv[5] = 5
-argv[6] = 6
+argv[0] = ./argc
+argv[1] = Shaft
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-If you use single or double quotes you can put spaces into single arguments.  You can use 
+If you use single or double quotes, you can put spaces into single arguments.  You can use 
 single quotes to put double quotes into arguments and vice-versa:
 
 <pre>
-UNIX> <font color=darkred><b>argc "Jim Plank" 'Jim Plank'</b></font>
+UNIX> <font color=darkred><b>./argc "Jim Plank" 'Jim Plank'</b></font>
 Argc is 3
 
 argv[0] = argc
 argv[1] = Jim Plank
 argv[2] = Jim Plank
-UNIX> <font color=darkred><b>argc "They call him 'Thor'"</b></font>
+
+argv[0] = argc
+argv[1] = Jim Plank
+argv[2] = Jim Plank
+UNIX> <font color=darkred><b>./argc "They call him 'Thor'"</b></font>
 Argc is 2
 
 argv[0] = argc
 argv[1] = They call him 'Thor'
-UNIX> <font color=darkred><b>argc 'He said, "Quoting, it'"'s quite confusing."'"'</b></font>
+
+argv[0] = argc
+argv[1] = They call him 'Thor'
+UNIX> <font color=darkred><b>./argc 'He said, "Quoting, it'"'s quite confusing."'"'</b></font>
 Argc is 2
+
+argv[0] = argc
+argv[1] = He said, "Quoting, it's quite confusing."
 
 argv[0] = argc
 argv[1] = He said, "Quoting, it's quite confusing."
@@ -141,32 +171,10 @@ in the current directory.  For example, "*" matches all files.  "*.cpp" matches 
 end with ".cpp".  These are then put onto the command line and into argv:
 
 <pre>
-UNIX> <font color=darkred><b>argc *</b></font>
-Argc is 19
-
-argv[0] = argc
-argv[1] = argc
-argv[2] = argc.cpp
-argv[3] = argv1int
-argv[4] = argv1int.cpp
-argv[5] = argv2int
-argv[6] = argv2int.cpp
-argv[7] = argvallint
-argv[8] = argvallint.cpp
-argv[9] = clearing-output
-argv[10] = clearing-output.cpp
-argv[11] = identify_words
-argv[12] = identify_words.cpp
-argv[13] = index.html
-argv[14] = input.txt
-argv[15] = onetoten
-argv[16] = onetoten.cpp
-argv[17] = output2.txt
-argv[18] = output.txt
-UNIX> <font color=darkred><b>argc *.cpp</b></font>
+UNIX> <font color=darkred><b>./argc *.cpp | head -n 10</b></font>
 Argc is 8
 
-argv[0] = argc
+argv[0] = ./argc
 argv[1] = argc.cpp
 argv[2] = argv1int.cpp
 argv[3] = argv2int.cpp
@@ -174,7 +182,7 @@ argv[4] = argvallint.cpp
 argv[5] = clearing-output.cpp
 argv[6] = identify_words.cpp
 argv[7] = onetoten.cpp
-UNIX> <font color=darkred><b></b></font>
+UNIX> 
 </pre>
 
 <hr>
@@ -187,7 +195,11 @@ into an <b>istringstream</b> and then uses that to convert <b>argv[1]</b> into a
 It is in
 <b><a href=argv1int.cpp>argv1int.cpp</a></b>
 
+
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program uses a stringstream to convert the first command line
+   argument to an integer.  It prints an error if it is not an integer. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 #include &lt;sstream&gt;
@@ -198,18 +210,27 @@ int main(int argc, char **argv)
   istringstream ss;
   int i;
 
-  if (argc != 2) { cerr &lt;&lt; "usage: argv1int argument\n"; return 1; }
+  <font color=blue>/* Make sure there is exactly one command line argument. */</font>
+
+  if (argc != 2) { 
+    cerr &lt;&lt; "usage: argv1int argument\n"; 
+    return 1; 
+  }
+
+  <font color=blue>/* Use the stringstream to convert the argument to an integer, or print
+     an error on standard error. */</font>
 
   ss.str(argv[1]);
-  if (!(ss &gt;&gt; i)) {
+  if (ss &gt;&gt; i) {
+    printf("Integer: %d\n", i);
+  } else {
     fprintf(stderr, "The argument %s is not an integer.\n", argv[1]);
     return 1;
   } 
 
-  printf("Integer: %d\n", i);
+  return 0;
 }
 </pre></td></table></center><p>
-
 First, if you want to use <b>printf()</b> to print to standard error, you 
 simply call <b>fprintf()</b> and make the first parameter <b>stderr</b>.
 <p>
@@ -218,12 +239,12 @@ above just like <b>cin</b> to determine whether <b>argv[1]</b> is an integer.
 <p>
 
 <pre>
-UNIX> <font color=darkred><b>g++ argv1int.cpp -o argv1int</b></font>
-UNIX> <font color=darkred><b>argv1int </b></font>
+UNIX> <font color=darkred><b>g++ -Wall -Wextra -o argv1int argv1int.cpp</b></font>
+UNIX> <font color=darkred><b>./argv1int </b></font>
 usage: argv1int argument
-UNIX> <font color=darkred><b>argv1int 8000</b></font>
+UNIX> <font color=darkred><b>./argv1int 8000</b></font>
 Integer: 8000
-UNIX> <font color=darkred><b>argv1int Fred</b></font>
+UNIX> <font color=darkred><b>./argv1int Fred</b></font>
 The argument Fred is not an integer.
 UNIX> <font color=darkred><b></b></font>
 </pre>
@@ -236,6 +257,10 @@ and
 <b>argv[2]</b> into <i>j</i>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Here we try to read argument 1 into i and argument 2 into j, but the second
+   one fails, because we haven't cleared the stringstream.  In other words, if
+   you put two integers on the command line, it will fail. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 #include &lt;sstream&gt;
@@ -246,21 +271,34 @@ int main(int argc, char **argv)
   istringstream ss;
   int i, j;
 
-  if (argc != 3) { cerr &lt;&lt; "usage: argv1int argument argument\n"; return 1; }
+  <font color=blue>/* Error check to make sure we have three arguments. */</font>
+
+  if (argc != 3) { 
+    cerr &lt;&lt; "usage: argv1int argument argument\n";
+    return 1; 
+  }
+
+  <font color=blue>/* Read the first argument into i. */</font>
 
   ss.str(argv[1]);
-  if (!(ss &gt;&gt; i)) {
+  if (ss &gt;&gt; i) {
+    printf("Argument i: %d\n", i);
+  } else {
     fprintf(stderr, "Argument i -- %s is not an integer.\n", argv[1]);
     return 1;
   } 
-  printf("Argument i: %d\n", i);
+
+  <font color=blue>/* Read the first argument into j. */</font>
 
   ss.str(argv[2]);
-  if (!(ss &gt;&gt; j)) {
+  if (ss &gt;&gt; j) {
+    printf("Argument j: %d\n", j);
+  } else {
     fprintf(stderr, "Argument j -- %s is not an integer.\n", argv[2]);
     return 1;
   } 
-  printf("Argument j: %d\n", j);
+
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -268,20 +306,25 @@ When we run it, it fails on <i>j</i>, even though <b>argv[2]</b> does represent
 an integer:
 
 <pre>
-UNIX> <font color=darkred><b>g++ argv2int.cpp -o argv2int</b></font>
-UNIX> <font color=darkred><b>argv2int 10 20</b></font>
-Argument i: 10
-Argument j -- 20 is not an integer.
+UNIX> <font color=darkred><b>g++ -Wall -Wextra -o argv2int argv2int.cpp</b></font>
+UNIX> <font color=darkred><b>./argv2int 1 2</b></font>
+Argument i: 1
+Argument j -- 2 is not an integer.
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-This is because you have to call <b>clear</b> on the stringstream before calling
+
+This is because you have to call <b>clear()</b> on the stringstream before calling
 <b>ss.str(argv[2])</b>.  That's a drag -- try to remember it so that you don't get
 burnt by it when programming.  To hammer this home, 
 <b><a href=argvallint.cpp>argvallint.cpp</a></b>
 tests each command line argument to see it it is an integer:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This reads all of the arguments on the command line to determine 
+   whether each is an integer or not.  You have to call clear() on 
+   the stringstream each time you set it to a new string.  */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 #include &lt;sstream&gt;
@@ -293,20 +336,20 @@ int main(int argc, char **argv)
   int i, j;
 
   for (i = 1; i &lt; argc; i++) {
-    ss.clear();
+    ss.clear();                      <font color=blue>// Here is the clear command.</font>
     ss.str(argv[i]);
-    if (!(ss &gt;&gt; j)) {
-      printf("Argument %d -- %s is not an integer.\n", i, argv[i]);
-    } else {
+    if (ss &gt;&gt; j) {
       printf("Argument %d -- %d\n", i, j);
+    } else {
+      printf("Argument %d -- %s is not an integer.\n", i, argv[i]);
     }
   }
+  return 0;
 }
 </pre></td></table></center><p>
-
 <pre>
-UNIX> <font color=darkred><b>g++ argvallint.cpp -o argvallint</b></font>
-UNIX> <font color=darkred><b>argvallint 1 2 buckle my shoe. 3 4 get out the door.</b></font>
+UNIX> <font color=darkred><b>g++ -Wall -Wextra -o argv2int argv2int.cpp</b></font>
+UNIX> <font color=darkred><b>./argvallint 1 2 buckle my shoe. 3 4 get out the door.</b></font>
 Argument 1 -- 1
 Argument 2 -- 2
 Argument 3 -- buckle is not an integer.
@@ -330,12 +373,14 @@ Here's an example in
 <b><a href=onetoten.cpp>onetoten.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Use an ostringstream to create a string that contains the numbers from 1 to 10. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 #include &lt;sstream&gt;
 using namespace std;
 
-int main(int argc, char **argv)
+int main()
 {
   ostringstream ss;
   string s;
@@ -344,14 +389,14 @@ int main(int argc, char **argv)
   for (i = 1; i &lt; 11; i++) ss &lt;&lt; i &lt;&lt; " ";
   s = ss.str();
   cout &lt;&lt; s &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
-
 It creates a string containing the numbers 1 through 10 and then prints it out:
 
 <pre>
-UNIX> <font color=darkred><b>g++ onetoten.cpp -o onetoten</b></font>
-UNIX> <font color=darkred><b>onetoten</b></font>
+UNIX> <font color=darkred><b>g++ -Wall -Wextra -o onetoten onetoten.cpp</b></font>
+UNIX> <font color=darkred><b>./onetoten</b></font>
 1 2 3 4 5 6 7 8 9 10 
 UNIX> <font color=darkred><b></b></font>
 </pre>
