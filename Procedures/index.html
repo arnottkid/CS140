@@ -1,0 +1,832 @@
+<title>CS140 Lecture notes -- Procedures</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Procedures</h1>
+<UL>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>~jplank/cs140/notes/Procedures</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Procedures>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Procedures</b></a>
+<LI> Last modification date: <i>
+Sat Feb  5 12:36:10 EST 2011
+</i>
+</UL>
+<hr>
+
+<h3>Basics</h3>
+
+Procedures allow you to perform the same task multiple times.  If you have 
+a functionality that you want to perform over and over, it's often good
+to define a procedure and use it.  For example, suppose you have a bunch  of
+songs and you want to burn them onto CD's.  You know that a CD will hold
+80 minutes of music, and you have a list of songs with their timings in MM:SS
+format in the file
+<b><a href=songs.txt>songs.txt</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+Africano                                     5:10
+Get to Me                                    4:06
+In-A-Gadda-Da-Vida                           3:02
+Can't Get Used To Losing You                 3:05
+Calling All Angels                           4:02
+Crosstown Traffic                            2:20
+Overture - Prologue                          3:04
+Funky Miracle                                2:30
+Queen Bee                                    3:13
+One Way or Another                           3:29
+Till There Was You                           2:14
+I Love The Nightlife (Disco 'Round)          2:55
+Tales 3. The Ancient; Giants Under the Sun  18:38
+Sit Down and Talk To Me                      3:18
+Mississippi Queen                            2:31
+Heartless                                    5:00
+Shake A Leg                                  4:06
+I Want To Know                               4:24
+Sugar Babe                                   4:35
+Intensity                                    3:50
+It's Too Late                                3:51
+You've Made Me So Very Happy                 4:23
+Tumbling Dice                                3:47
+Rainbow Blues                                3:39
+Anyway                                       3:19
+Bad Time                                     2:57
+If I Can't Have You                          3:00
+War Within a Breath                          3:37
+High Time We Went                            4:30
+I'm Coming Home                              3:01
+Loving Cup                                   4:26
+Darts                                        2:14
+Amen                                         3:30
+Are You Happy                                4:50
+First Brain                                  3:40
+Sexy Ida                                     2:34
+Josie                                        4:31
+Stairway To Heaven                           8:02
+While The City Sleeps                        3:51
+Do For the Others                            2:50
+Fair Game                                    3:30
+I'm Not Leaving                              2:32
+Roll on Down the Highway                     3:57
+You Get Me                                   3:54
+Little Guitars (Intro)                       0:42
+The Caves Of Altamira                        3:34
+
+</pre></td></table></center><p>
+
+You'd like to turn this big list into a list of playlists where each playlist fits onto a CD.
+First, let's write a program that simply reads in each song and timing and creates two 
+string vectors -- one of song titles and one of timings.  This is good string
+practice -- we're going to assume that the last word on each line is a timing and that it
+is separated from the title by more than one space.  The program is
+in <b><a href=readlist.cpp>readlist.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+main()
+{
+  vector &lt;string&gt; songs;
+  vector &lt;string&gt; timings;
+  string line;
+  int i;
+
+  while(getline(cin, line)) {
+    i = line.find("  ");
+    if (i == string::npos) { cerr &lt;&lt; "Bad line -- " &lt;&lt; line &lt;&lt; endl; exit(1); }
+    songs.push_back(line.substr(0, i));
+    while (line[i] == ' ') i++;
+    timings.push_back(line.substr(i));
+  }
+  for (i = 0; i &lt; songs.size(); i++) {
+    printf("Song: %-40s -- Timing %5s\n", songs[i].c_str(), timings[i].c_str());
+  }
+}
+</pre></td></table></center><p>
+
+As always, we should test -- here we do it on the first ten lines of <b>songs.txt</b>:
+
+<pre>
+UNIX> <font color=darkred><b>head songs.txt | readlist</b></font>
+Song: Africano                                 -- Timing  5:10
+Song: Get to Me                                -- Timing  4:06
+Song: In-A-Gadda-Da-Vida                       -- Timing  3:02
+Song: Can't Get Used To Losing You             -- Timing  3:05
+Song: Calling All Angels                       -- Timing  4:02
+Song: Crosstown Traffic                        -- Timing  2:20
+Song: Overture - Prologue                      -- Timing  3:04
+Song: Funky Miracle                            -- Timing  2:30
+Song: Queen Bee                                -- Timing  3:13
+Song: One Way or Another                       -- Timing  3:29
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Now, we need to turn those timings into numbers -- it's convenient if we can turn 
+them into seconds.  We can use stringstreams to do this -- the program is in
+<b><a href=timing_convert.cpp>timing_convert.cpp</a></b>, and it's an interesting
+use of stringstreams:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+main()
+{
+  vector &lt;string&gt; songs;
+  vector &lt;string&gt; timings;
+  string line;
+  int i, sec, min, colon;
+  istringstream ss;
+
+  while(getline(cin, line)) {
+    i = line.find("  ");
+    if (i == string::npos) { cerr &lt;&lt; "Bad line -- " &lt;&lt; line &lt;&lt; endl; exit(1); }
+    songs.push_back(line.substr(0, i));
+    while (line[i] == ' ') i++;
+    timings.push_back(line.substr(i));
+  }
+  for (i = 0; i &lt; songs.size(); i++) {
+    colon = timings[i].find(':');
+    timings[i][colon] = ' ';
+    ss.clear();
+    ss.str(timings[i]);
+    ss &gt;&gt; min &gt;&gt; sec;
+    sec += (min * 60); 
+    timings[i][colon] = ':';
+    
+    printf("Song: %-40s -- Timing %5s -- %5d\n", songs[i].c_str(), timings[i].c_str(), sec);
+  }
+}
+</pre></td></table></center><p>
+
+We convert the colon in <b>timings[i]</b> to a space, then convert that string to
+a stringstream and extract the minutes and seconds.  We add the minutes to the 
+seconds, and we then convert the space back to a colon.  Finally, we print out the 
+song name, original timing and timing in seconds.  Convince yourself that the output
+is correct:
+
+<pre>
+UNIX> <font color=darkred><b>head songs.txt | timing_convert</b></font>
+Song: Africano                                 -- Timing  5:10 --   310
+Song: Get to Me                                -- Timing  4:06 --   246
+Song: In-A-Gadda-Da-Vida                       -- Timing  3:02 --   182
+Song: Can't Get Used To Losing You             -- Timing  3:05 --   185
+Song: Calling All Angels                       -- Timing  4:02 --   242
+Song: Crosstown Traffic                        -- Timing  2:20 --   140
+Song: Overture - Prologue                      -- Timing  3:04 --   184
+Song: Funky Miracle                            -- Timing  2:30 --   150
+Song: Queen Bee                                -- Timing  3:13 --   193
+Song: One Way or Another                       -- Timing  3:29 --   209
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Defining a procedure to convert the timing to seconds</h3>
+
+That code is a bit yucky and hard to read -- this is a good place to define 
+a <i>procedure</i> that converts the timing string to a number of seconds.
+We do this in 
+<b><a href=timing_procedure.cpp>timing_procedure.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+int timing_seconds(string s)
+{
+  int colon;
+  istringstream ss;
+  int min, sec;
+
+  colon = s.find(':');
+  if (colon == string::npos) return -1;
+  s[colon] = ' ';
+  ss.str(s);
+  if (!(ss &gt;&gt; min &gt;&gt; sec)) return -1;
+  return sec + min*60;
+}
+
+main()
+{
+  vector &lt;string&gt; songs;
+  vector &lt;string&gt; timings;
+  string line;
+  int i;
+
+  while(getline(cin, line)) {
+    i = line.find("  ");
+    if (i == string::npos) { cerr &lt;&lt; "Bad line -- " &lt;&lt; line &lt;&lt; endl; exit(1); }
+    songs.push_back(line.substr(0, i));
+    while (line[i] == ' ') i++;
+    timings.push_back(line.substr(i));
+  }
+  for (i = 0; i &lt; songs.size(); i++) {
+    printf("Song: %-40s -- Timing %5s -- %5d\n", songs[i].c_str(), timings[i].c_str(), 
+           timing_seconds(timings[i]));
+  }
+}
+</pre></td></table></center><p>
+
+We've defined the procedure <b>timing_seconds()</b> which takes one parameter, a string,
+and returns an integer.  It assumes that the string is in the format "mm:ss", converts the
+colon to a space and extracts the minutes and seconds using a stringstream as before.  
+It also performs some tests to make sure that the parameter is in the proper format --
+if there is no color or if the extraction of minutes and seconds fails, it returns -1.
+That's a good habit to acquire -- writing code so that if something unexpected happens
+(like <b>s</b> not being in the correct format), it is discovered and handled appropriately.
+
+<p>
+In the <b>printf()</b> statement, we simply call <b>timing_seconds(timings[i])</b> -- that
+returns the number of seconds.
+
+<pre>
+UNIX> <font color=darkred><b>head songs.txt | timing_procedure</b></font>
+Song: Africano                                 -- Timing  5:10 --   310
+Song: Get to Me                                -- Timing  4:06 --   246
+Song: In-A-Gadda-Da-Vida                       -- Timing  3:02 --   182
+Song: Can't Get Used To Losing You             -- Timing  3:05 --   185
+Song: Calling All Angels                       -- Timing  4:02 --   242
+Song: Crosstown Traffic                        -- Timing  2:20 --   140
+Song: Overture - Prologue                      -- Timing  3:04 --   184
+Song: Funky Miracle                            -- Timing  2:30 --   150
+Song: Queen Bee                                -- Timing  3:13 --   193
+Song: One Way or Another                       -- Timing  3:29 --   209
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Now, you may notice a few differences between <b>timing_convert.cpp</b> and <b>timing_procedure.cpp</b>.
+One glaring difference is that you didn't change the space back to a colon.  
+Why?  The answer is a little
+subtle, but one that you need to pay attention to -- <i>when you call a procedure, copies are made
+of the parameters</i>.  These copies exist for the lifetime of the procedure call, and they
+go away when the procedure call returns.  The same is true of the local variables -- they exist
+for the lifetime of the procedure call, and they too 
+go away when the procedure call returns.  
+This is why changing the colon to a space does not affect the string in <b>timings[i]</b>.  
+<p>
+This is a <i>very important</i> thing for you to understand -- by default, parameters to 
+procedures are copied.  Most of the time, it's not a problem.  Sometimes it is.
+<p>
+Regardless, let's finish our CD partitioning program:  The final program,
+<b><a href=cd_partition.cpp>cd_partition.cpp</a></b>, keeps track of 
+the total time of each CD, and when a song makes that time greater than 80
+minutes, it starts a new CD:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+int timing_seconds(string s)
+{
+  int colon;
+  istringstream ss;
+  int min, sec;
+
+  colon = s.find(':');
+  if (colon == string::npos) return -1;
+  s[colon] = ' ';
+  ss.str(s);
+  if (!(ss &gt;&gt; min &gt;&gt; sec)) return -1;
+  return sec + min*60;
+}
+
+main()
+{
+  vector &lt;string&gt; songs;
+  vector &lt;string&gt; timings;
+  string line;
+  int i, ttime, cd_number;
+
+  while(getline(cin, line)) {
+    i = line.find("  ");
+    if (i == string::npos) { cerr &lt;&lt; "Bad line -- " &lt;&lt; line &lt;&lt; endl; exit(1); }
+    songs.push_back(line.substr(0, i));
+    while (line[i] == ' ') i++;
+    timings.push_back(line.substr(i));
+  }
+ 
+  cd_number = 0;
+  ttime = 0;
+  printf("CD %d\n\n", cd_number);
+  for (i = 0; i &lt; songs.size(); i++) {
+    ttime += timing_seconds(timings[i]);
+    if (ttime &gt; 80*60) {
+      cd_number++;
+      printf("\nCD %d\n\n", cd_number);
+      ttime = timing_seconds(timings[i]);
+    }
+    printf("Song: %-50s   Timing %5s -- Total: %2d:%02d\n", 
+           songs[i].c_str(), timings[i].c_str(), 
+           ttime/60, ttime%60);
+  }
+}
+</pre></td></table></center><p>
+
+Take a good look at the <b>printf()</b> statement -- when it prints the
+total time, it prints the minutes in two digits, right justified, then 
+a colon, then the seconds in two digits with leading zeros.  Here's
+the final output.  Make sure you understand the flow of control and
+how the program works.  
+
+<pre>
+UNIX> <font color=darkred><b>cd_partition < songs.txt</b></font>
+CD 0
+
+Song: Africano                                             Timing  5:10 -- Total:  5:10
+Song: Get to Me                                            Timing  4:06 -- Total:  9:16
+Song: In-A-Gadda-Da-Vida                                   Timing  3:02 -- Total: 12:18
+Song: Can't Get Used To Losing You                         Timing  3:05 -- Total: 15:23
+Song: Calling All Angels                                   Timing  4:02 -- Total: 19:25
+Song: Crosstown Traffic                                    Timing  2:20 -- Total: 21:45
+Song: Overture - Prologue                                  Timing  3:04 -- Total: 24:49
+Song: Funky Miracle                                        Timing  2:30 -- Total: 27:19
+Song: Queen Bee                                            Timing  3:13 -- Total: 30:32
+Song: One Way or Another                                   Timing  3:29 -- Total: 34:01
+Song: Till There Was You                                   Timing  2:14 -- Total: 36:15
+Song: I Love The Nightlife (Disco 'Round)                  Timing  2:55 -- Total: 39:10
+Song: Tales 3. The Ancient; Giants Under the Sun           Timing 18:38 -- Total: 57:48
+Song: Sit Down and Talk To Me                              Timing  3:18 -- Total: 61:06
+Song: Mississippi Queen                                    Timing  2:31 -- Total: 63:37
+Song: Heartless                                            Timing  5:00 -- Total: 68:37
+Song: Shake A Leg                                          Timing  4:06 -- Total: 72:43
+Song: I Want To Know                                       Timing  4:24 -- Total: 77:07
+
+CD 1
+
+Song: Sugar Babe                                           Timing  4:35 -- Total:  4:35
+Song: Intensity                                            Timing  3:50 -- Total:  8:25
+Song: It's Too Late                                        Timing  3:51 -- Total: 12:16
+Song: You've Made Me So Very Happy                         Timing  4:23 -- Total: 16:39
+Song: Tumbling Dice                                        Timing  3:47 -- Total: 20:26
+Song: Rainbow Blues                                        Timing  3:39 -- Total: 24:05
+Song: Anyway                                               Timing  3:19 -- Total: 27:24
+Song: Bad Time                                             Timing  2:57 -- Total: 30:21
+Song: If I Can't Have You                                  Timing  3:00 -- Total: 33:21
+Song: War Within a Breath                                  Timing  3:37 -- Total: 36:58
+Song: High Time We Went                                    Timing  4:30 -- Total: 41:28
+Song: I'm Coming Home                                      Timing  3:01 -- Total: 44:29
+Song: Loving Cup                                           Timing  4:26 -- Total: 48:55
+Song: Darts                                                Timing  2:14 -- Total: 51:09
+Song: Amen                                                 Timing  3:30 -- Total: 54:39
+Song: Are You Happy                                        Timing  4:50 -- Total: 59:29
+Song: First Brain                                          Timing  3:40 -- Total: 63:09
+Song: Sexy Ida                                             Timing  2:34 -- Total: 65:43
+Song: Josie                                                Timing  4:31 -- Total: 70:14
+Song: Stairway To Heaven                                   Timing  8:02 -- Total: 78:16
+
+CD 2
+
+Song: While The City Sleeps                                Timing  3:51 -- Total:  3:51
+Song: Do For the Others                                    Timing  2:50 -- Total:  6:41
+Song: Fair Game                                            Timing  3:30 -- Total: 10:11
+Song: I'm Not Leaving                                      Timing  2:32 -- Total: 12:43
+Song: Roll on Down the Highway                             Timing  3:57 -- Total: 16:40
+Song: You Get Me                                           Timing  3:54 -- Total: 20:34
+Song: Little Guitars (Intro)                               Timing  0:42 -- Total: 21:16
+Song: The Caves Of Altamira                                Timing  3:34 -- Total: 24:50
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Prototypes</h3>
+
+Take a look at 
+<b><a href=cd_partition_below.cpp>cd_partition_below.cpp</a></b>.  It has moved the
+definition of the procedure from before <b>main()</b> to after <b>main()</b>.  This 
+causes a compilation warning from the C++ compiler:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o cd_partition_below  cd_partition_below.cpp</b></font>
+cd_partition_below.cpp: In function 'int main()':
+cd_partition_below.cpp:27: error: 'timing_seconds' was not declared in this scope
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The C++ compiler is strict -- it wants to see procedures defined before they 
+are used.  There are times when you can't enforce this, and to handle that, you 
+can define a placeholder for the procedure.  This is called a <i>prototype</i>
+-- it is like the procedure definition, except you only include the first line
+and you end it with a semi-colon.  The example is in 
+<b><a href=cd_partition_prototype.cpp>cd_partition_prototype.cpp</a></b>, and I 
+just include the prototype:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+int timing_seconds(string s);
+</pre></td></table></center><p>
+
+
+Sometimes you see the prototype preceded by the word <b>extern</b>.  This means that
+the procedure definition may be in another file.  That's convenient.
+<p>
+Sometimes you see the prototype preceded by the word <b>static</b>.  This means
+that the procedure definition is most definitely in this file, and other files
+<i>cannot</i> use it.  That's convenient too, sometimes.
+
+<hr>
+<h3>Reference Parameters in C++: Swallowing the Red Pill</h3>
+
+<i>This text comes from 2009, when I was still coming to grips with reference
+parameters.  It reads well though, so I'm keeping it verbatim</i>.
+<p>
+Reference parameters appall me, but they are ubiquitous in the STL, so unlike previous
+years, I will not pretend that they don't exist, but instead address them head-on.
+<p>
+You may declare a procedure parameter to take a reference to a variable.  You 
+this by putting an ampersand (&) between the parameter's type and its name.  
+When you do this, a reference is passed to the parameter rather than a copy, 
+which means that if you change the parameter's value, it will change that value
+in the caller as well.
+<p>
+Let's see an example in
+<b><a href=refparam.cpp>refparam.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+void add_5_to_i_non_ref(int i)
+{
+  i += 5;
+}
+
+void add_5_to_i_ref(int &amp;i)
+{
+  i += 5;
+}
+
+main(int argc, char **argv)
+{
+  int i;
+  istringstream ss;
+
+  if (argc != 2) {
+    cerr &lt;&lt; "usage: refparam number\n";
+    exit(1);
+  }
+
+  ss.str(argv[1]);
+  if (!(ss &gt;&gt; i)) {
+    cerr &lt;&lt; "usage: refparam number\n";
+    exit(1);
+  }
+
+  cout &lt;&lt; "I is " &lt;&lt; i &lt;&lt; endl;
+
+  add_5_to_i_non_ref(i);
+  cout &lt;&lt; "After calling add_5_to_i_non_ref(i).  I is " &lt;&lt; i &lt;&lt; endl;
+  
+  add_5_to_i_ref(i);
+  cout &lt;&lt; "After calling add_5_to_i_ref(i).      I is " &lt;&lt; i &lt;&lt; endl;
+  
+  cout &lt;&lt; "I feel ill." &lt;&lt; endl;
+  exit(0);
+}
+</pre></td></table></center><p>
+
+As you can see, the procedures
+<b>add_5_to_i_non_ref(i)</b> and
+<b>add_5_to_i_non(i)</b> are identical except that 
+<b>add_5_to_i_non(i)</b> declares <b>i</b> as a reference parameter.  That explains the output:
+
+<pre>
+UNIX> <b>refparam 3</b>
+I is 3
+After calling add_5_to_i_non_ref(i).  I is 3
+After calling add_5_to_i_ref(i).      I is 8
+I feel ill.
+UNIX> <b></b>
+</pre>
+
+Since <b>add_5_to_i_non(i)</b> declares <b>i</b> as a reference parameter, the value of <b>i</b> 
+is changed in <b>main()</b>.  
+<p>
+I believe that reference parameters are used for convenience, when you want to pass an object 
+to a procedure that is not going to modify it, and evidently you are too lazy to pass a pointer.
+Then reference parameters are nice because you get efficiency and you can live in denial that
+pointers exist for a reason.  
+<p>
+Why do they make me sick?  Because when I see a procedure call like:
+<pre>
+  add_5_to_i_ref(i);
+</pre>
+I believe that <b>i</b> will not change, and that is enforced by a well-designed language
+like C.  I don't want to have to go hunting down the prototype of <b>add_5_to_i_ref()</b>
+to see that <b>i</b>'s value might get changed from under me.  It is an atrocity.
+<p>
+<i>End of 2009 text</i>.
+<p>
+Now, acceptance is often the first part of recovery, so since I first started programming
+in C++ (2005 or so), I have grown to accept reference parameters for what they are.
+There are reasons to use reference parameters, and there are reasons not to use them.
+The reasons to use them pretty much boil down to one thing:
+<p>
+<center>
+<i>You want the convenience of using a procedure, but you don't want to make
+copies, because that is expensive.</i>
+</center>
+<p>
+I'll give you two examples to illustrate.
+<hr>
+<h3>Example #1: Using a procedure to calculate a function of a large vector</h3>
+
+Take a look at 
+<b><a href=total_etc_1.cpp>total_etc_1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+double total(vector &lt;double&gt; v)
+{
+  int i;
+  double t;
+
+  t = 0;
+  for (i = 0; i &lt; v.size(); i++) t += v[i];
+  return t;
+}
+
+double avg(vector &lt;double&gt; v)
+{
+  double size;
+
+  size = v.size();
+  return total(v)/size;
+}
+
+double max(vector &lt;double&gt; v)
+{
+  int i;
+  double mx;
+
+  mx = v[0];
+  for (i = 1; i &lt; v.size(); i++) if (v[i] &gt; mx) mx = v[i];
+  return mx;
+}
+
+double min(vector &lt;double&gt; v)
+{
+  int i;
+  double mn;
+
+  mn = v[0];
+  for (i = 1; i &lt; v.size(); i++) if (v[i] &lt; mn) mn = v[i];
+  return mn;
+}
+
+main(int argc, char **argv)
+{
+  int i;
+  int n, seed;
+  istringstream ss;
+  vector &lt;double&gt; v;
+
+  if (argc != 3) {
+    cerr &lt;&lt; "usage: total_etc_1 number-of-elements seed\n";
+    exit(1);
+  }
+
+  ss.str(argv[1]);
+  if (!(ss &gt;&gt; n)) { cerr &lt;&lt; "usage: total_etc_1 number-of-elements seed\n"; exit(1); }
+
+  ss.clear(); ss.str(argv[2]);
+  if (!(ss &gt;&gt; seed)) { cerr &lt;&lt; "usage: total_etc_1 number-of-elements seed\n"; exit(1); }
+
+  if (n &lt;= 0) exit(0);
+
+  srand48(seed);
+
+  for (i = 0; i &lt; n; i++) v.push_back(drand48());
+
+  if (n &lt; 10) {
+    for (i = 0; i &lt; n; i++) printf("%6.4lf\n", v[i]);
+    printf("\n");
+  }
+
+  printf("Total: %12.4lf\n", total(v));
+  printf("Avg:   %12.4lf\n", avg(v));
+  printf("Max:   %12.4lf\n", max(v));
+  printf("Max:   %12.4lf\n", min(v));
+  exit(0);
+}
+</pre></td></table></center><p>
+
+This is a program that generates a given number of random doubles, then prints out their
+total, average, max and min, using procedures to calculate each of them.  This is a very
+natural task -- one that lends itself very cleanly to procedures.  First, as always, you
+should make sure it actually works on a small input value like 3:
+
+<pre>
+UNIX> <font color=darkred><b>total_etc_1 3 1</b></font>
+0.0416
+0.4545
+0.8348
+
+Total:       1.3309
+Avg:         0.4436
+Max:         0.8348
+Max:         0.0416
+UNIX>
+</pre>
+
+You can confirm by hand that all those values are correct.  Now, let's create
+a second program, 
+<b><a href=total_etc_2.cpp>total_etc_2.cpp</a></b>, that uses reference parameters
+in the definition of 
+<b>total()</b>,
+<b>avg()</b>,
+<b>max()</b> and 
+<b>min()</b>.  When we call both on a very large value like 50,000,000, you can
+see a significant difference in the running times (This is on my linux box in 
+January, 2011):
+
+<pre>
+UNIX> <font color=darkred><b>total_etc_1 50000000 1</b></font>
+Total: 25000209.0714
+Avg:         0.5000
+Max:         1.0000
+Max:         0.0000
+2.720u 2.450s 0:05.24 98.6%	0+0k 208+0io 2pf+0w
+UNIX> <font color=darkred><b>time total_etc_2 50000000 1</b></font>
+Total: 25000209.0714
+Avg:         0.5000
+Max:         1.0000
+Max:         0.0000
+1.770u 0.950s 0:02.72 100.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+The second one runs in 2.72 seconds, while the first runs in 5.24 seconds.
+That's nearly half (51.9%) the running time, and is significant.  Why?  Because <b>v</b>
+contains 50 million doubles, which is roughly 400 MB of storage.  Making
+copies takes a significant amount of time and memory.
+
+
+<hr>
+<h3>Example #2: Using a procedure to modify a large amount of data</h3>
+
+Take a look at
+<b><a href=rev_1.cpp>rev_1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+void reverse(vector &lt;double&gt; &v)
+{
+  double tmp;
+  int i;
+
+  for (i = 0; i &lt; v.size()/2; i++) {
+    tmp = v[i];
+    v[i] = v[v.size()-i-1];
+    v[v.size()-i-1] = tmp;
+  }
+}
+
+main(int argc, char **argv)
+{
+  int i;
+  int n, seed;
+  istringstream ss;
+  vector &lt;double&gt; v;
+
+  if (argc != 3) {
+    cerr &lt;&lt; "usage: rev_1 number-of-elements seed\n";
+    exit(1);
+  }
+
+  ss.str(argv[1]);
+  if (!(ss &gt;&gt; n)) { cerr &lt;&lt; "usage: rev_1 number-of-elements seed\n"; exit(1); }
+
+  ss.clear(); ss.str(argv[2]);
+  if (!(ss &gt;&gt; seed)) { cerr &lt;&lt; "usage: rev_1 number-of-elements seed\n"; exit(1); }
+
+  if (n &lt;= 0) exit(0);
+
+  srand48(seed);
+
+  for (i = 0; i &lt; n; i++) v.push_back(drand48());
+
+  if (n &lt; 10) {
+    for (i = 0; i &lt; n; i++) printf("%6.4lf\n", v[i]);
+  }
+
+  reverse(v);
+  printf("\n");
+
+  if (n &lt; 10) {
+    for (i = 0; i &lt; n; i++) printf("%6.4lf\n", v[i]);
+  }
+  exit(0);
+}
+  
+</pre></td></table></center><p>
+
+This is very much like the previous program, only the procedure reverses
+the values in the vector.  It uses a reference parameter -- otherwise, the
+values in <b>v</b> would be unmodified after the call.  We can verify 
+that it works with a simple example:
+
+<pre>
+UNIX> <font color=darkred><b>rev_1 3 1</b></font>
+0.0416
+0.4545
+0.8348
+
+0.8348
+0.4545
+0.0416
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Suppose we didn't want to use a reference parameter (and we didn't know about
+pointers yet).  Then we'd have to write something like the following for
+reverse:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+vector &lt;double&gt; reverse(vector &lt;double&gt; v)
+{
+  vector &lt;double&gt; rv;
+  int i;
+
+  for (i = v.size()-1; i &gt;= 0; i--) rv.push_back(v[i]);
+  return rv;
+}
+</pre></td></table></center><p>
+
+And we'd call it with:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  v = reverse(v);
+</pre></td></table></center><p>
+
+This is done in the program <b><a href=rev_2.cpp>rev_2.cpp</a></b>.  Again, we can 
+verify that it works with a small value:
+
+<pre>
+UNIX> <font color=darkred><b>rev_2 4 1</b></font>
+0.0416
+0.4545
+0.8348
+0.3360
+
+0.3360
+0.8348
+0.4545
+0.0416
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+As before, let's time them on 50 million doubles:
+
+<pre>
+UNIX> <font color=darkred><b>time rev_1 50000000 1</b></font>
+
+1.520u 0.970s 0:03.05 81.6%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time rev_2 50000000 1</b></font>
+
+2.000u 2.230s 0:08.16 51.8%	0+0k 328+8io 2pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Once again, the copies matter.  Using the reference parameter  (<b>rev_1</b>)
+takes 37.4 percent of the time as making the copy and returning the
+reversed vector (<b>rev_2</b>).
+
+<hr>
+<h3>Caution about using reference parameters</h3>
+
+If you use reference parameters, it should be for the right reason (the one above).
+There is <i>no</i> reason to use a reference parameter for a small value like
+an integer or a double.  None.  You use it when your data structure (like those
+vectors) can be large.
+
