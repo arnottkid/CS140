@@ -1,23 +1,187 @@
-<title>CS140 Lecture notes -- Procedures</title>
+<title>CS140 Lecture notes -- Procedures, Prototypes, Reference Parameters, Const</title>
 <body bgcolor=ffffff>
-<h1>CS140 Lecture notes -- Procedures</h1>
+<h1>CS140 Lecture notes -- Procedures, Prototypes, Reference Parameters, Const</h1>
 <UL>
 <LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
 <LI>Directory: <b>~jplank/cs140/notes/Procedures</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Procedures>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Procedures</b></a>
-<LI> Last modification date: <i>
-Sat Feb  5 12:36:10 EST 2011
+<LI> Original lecture notes: 2011
+<LI> Revamp: <i>
+Fri Aug 30 15:56:44 EDT 2019
 </i>
 </UL>
 <hr>
 
-<h3>Basics</h3>
+<h3>Procedures</h3>
 
 Procedures allow you to perform the same task multiple times.  If you have 
 a functionality that you want to perform over and over, it's often good
-to define a procedure and use it.  For example, suppose you have a bunch  of
+to define a procedure and use it.  It also cleans up your code so that your
+programs are broken up into reasonable-sized procedures rather than one giant
+<b>main()</b>.
+<p>
+When you are writing/using procedures, there are some things that you should
+keep in mind about how parameters are passed.  That is the focus of this
+lecture.
+
+<p>
+I'm going to motivate this with an example that comes from my life.  My wife and
+I have our phones store pictures into the same Dropbox folder.  That's convenient,
+because I can get them on my laptop easily.  There is an issue, though -- my 
+wife's phone names the files one way, and my phone names them another.  In the
+file 
+<b><a href=filenames.txt>filenames.txt</a></b>, there is a listing of a few pictures
+from July and August, 2019.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+2019-07-13 00.09.11.jpg
+2019-07-14 21.57.36.jpg
+2019-07-17 09.28.48.jpg
+2019-07-26 19.06.20.jpg
+2019-07-29 17.51.39.jpg
+2019-07-31 16.02.56.jpg
+2019-07-31 16.04.31.jpg
+2019-07-31 16.05.08.jpg
+2019-08-04 21.35.23.jpg
+2019-08-05 14.10.06.jpg
+2019-08-06 15.31.40.jpg
+Photo Aug 02, 10 22 21 PM.jpg
+Photo Aug 03, 9 25 04 PM.jpg
+Photo Aug 04, 3 03 33 PM.jpg
+Photo Aug 10, 9 56 09 AM.jpg
+Photo Aug 10, 9 59 07 AM.jpg
+Photo Aug 21, 9 27 02 AM.jpg
+Photo Aug 21, 9 35 04 AM.jpg
+Photo Jul 13, 9 57 54 AM.jpg
+Photo Jul 19, 10 35 39 PM.jpg
+</pre></td></table></center><p>
+
+We're going to write a program that will read filenames on standard input, and
+then it does one of two things -- if the filename begins with "2019", then it
+will emit the shell command to move the file to one with the same name, but with
+the space removed.  If the filename begins with "Photo", then it will emit the 
+shell command that converts it into the same format as the "2019" files.
+
+Here's the C++ code -- the procedures make it all quite easy to read, I think.
+(It's in <b><a href=move_filenames_1.cpp>move_filenames_1.cpp</a></b>).
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This emits the shell command to move the files that start with 2019.  
+   We implement it by finding the space in the line.  Then we print "mv 'line'", 
+   change the space to a hyphen, and finally "line\n". */</font>
+
+void move_2019(string line)
+{
+  int i;
+
+  i = line.find(' ');
+  if (i == string::npos) {
+    fprintf(stderr, "move_2019() - the line of text has no space.\n");
+    exit(1);
+  }
+  printf("mv '%s'", line.c_str());
+  line[i] = '-';
+  printf(" %s\n", line.c_str());
+}
+  
+<font color=blue>/* move_photo() assumes that the line is like "Photo Aug 04, 3 03 33 PM.jpg".  It uses
+   an istringstream to read all of those values, and then emits the shell command
+   to move the photo to one like "2019-08-04-15.03.33.jpg" */</font>
+
+void move_photo(string line)
+{
+  string p, month, comma, ampm;
+  int day, hour, minute, second;
+  int m;
+  istringstream ss;
+
+  ss.str(line);
+  if (ss &gt;&gt; p &gt;&gt; month &gt;&gt; day &gt;&gt; comma &gt;&gt; hour &gt;&gt; minute &gt;&gt; second &gt;&gt; ampm) {
+    m = (month == "Jul") ? 7 : 8;
+    if (ampm.substr(0, 2) == "PM") hour += 12;
+    printf("mv '%s' 2019-%02d-%02d-%02d.%02d.%02d.jpg\n", line.c_str(), m, day, hour, minute, second);
+  } else {
+    fprintf(stderr, "move_2019() - sv.size has to equal two.\n");
+    exit(1);
+  }
+}
+
+<font color=blue>/* The main is pretty simple.  It reads in a line of text, and if the line begins with
+   "2019", it calls move_2019().  Otherwise, it calls movo_photo(). */</font>
+
+int main()
+{
+  string l;
+
+  while (getline(cin, l)) {
+    if (l.substr(0, 4) == "2019") {
+      move_2019(l);
+    } else {
+      move_photo(l);
+    }
+  }
+  return 0;
+}
+</pre></td></table></center><p>
+
+I'm going to highlight just a few things about this program.  First, <b>move_2019()</b> uses
+the <b>find()</b> method of strings to find the space in the string.  If there's no space,
+then <b>find()</b> returns "string::npos".  You may not have known that, so now you do.
+<p>
+Second, both <b>move_photo()</b> and <b>main()</b> use the <b>substr()</b> method of strings
+to extract a substring from a string.  The first argument is the starting character of the
+substring, and the second argument is the size.  That's how you check that <b>ampm</b> starts
+with "PM".
+<p>
+Third, you'll note that in <b>move_photo()</b> I explicitly read the comma after the day. 
+If I didn't do that, then the rest of the "ss >> p >> ..." would fail.
+<p>
+This works very nicely, and enables me to have all of the photo files have the same format:
+
+
+<pre>
+UNIX> <font color=darkred><b>g++ -Wall -Wextra -o move_filenames_1 move_filenames_1.cpp</b></font>
+UNIX> <font color=darkred><b>move_filenames_1 < filenames.txt</b></font>
+mv '2019-07-13 00.09.11.jpg' 2019-07-13-00.09.11.jpg
+mv '2019-07-14 21.57.36.jpg' 2019-07-14-21.57.36.jpg
+mv '2019-07-17 09.28.48.jpg' 2019-07-17-09.28.48.jpg
+mv '2019-07-26 19.06.20.jpg' 2019-07-26-19.06.20.jpg
+mv '2019-07-29 17.51.39.jpg' 2019-07-29-17.51.39.jpg
+mv '2019-07-31 16.02.56.jpg' 2019-07-31-16.02.56.jpg
+mv '2019-07-31 16.04.31.jpg' 2019-07-31-16.04.31.jpg
+mv '2019-07-31 16.05.08.jpg' 2019-07-31-16.05.08.jpg
+mv '2019-08-04 21.35.23.jpg' 2019-08-04-21.35.23.jpg
+mv '2019-08-05 14.10.06.jpg' 2019-08-05-14.10.06.jpg
+mv '2019-08-06 15.31.40.jpg' 2019-08-06-15.31.40.jpg
+mv 'Photo Aug 02, 10 22 21 PM.jpg' 2019-08-02-22.22.21.jpg
+mv 'Photo Aug 03, 9 25 04 PM.jpg' 2019-08-03-21.25.04.jpg
+mv 'Photo Aug 04, 3 03 33 PM.jpg' 2019-08-04-15.03.33.jpg
+mv 'Photo Aug 10, 9 56 09 AM.jpg' 2019-08-10-09.56.09.jpg
+mv 'Photo Aug 10, 9 59 07 AM.jpg' 2019-08-10-09.59.07.jpg
+mv 'Photo Aug 21, 9 27 02 AM.jpg' 2019-08-21-09.27.02.jpg
+mv 'Photo Aug 21, 9 35 04 AM.jpg' 2019-08-21-09.35.04.jpg
+mv 'Photo Jul 13, 9 57 54 AM.jpg' 2019-07-13-09.57.54.jpg
+mv 'Photo Jul 19, 10 35 39 PM.jpg' 2019-07-19-22.35.39.jpg
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Prototypes</h3>
+
+Suppose I put <b>main()</b> before <b>move_2019()</b> and <b>move_photo()</b>.
+I've done that in 
+
+
+
+For example, suppose you have a bunch  of
 songs and you want to burn them onto CD's.  You know that a CD will hold
 80 minutes of music, and you have a list of songs with their timings in MM:SS
 format in the file
