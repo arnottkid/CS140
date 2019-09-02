@@ -1,6 +1,6 @@
 # +mkmake+ -- Everything after this line is automatically generated
 
-EXECUTABLES = move_filenames_1 move_filesname_3 move_filenames_4 move_filenames_5 move_filenames_6 \
+EXECUTABLES = move_filenames_1 move_filenames_3 move_filenames_4 move_filenames_5 move_filenames_6 \
               move_filenames_8 total_etc_1 total_etc_2
 CFLAGS ?= -Wall -Wextra
 
