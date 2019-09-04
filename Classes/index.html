@@ -1,0 +1,886 @@
+<title>CS140 Lecture Notes</title>
+<h2>CS140 Lecture Notes - Classes, Header Files, Constructors, Etc.</h2>
+<UL>
+<LI> James S. Plank, with help from Brad Vander Zanden
+<LI> Original Lecture: August 29, 2009.  Last modification: February, 2016 .
+<LI> Directory: <b>/home/plank/cs140/Notes/Classes</b>
+</UL>
+
+To motivate this lecture, our job is to write a program that helps us
+memorize people's names using their pictures.  This is what I 
+do in CS302/CS360 to learn students' names (there are too many of you
+in CS140 this year!)
+The program will take
+as input a "roster" file that contains names, and a directory
+that has pictures that correspond to the names.  
+As an example, we will use a fictitious CS140 class with 18 students.  Here
+are their names and pictures:
+<p><center><table border=3><td><img src=Screenshot.jpg></td></table></center><p>
+
+For the program that we write, we will put their names into a file called
+<b><a href=Roster.txt>Roster.txt</a></b>, and their pictures into the 
+directory <a href=Pictures><b>Pictures</b></a>, starting with the
+file <a href=Pictures/001001.jpg><b>001001.jpg</b></a> and 
+ending with
+<a href=Pictures/001018.jpg><b>001018.jpg</b></a>.  
+The first file corresponds to the first name in the roster (Alexander Blinn).
+The second file corresponds to the second name in the roster (Brody Fairport), etc.
+<p>
+Our goal is to write a program that will create an HTML file that one can use
+to help memorize the names and faces.  
+The HTML file will have the pictures displayed randomly, and there should
+be an option to either include the names with the pictures, or not.
+<p>
+We're going to structure this in a standard C++ way.  We're going to define a class
+called a <b>Roster</b>, in a header file
+<b><a href=roster_01.h>roster_01.h</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Roster {
+  public:
+    void Add_name(string name);
+    void Print();
+  protected:
+    vector &lt;string&gt; names;
+};
+</pre></td></table></center><p>
+
+Classes divide their data and methods into <b>public</b> and
+<b>protected</b>.  If something is <b>public</b>, then anyone may
+access it.  If something is <b>protected</b>, then the data/methods
+may only be used within the implementation of a class' method.
+Typically, we make all of the data <b>protected</b>, and only have
+the methods be <b>public</b>.  The reason for this is so that 
+users of a data structure cannot mess up the data -- they only gain 
+access through the methods, which keeps the data safe.
+<p>
+In this example, we have one piece of <b>protected</b> data -- a 
+vector of names, which will contain the roster.  There are two
+methods -- <b>Add_name()</b> adds a name to the roster, and <b>Print()</b>
+prints the roster.
+<p>
+We're going to do this implementation incrementally, which is how you 
+should always program.  It lets you test as you go, and you find bugs much more
+quickly.  Those of you in class typically get to see that first hand, as my programs
+usually have a few bugs as I write them.
+<p>
+We'll implement the class in 
+<b><a href=roster_01.cpp>roster_01.cpp</a></b>.  This is a very simple
+implementation: <b>Add_name()</b> simply appends the name to the vector,
+and <b>Print()</b> simply prints out the names:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include "roster_01.h"
+
+void Roster::Add_name(string name)
+{
+  names.push_back(name);
+}
+
+void Roster::Print()
+{
+  int i;
+
+  for (i = 0; i &lt; names.size(); i++) cout &lt;&lt; names[i] &lt;&lt; endl;
+}
+</pre></td></table></center><p>
+
+We'll add a <b>main()</b> routine to complete the program in 
+<b><a href=roster_01_main.cpp>roster_01_main.cpp</a></b>.
+It does a little error checking, then reads the roster file, calling <b>Add_name()</b>
+with every name.  At the end, it calls <b>Print()</b>.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;fstream&gt;
+#include "roster_01.h"
+
+main(int argc, char **argv)
+{
+  Roster r;
+  ifstream fin;
+  string name;
+
+  if (argc != 2) {
+    cerr &lt;&lt; "usage: roster_main filename\n";
+    exit(1);
+  }
+
+  fin.open(argv[1]);
+  if (fin.fail()) { perror(argv[1]); exit(1); }
+  
+  while (getline(fin, name)) r.Add_name(name);
+  r.Print();
+}
+</pre></td></table></center><p>
+
+First, if you haven't seen an <b>ifstream</b> before, these are how you read from files
+in C++.  You <b>open()</b> the <b>ifstream</b> by associating it with a file (in a 
+C-style string, by the way).  Then you can treat <b>fin</b> just like you treat
+<b>cin</b> to read from the terminal; however, now, you are reading from the 
+file.  You can also write files with an <b>ofstream</b>.
+We'll see that later.
+<p>
+Since we declared <b>r</b> as a local variable, the instance of the <b>Roster</b> class is
+created as soon as the <b>main()</b> program starts.  That class starts with an empty <b>names</b>
+vector.  For that reason, we do not need to do any initialization of the <b>Roster</b> class.
+<p>
+Let's think a little about how we structured this program:
+
+<p><center><table border=0><td><img src=three-files.jpg></td></table></center><p>
+
+There are three files.  The <i>header</i> in <b>roster_01.h</b> contains definitions only.
+It must be included by the programs that use it and define it.  The <b>#include</b> statement
+uses double-quotes because the header file is in the current directory.  
+<p>
+The <i>main</i> file in <b>roster_01_main.cpp</b> uses the public methods in the 
+<b>Roster</b> class to store names and then print out the <b>Roster</b>.
+<p>
+The <i>implementation</i> file in <b>roster_01.cpp</b> implements the methods.  As such,
+it is allowed to use all parts of the class, both public and protected.
+It specifies the method being implemented by tagging it with "<b>Roster::</b>."  This
+is how you know that it is implementing a method, and not simply a normal procedure.
+The implementations are allowed to use all parts of the class as local variables.  Thus,
+when the implementation of <b>Print()</b> uses <b>names</b>, that refers to the 
+vector that is defined in the class.
+
+<p>We can compile the files with one line of g++:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o roster_01 roster_01.cpp roster_01_main.cpp</b></font>
+UNIX> <font color=darkred><b>roster_01 </b></font>
+usage: roster_main filename
+UNIX> <font color=darkred><b>roster_01 Roster.txt</b></font>
+Alexander Blinn
+Brody Fairport
+Taylor Toxin
+Kayla Metro
+William Grantee
+Sofia Doleful
+Layla Simplex
+Henry Betide
+Ella Grievous
+Landon Lockheed
+Hannah Sleep
+Andrew Domingo
+Daniel Petrify
+Eli Jayden Olivine
+Grace Convoke
+Gianna Deportation
+Zachary Obviate
+Alexandra Spicebush
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Alternatively, we can do what is known as <i>separate compilation</i>, to incrementally
+compile the program.  We do this by first compiling each <b>.cpp</b> program to an
+<i>object file</i>, which has a <b>.o</b> extension.  This is done by passing <b>-c</b>
+as a flag to the compiler:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -c roster_01.cpp</b></font>
+UNIX> <font color=darkred><b>g++ -c roster_01_main.cpp</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+We then <i>link</i> the object files to create an <i>executable</i> that we can run:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o roster_01 roster_01.o roster_01_main.o</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The reason why separate compilation is nice is that compiling from object files is
+faster than from the <i>source</i> files (the <b>.cpp</b>) ones.  Thus, when we
+compile incrementally, and we change a source file, we recompile the changes source
+to its object file and then relink all the object files.  That is faster than
+calling <b>g++</b> on all the source files.
+
+<p>
+The program <b>make</b> lets you automate this task.  If I type "make clean" and then
+"make roster_01", then <b>make</b> performs the incremental compilation:
+
+<pre>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f *.o roster_??
+UNIX> <font color=darkred><b>make roster_01</b></font>
+g++ -c roster_01.cpp 
+g++ -c roster_01_main.cpp 
+g++ -o roster_01 roster_01.o roster_01_main.o
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+If I type "make roster_01" again, nothing happens, because <b>make</b> looks at
+the modification times of all the files to determine whether any recompilation 
+needs to occur.  Since the object files are newer than the source files, and the
+executable file is newer than the object files, no recompilation is necessary:
+
+<pre>
+UNIX> <font color=darkred><b>make roster_01</b></font>
+make: `roster_01' is up to date.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+However, if I type "touch roster_01.cpp", which updates its modification time,
+then "make roster_01" will incrementally recompile <b>roster_01.cpp</b>, but
+not <b>roster_01_main.cpp</b>, and then make 
+the executable:
+
+<pre>
+UNIX> <font color=darkred><b>touch roster_01.cpp</b></font>
+UNIX> <font color=darkred><b>make roster_01</b></font>
+g++ -c roster_01.cpp 
+g++ -o roster_01 roster_01.o roster_01_main.o
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<b>Make</b> reads a <b>makefile</b> to determine what it compiles.  Writing
+makefiles is a bit of an art form.  I'll try to have them in the lecture note
+and lab directories when needed.
+
+
+<hr>
+<h3>roster_02 -- Turning the names into HTML</h3>
+
+I don't want to go into a HTML tutorial here -- we are going to create a HTML table of names
+and pictures.  Here are the relevant HTML tags for tables:
+
+<UL>
+<LI> &lt;table&gt; starts a table and &lt;/table&gt; ends it.
+<LI> &lt;tr&gt; starts a new row within a table and &lt;/tr&gt; ends it.
+<LI> &lt;td&gt; starts a new column within a row and &lt;/td&gt; ends it.
+</UL>
+
+We're going to update our <b>Print()</b> method so that the user may specify the
+number of columns in the HTML table, and then the user specifies that on the
+command line.  The changed files are
+<b><a href=roster_02.h>roster_02.h</a></b>,
+<b><a href=roster_02.cpp>roster_02.cpp</a></b> and
+<b><a href=roster_02_main.cpp>roster_02_main.cpp</a></b>.
+The main modification is the <b>Print()</b> method in 
+
+<b><a href=roster_02.cpp>roster_02.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void Roster::Print(int columns)
+{
+  int i;
+
+  cout &lt;&lt; "&lt;table border=2&gt;\n";
+
+  for (i = 0; i &lt; names.size(); i++) {
+    if (i % columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";            // Start a new row when i%columns == 0
+    printf("&lt;td&gt;%s&lt;/td&gt;\n", names[i].c_str());
+    if (i % columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";   // End the row when i%columns == columns -1
+  }
+
+  if (i%columns != 0) cout &lt;&lt; "&lt;/tr&gt;\n";               // If the last row is incomplete, end it.
+  cout &lt;&lt; "&lt;/table&gt;\n";
+}
+</pre></td></table></center><p>
+<p>
+We compile and run it below:
+
+<pre>
+UNIX> <font color=darkred><b>make roster_02</b></font>
+g++ -c roster_02.cpp 
+g++ -c roster_02_main.cpp 
+g++ -o roster_02 roster_02.o roster_02_main.o
+UNIX> <font color=darkred><b>roster_02</b></font>
+usage: roster_main filename columns
+UNIX> <font color=darkred><b>roster_02 Roster.txt 6 > roster_02_example.html</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can look at the resulting HTML file in <a href=roster_02_example.html><b>roster_02_example.html</b></a> (Click
+the link to see it as an HTML file):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+&lt;table border=2&gt;
+&lt;tr&gt;
+&lt;td&gt;Alexander Blinn&lt;/td&gt;
+&lt;td&gt;Brody Fairport&lt;/td&gt;
+&lt;td&gt;Taylor Toxin&lt;/td&gt;
+&lt;td&gt;Kayla Metro&lt;/td&gt;
+&lt;td&gt;William Grantee&lt;/td&gt;
+&lt;td&gt;Sofia Doleful&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Layla Simplex&lt;/td&gt;
+&lt;td&gt;Henry Betide&lt;/td&gt;
+&lt;td&gt;Ella Grievous&lt;/td&gt;
+&lt;td&gt;Landon Lockheed&lt;/td&gt;
+&lt;td&gt;Hannah Sleep&lt;/td&gt;
+&lt;td&gt;Andrew Domingo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Daniel Petrify&lt;/td&gt;
+&lt;td&gt;Eli Jayden Olivine&lt;/td&gt;
+&lt;td&gt;Grace Convoke&lt;/td&gt;
+&lt;td&gt;Gianna Deportation&lt;/td&gt;
+&lt;td&gt;Zachary Obviate&lt;/td&gt;
+&lt;td&gt;Alexandra Spicebush&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+</pre></td></table></center><p>
+<hr>
+
+<h3>roster_03 -- Using a constructor to initialize the Roster</h3>
+
+I'd like to add another command line argument to the program -- the starting
+number of the first picture.  You'll note that the first file in <b>Pictures</b>
+is <a href=Pictures/001001.jpg><b>001001.jpg</b></a>.  I'd like to have the number 1001
+be a command line argument, and then I'll use that to construct all of the 
+proper filenames for the pictures.  
+<p>
+I'd like to have this number be part of the class.  It will be a piece of
+the class's <b>protected</b> data, and I'll set it when I create an instance
+of the class.  To do that, I need to define a <i>constructor</i> method for
+the class, which takes the starting number as a parameter.  Here is the 
+new class defintion, in 
+<b><a href=roster_03.h>roster_03.h</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Roster {
+  public:
+    Roster(int starting_number);     // The constructor, which takes an integer as a parameter.
+    void Add_name(string name);
+    void Print(int columns);
+  protected:
+    vector &lt;string&gt; names;
+    int start;
+};
+</pre></td></table></center><p>
+
+In <b><a href=roster_03.cpp>roster_03.cpp</a></b>, we define the constructor, which simply 
+sets the new <b>start</b> variable to the constructor's parameter, and then
+constructs the filename in the <b>Print()</b> procedure:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include "roster_03.h"
+
+Roster::Roster(int starting_number)
+{
+  start = starting_number;
+}
+
+void Roster::Add_name(string name)
+{
+  names.push_back(name);
+}
+
+void Roster::Print(int columns)
+{
+  int i;
+
+  cout &lt;&lt; "&lt;table border=2&gt;\n";
+
+  for (i = 0; i &lt; names.size(); i++) {
+    if (i % columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";            // Start a new row when i%columns == 0
+    printf("&lt;td&gt;");
+    printf("Filename: Pictures/%06d.jpg, %s", i+start, names[i].c_str());
+    printf("&lt;/td&gt;\n");
+    if (i % columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";   // End the row when i%columns == columns -1
+  }
+
+  if (i%columns != 0) cout &lt;&lt; "&lt;/tr&gt;\n";               // If the last row is incomplete, end it.
+  cout &lt;&lt; "&lt;/table&gt;\n";
+}
+</pre></td></table></center><p>
+
+Remember that <b>printf()</b> statement -- it pads the number to six digits, 
+and includes leading zeros.
+<p>
+Finally, we have an issue with our <b>main()</b> routine.  Previously, we
+had declared <b>r</b> is a parameter, which was fine since it did not take
+an explicit constructor.  If we try that now, we'll get a compilation 
+error.  To fix it, we change <b>r</b> to be a <i>pointer</i>, and call <b>new</b>
+with the starting number as a parameter, which is passed to the constructor.
+<p>
+This delays creating the instance of the roster class until the <b>new</b> statement
+has been reached.  It also means that <b>r</b> is a </i>pointer</i>, which points
+to the new instance.  To access the members of the class, you have to use "->" 
+instead of ".".  If you copy <b>r</b>, it only copies the pointer and not the
+instance.  This allows you to have multiple data structures that point to one
+data structure, which is sometimes exactly what you want.  Without pointers, you'd
+have to make copies.
+
+<p>
+Here is the code for
+<b><a href=roster_03_main.cpp>roster_03_main.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;fstream&gt;
+#include &lt;sstream&gt;
+#include "roster_03.h"
+
+main(int argc, char **argv)
+{
+  Roster *r;
+  ifstream fin;
+  istringstream ss;
+  string name;
+  int columns, starting_number;
+
+  if (argc != 4) {
+    cerr &lt;&lt; "usage: roster_main filename starting_number columns\n";
+    exit(1);
+  }
+
+  ss.clear(); ss.str(argv[2]); 
+  if (!(ss &gt;&gt; starting_number)) {
+    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad starting number\n";
+    exit(1);
+  }
+
+  ss.clear(); ss.str(argv[3]); 
+  if (!(ss &gt;&gt; columns) || columns &lt;= 0) {
+    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad columns specification\n";
+    exit(1);
+  }
+
+  r = new Roster(starting_number);
+
+  fin.open(argv[1]);
+  if (fin.fail()) { perror(argv[1]); exit(1); }
+  
+  while (getline(fin, name)) r-&gt;Add_name(name);
+  r-&gt;Print(columns);
+}
+</pre></td></table></center><p>
+
+
+<pre>
+UNIX> <font color=darkred><b>make roster_03</b></font>
+g++ -c roster_03.cpp 
+g++ -c roster_03_main.cpp 
+g++ -o roster_03 roster_03.o roster_03_main.o
+UNIX> <font color=darkred><b>roster_03</b></font>
+usage: roster_main filename starting_number columns
+UNIX> <font color=darkred><b>roster_03 Roster.txt 1001 6 > roster_03_example.html</b></font>
+UNIX> <b></b>
+</pre>
+
+Here's 
+<b><a href=roster_03_example.html>roster_03_example.html</a></b>.
+
+
+<hr>
+<h3>roster_03_evil -- "But I don't like pointers."</h3>
+
+The fact that we need to construct our instance of <b>r</b> <i>after</i> parsing
+the command line means that we have to use a pointer and <b>new</b>. You might
+ask, "Can I do it without a pointer?"  The answer is yes you can, but I don't 
+like it.  I've put the code in 
+<b><a href=roster_03_evil.cpp>roster_03_evil.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;fstream&gt;
+#include &lt;sstream&gt;
+#include "roster_03.h"
+
+main(int argc, char **argv)
+{
+  ifstream fin;
+  istringstream ss;
+  string name;
+  int columns, starting_number;
+
+  if (argc != 4) {
+    cerr &lt;&lt; "usage: roster_main filename starting_number columns\n";
+    exit(1);
+  }
+
+  ss.clear(); ss.str(argv[2]); 
+  if (!(ss &gt;&gt; starting_number)) {
+    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad starting number\n";
+    exit(1);
+  }
+
+  ss.clear(); ss.str(argv[3]); 
+  if (!(ss &gt;&gt; columns) || columns &lt;= 0) {
+    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad columns specification\n";
+    exit(1);
+  }
+
+  Roster r(starting_number);
+
+  fin.open(argv[1]);
+  if (fin.fail()) { perror(argv[1]); exit(1); }
+  
+  while (getline(fin, name)) r.Add_name(name);
+  r.Print(columns);
+}
+</pre></td></table></center><p>
+
+You'll note that I've put the variable declaration after the processing of the command
+line.  That way, <b>r</b> does not get constructed until <b>starting_number</b> has
+been initialized.  It works fine:
+
+<pre>
+UNIX> <font color=darkred><b>make roster_ev</b></font>
+g++ -c roster_03_evil.cpp 
+g++ -o roster_ev roster_03.o roster_03_evil.o
+UNIX> <font color=darkred><b>roster_ev Roster.txt 1001 6 > roster_ev_example.html</b></font>
+UNIX> <b></b>
+</pre>
+
+However, I really don't like that style of programming.  Why?  Because in my opinion, 
+programs and procedures should have variable declarations and then code.  When variables
+are declared inline, it makes the code that much harder to read and debug.  I believe
+you do much better to declare a pointer with the variable declarations, and then use
+<b>new</b>.  You will not see me ever declare variables in the middle of a procedure.
+I would prefer that you not do that either.
+
+<hr>
+<h3>roster_04 -- Some simple modifications</h3>
+
+I've made some simple modifications in 
+<b><a href=roster_04.h>roster_04.h</a></b>,
+<b><a href=roster_04.cpp>roster_04.cpp</a></b> and
+<b><a href=roster_04_main.cpp>roster_04_main.cpp</a></b>.
+
+These are:
+
+<OL>
+<LI> I have changed the HTML to include the image tags for the pictures.
+<LI> I have added an extra command line argument <b>print_names</b>, which 
+says whether or not to print the names in the final HTML. 
+<LI> I have changed the <b>Print()</b> method to take an integer <b>print_names</b>
+which says whether or not the method should print the names in the final
+HTML.
+</OL>
+
+I won't put them here -- click on the links to see the changes.  Here they
+are in use:
+
+<pre>
+UNIX> <font color=darkred><b>make roster_04</b></font>
+g++ -c roster_04.cpp 
+g++ -c roster_04_main.cpp 
+g++ -o roster_04 roster_04.o roster_04_main.o
+UNIX> <font color=darkred><b>roster_04 </b></font>
+usage: roster_main filename starting_number columns print_names(yes/no)
+UNIX> <font color=darkred><b>roster_04 Roster.txt 1001 6 yes > roster_04_names.html</b></font>
+UNIX> <font color=darkred><b>roster_04 Roster.txt 1001 6 no > roster_04_no_names.html</b></font>
+</pre>
+
+Take a look at the two output files:
+
+<UL>
+<LI> <a href=roster_04_names.html><b>roster_04_names.html</b></a> has the names with the pictures.
+<LI> <a href=roster_04_no_names.html><b>roster_04_no_names.html</b></a> has only the pictures.
+</UL>
+
+<hr>
+<h3>roster_05_bad_1 -- Randomizing the output badly, #1</h3>
+
+Finally, I'd like the pictures to be randomly ordered, to help me test myself
+better.  There are many ways to randomize a list, some good, some bad.  I'll
+show you two bad and one good.  The first bad one is in 
+<b><a href=roster_05_bad_1.cpp>roster_05_bad_1.cpp</a></b>, and I'm only showing 
+the <b>Print()</b> implementation:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void Roster::Print(int columns, int print_names)
+{
+  int i;
+  int rn;
+
+  cout &lt;&lt; "&lt;table border=2&gt;\n";
+
+  for (i = 0; i &lt; names.size(); i++) {
+
+    if (i%columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";   
+
+    rn = lrand48()%names.size();
+    cout &lt;&lt; "&lt;td&gt;";
+    printf("&lt;IMG src=Pictures/%06d.jpg height=100&gt;", rn+start);
+    if (print_names) cout &lt;&lt; "&lt;br&gt;" &lt;&lt; names[rn];
+    cout &lt;&lt; "&lt;/td&gt;" &lt;&lt; endl;
+
+    if (i%columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";
+  }
+
+  if (i%columns != 0) cout &lt;&lt; "&lt;/tr&gt;\n";   
+  cout &lt;&lt; "&lt;/table&gt;\n";
+}
+</pre></td></table></center><p>
+
+Instead of printing out the names and pictures from 0 to <b>names.size()-1</b>,
+we use <b>lrand48()</b> to pick a random number between 0 and 
+<b>names.size()-1</b> and print that out at each iteration.  This is 
+a pretty bad technique, because you're very likely to pick the same number
+twice, which means you get multiple pictures of the same person, and some
+people won't show up at all.  For example:
+
+<pre>
+UNIX> <font color=darkred><b>make roster_05_bad_1</b></font>
+g++ -c roster_05_bad_1.cpp 
+g++ -c roster_05_main.cpp 
+g++ -o roster_05_bad_1 roster_05_bad_1.o roster_05_main.o
+UNIX> <font color=darkred><b>roster_05_bad_1 Roster.txt 1001 6 yes > roster_05_bad_1.html</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+When you look at <a href=roster_05_bad_1.html><b>roster_05_bad_1.html</b></a>, you see
+a lot of duplicates: Andrew Domingo, William Grantee, Taylor Toxin.  There is no
+Grace Convoke or Daniel Petrify.
+<p>
+In class, someone mentioned that I forgot to seed the random number generator (with <b>srand48()</b>).
+That was intentional on my part: when you're debugging code that uses random numbers, it's
+good either to not seed the random number generator, or to seed it with the same value over
+and over.  This is because you'll get the same random numbers, which is helpful if you have
+to chase down a bug that involves the random numbers.
+
+<hr>
+<h3>roster_05_bad_2 -- Randomizing the output badly, #2</h3>
+
+My second attempt is one that I've read in textbooks.  You are going to create
+a vector <b>random</b>, which contains the numbers from 0 to <b>names.size()-1</b>
+in random order.  To do this, you use a second vector <b>inrandom</b>, which 
+is the same size as <b>random</b> and is initialized to zeros.  You use
+<b>inrandom</b> to create <b>random</b>.  For each element of <b>random</b>,
+you choose a random number <i>rn</i> between 0 and <b>names.size()-1</b>.  If 
+<b>inrandom[<i>rn</i>]</b> is zero, you set <b>random[<i>i</i>]</b> to equal
+<i>rn</i> and <b>inrandom[<i>rn</i>]</b> to one.  If 
+<b>inrandom[<i>rn</i>]</b> is one, you try again.
+<p>
+The code is in 
+<b><a href=roster_05_bad_2.cpp>roster_05_bad_2.cpp</a></b>, where
+the following code initializes <b>random</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void Roster::Print(int columns, int print_names)
+{
+  int i, rn;
+  vector &lt;int&gt; random, inrandom;
+
+  inrandom.resize(names.size(), 0);
+  for (i = 0; i &lt; names.size(); i++) {
+    do {
+      rn = lrand48()%names.size(); 
+    } while (inrandom[rn]);
+    inrandom[rn] = 1;
+    random.push_back(rn);
+  }
+  ...
+</pre></td></table></center><p>
+
+First off, how can we be sure that this code works?  While reasoning about it 
+and convincing yourself it works is one way, another more compelling way is
+to test it.  To do that, I've written
+<b><a href=rb1.cpp>rb1.cpp</a></b>, which randomizes the numbers from 0 to 99
+with the above code:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+main()
+{
+  int i, rn;
+  vector &lt;int&gt; inrandom;
+
+  inrandom.resize(100, 0);
+  for (i = 0; i &lt; 100; i++) {
+    do {
+      rn = lrand48()%100;
+    } while (inrandom[rn]);
+    inrandom[rn] = 1;
+    printf("%3d\n", rn);
+  }
+}
+</pre></td></table></center><p>
+
+I first run it and look at the output -- looks random.  To prove that all numbers
+are there, though, I'll run the following Unix command:
+
+<pre>
+UNIX> <font color=darkred><b>rb1 | sort -u | wc</b></font>
+     100     100     400
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The <b>sort</b> command sorts the lines of standard input, and when you pass it the "-u"
+flag, it removes duplicate lines.  Thus, if you have no duplicates, it will emit 100
+lines.  If you have duplicates, it will emit fewer.  The <b>wc</b> command prints the
+number of lines, words and characters on standard input.  It confirms that <b>sort -u</b>
+emitted 100 lines, and our code is working.  
+<p>
+To demonstrate it catching a bug, 
+<b><a href=rb1-buggy.cpp>rb1-buggy.cpp</a></b> is identical to 
+<b><a href=rb1.cpp>rb1.cpp</a></b>, except I deleted the "<b>inrandom[rn] = 1;</b>" line.
+Running the above Unix command illustrates that it only produces 66 unique lines -- it has
+printed lots of duplicates!
+
+<pre>
+UNIX> <font color=darkred><b>rb1-buggy | sort -u | wc</b></font>
+      66      66     264
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+While I don't test you on these things, it's good for you to learn some of the Unix
+commands, like <b>grep</b>, <b>sed</b>, <b>sort</b>, <b>diff</b> and <b>wc</b>.  They
+are powerful tools to help you debug your programs!
+<p>
+Now, why is 
+<b><a href=roster_05_bad_2.cpp>roster_05_bad_2.cpp</a></b> a bad program?  Think about
+how many times you run through that <b>do-while</b> loop.  When <i>i</i> is zero, you
+will run it once.  
+When <i>i</i> is one, you have a 1 in <b>names.size()</b> chance of
+picking the number you picked last time.  
+When <i>i</i> is <b>names.size()-1</b>, you only have 1 in <b>names.size()</b> chance of
+<i>not</i> picking the number you have previously picked.  On average, at iteration
+<i>i</i>, you're going to run the <b>do-while</b> loop <i>n/(n-i)</i> times.  If <b>n</b> is
+equal to <b>names.size()</b>, our average total number of times iterating through the
+<b>do-while</b> loop  is:
+
+<p><center><table border=0><td><img src=summation.jpg></td></table></center><p>
+
+That's expensive -- think about it.  If <b>n</b> is 1000, that is 6,908 times.
+Of course, in our program <b>names.size()</b> is 22, so the program runs quickly.
+However, part of my job is to teach you good algorithm design, and this program
+is bad because of how many times you will run through that <b>do-while</b> loop.
+
+
+<hr>
+<h3>roster_05_good -- A good way to randomize the output</h3>
+
+My last randomization program is much better.  What we're going to do
+is initialize <b>random</b> so that <b>random[<i>i</i>]</b> contains <i>i</i>.
+Next, we're going to iterate from <i>i</i> = <b>names.size()-1</b> down to 0,
+and at each iteration, we're going to swap element <i>i</i> with a random element
+whose index is less than or equal to <i>i</i>.   
+<p>
+For example, suppose we want to randomize the numbers 0, 1, 2, 3, 4 with this
+algorithm.  The following table shows how it works:
+
+<p><center><table border=3>
+<tr>
+<td align=center><i>i</i></td>
+<td align=center><b>random</b> before swapping</td>
+<td align=center><b>lrand48()%(i+1)</b></td>
+<td align=center><b>random</b> after swapping</td>
+</tr>
+<tr>
+<td align=center>4</td>
+<td align=center>{ 0, 1, 2, 3, 4 } </td>
+<td align=center>2</td>
+<td align=center>{ 0, 1, <b><font color=darkred>4</b></font>, 3, <b><font color=darkred>2</b></font> } </td>
+</tr>
+<tr>
+<td align=center>3</td>
+<td align=center>{ 0, 1, 4, 3, 2 } </td>
+<td align=center>1</td>
+<td align=center>{ 0, <b><font color=darkred>3</b></font>, 4, <b><font color=darkred>1</b></font>, 2 } </td>
+</tr>
+<tr>
+<td align=center>2</td>
+<td align=center>{ 0, 3, 4, 1, 2 } </td>
+<td align=center>2</td>
+<td align=center>{ 0, 3, <b><font color=darkred>4</b></font>, 1, 2 } </td>
+</tr>
+<tr>
+<td align=center>1</td>
+<td align=center>{ 0, 3, 4, 1, 2 } </td>
+<td align=center>0</td>
+<td align=center>{ <b><font color=darkred>3</b></font>, <b><font color=darkred>0</b></font>, 4, 1, 2 } </td>
+</tr>
+<tr>
+<td align=center>0</td>
+<td align=center>{ 3, 0, 4, 1, 2 } </td>
+<td align=center>0</td>
+<td align=center>{ <b><font color=darkred>3</b></font>, 0, 4, 1, 2 } </td>
+</tr>
+</table></center><p>
+
+You're only calling <b>lrand48()</b> once per iteration, for a total of <b>names.size()</b>
+times.  That's much better than <b>roster_05_bad_2.cpp</b>.  Here's the code
+in 
+<b><a href=roster_05_good.cpp>roster_05_good.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void Roster::Print(int columns, int print_names)
+{
+  int i, rn, tmp;
+  vector &lt;int&gt; random;
+
+  for (i = 0; i &lt; names.size(); i++) random.push_back(i);
+  for (i = random.size()-1; i &gt;= 0; i--) {
+    rn = lrand48()%(i+1);
+    tmp = random[i];
+    random[i] = random[rn];
+    random[rn] = tmp;
+  }
+
+  ...
+</pre></td></table></center><p>
+
+It runs as we'd like.  Finally, 
+<b><a href=roster_06.h>roster_06.h</a></b>,
+<b><a href=roster_06.cpp>roster_06.cpp</a></b> and
+<b><a href=roster_06_main.cpp>roster_06_main.cpp</a></b> are copies of the previous program
+with one modification -- <b>srand48(time(0))</b> is called in 
+<b><a href=roster_06_main.cpp>roster_06_main.cpp</a></b> so that we get different
+HTML files whenever we run it:
+
+<pre>
+UNIX> <font color=darkred><b>make roster_06</b></font>
+g++ -c roster_06.cpp 
+g++ -c roster_06_main.cpp 
+g++ -o roster_06 roster_06.o roster_06_main.o
+UNIX> <font color=darkred><b>roster_06 Roster.txt 1001 6 yes > roster_06.html</b></font>
+UNIX> <font color=darkred><b>sleep 1</b></font>
+UNIX> <font color=darkred><b>roster_06 Roster.txt 1001 6 yes > roster_06_2.html</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<b><a href=roster_06.html>roster_06.html</a></b> and
+<b><a href=roster_06_2.html>roster_06_2.html</a></b> are indeed different.
+
+<hr>
+<h3>Lessons Learned</h3>
+
+We've covered a <i>lot</i> of material in this lecture.  To summarize, we've
+learned:
+
+<UL>
+<LI> A standard way of laying out a C++ class: Data is <b>protected</b>
+and methods are <b>public</b>.  That way, users of the class are only
+allowed to access the data through the methods, which safeguards the
+data.
+<p>
+<LI> Compiling multiple C++ files that are connected with a header file.
+Moreover, we've learned how to perform incremental compilation, and 
+how <b>make</b> can do this for us.
+<p>
+<LI> Creating a customized constructor for a class that contains a
+parameter:  When this happens, you often need to use a pointer to the
+class when you create an instance of it.  This is because you don't know
+the value of the parameter until runtime, so you can't construct it in
+the variable declaration part of a procedure.  I don't approve of declaring
+variables in the middle of a procedure, so the only way to construct
+the instance of the class is to use <b>new</b>.
+<p>
+<LI> Changing the parameters that a method uses.
+<p>
+<LI> How to make a basic HTML table.
+<p>
+<LI> Good and bad ways to randomize an array of integers.
+</UL>
