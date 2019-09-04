@@ -1,22 +1,27 @@
+/* This program demonstrates the substr() method of strings. */
+
 #include <iostream>
-#include <string>
-#include <cstdlib>
-#include <cstdio>
 using namespace std;
 
-main()
+int main()
 {
   string a;
-  int i;
+  size_t i;
 
   a = "Lighting Strikes.  Lightning Strikes Again.";
 
-  printf("    ");
-  for (i = 0; i < 43; i++) printf("%d", i%10);
-  printf("\n");
+  /* Print out digits, so that it's easier to see the indices of the string. */
 
-  printf("a = %s\n", a.c_str());
-  printf("a.substr(19) = %s\n", a.substr(19).c_str());
-  printf("a.substr(19, 13) = %s\n", a.substr(19, 13).c_str());
-  printf("a.substr(19, 13).substr(5) = %s\n", a.substr(19, 13).substr(5).c_str());
+  cout << "    ";
+  for (i = 0; i < a.size(); i++) cout << i%10;
+  cout << endl;
+
+  /* Now make a few a.substr() calls. */
+
+  cout << "a = "                           << a << endl;
+  cout << "a.substr(19) = "                << a.substr(19) << endl;
+  cout << "a.substr(19, 13) = "            << a.substr(19, 13) << endl;
+  cout << "a.substr(19, 13).substr(5) = "  << a.substr(19, 13).substr(5) << endl;
+
+  return 0;
 }

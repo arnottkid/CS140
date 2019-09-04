@@ -4,10 +4,10 @@
 #include <cstdio>
 using namespace std;
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   string a, b;
-  char *ca, *ca2, *ca4; 
+  char *ca, *ca2; 
   const char *ca3;
 
   if (argc != 2) { cerr << "usage: argv-mess arg1\n"; exit(1); }

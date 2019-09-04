@@ -1,23 +1,28 @@
+/* This program uses the Mother of All random number generator from MOA.hpp to print
+   a bunch of random doubles between 0 and 1. */
+
+#include "MOA.hpp"
 #include <iostream>
-#include <sstream>
-#include <cstdlib>
 #include <cstdio>
 using namespace std;
 
-main(int argc, char **argv)
+int main()
 {
+  MOA rng;
   double d;
   int n, i;
-  istringstream ss;
 
-  if (argc != 2) { cerr << "usage: gendouble iterations\n"; exit(1); }
-  ss.str(argv[1]);
-  if (!(ss >> n)) { cerr << "usage: gendouble iterations\n"; exit(1); }
+  /* Read a value, n, from standard input. */
 
-  d = 0;
+  if (!(cin >> n)) return 1;
+
+  /* Generate n random doubles and print them. */
+
+  rng.Seed(0);
   for (i = 0; i < n; i++) {
-    d += drand48();
+    d = rng.Random_Double();
+    printf("%7.5lf\n", d);
   }
 
-  cout << d << endl;
+  return 0;
 }

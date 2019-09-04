@@ -1,4 +1,4 @@
-<title>CS140 Lecture notes -- Strings</title>
+<title>CS140 Lecture notes -- Random Numbers, Strings, Polymorphism, Exceptions</title>
 <body bgcolor=ffffff>
 <h1>CS140 Lecture notes -- Strings</h1>
 <LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
@@ -6,8 +6,9 @@
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/String>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/String</b></a>
-<LI> Last modification date: <i>
-Mon Jan 30 14:38:26 EST 2012
+<LI> Original Notes: Sometime in the 1990's
+<LI> Latest Revision: <i> 
+Tue Sep  3 16:15:08 EDT 2019
 </i>
 <hr>
 
@@ -26,7 +27,7 @@ few situations.
 rather than C++ -- simply be aware of it, and use the <b>c_str()</b> method when
 you want to convert it to a C-style string for this reason.
 <p>
-<LI> <i>Argv is composed of C-style strings.</i>.  When you encounter a C-style
+<LI> <i>Argv is composed of C-style strings.</i>  When you encounter a C-style
 string, just copy it to a C++ string, and then you can use it happily.
 <p>
 <LI> <b>sscanf()</b>: You'll be exposed to the joys of <b>sscanf()</b> soon enough.
@@ -34,203 +35,161 @@ Just keep it in the back of your mind.
 </UL>
 
 <hr>
-<h2>Innocently consuming gobs of memory</h2>
+<h2>Random Numbers</h2>
 
-Let's take a look at two really simple programs.   The first,
-<b><a href=gendouble.cpp>gendouble.cpp</a></b>, adds up some number of random doubles
-and prints the result:
+The issue of random numbers is a thorny one.   C's <b>rand()</b> has undergone
+a number of changes and is not a very good random number generator.  I don't
+believe that <b>drand48()/lrand48()</b> has changed over time, but it's a pretty 
+bad random number generator.  I don't recommend that you use <b>lrand48()</b>, because
+it is so bad.  
+C++11 implements a variety of random number generators -- go ahead and read
+<a href=https://en.cppreference.com/w/cpp/numeric/random>https://en.cppreference.com/w/cpp/numeric/random</a> if you care.  They are a little clunky for my tastes, and I've been burned by 
+underlying RNG implementations changing, so I don't use them.  However, that doesn't preclude
+you from using them, so feel free to.
+<p>
+What I'm going to do in this class is use a header-only RNG library that my research group
+uses.  It's called the "Mother of All" RNG, and the original code is available on Github
+at <a href=https://github.com/mfoo/Math-Library-Test/blob/master/src/mother.cpp>https://github.com/mfoo/Math-Library-Test/blob/master/src/mother.cpp</a>.  It is open source, so use it however you
+want. When I use it in a set of lecture notes, I'll include the header file in the lecture
+note directory.  In this directory, it is in 
+<b><a href=MOA.hpp>MOA.hpp</a></b>.   Here are the relevant parts of the class definition:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* These are wrappers around the "Mother of All" random number generator from 
+   http:<font color=blue>//www.agner.org/random/.</font>
+ */</font>
+
+#pragma once
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;cstdint&gt;
+
+class MOA {
+  public:
+    double   Random_Double();                <font color=blue>/* Returns a double in the interval [0, 1) */</font>
+    double   Random_DoubleI();               <font color=blue>/* Returns a double in the interval [0, 1] */</font>
+    int      Random_Integer();               <font color=blue>/* Returns an integer between 0 and 2^31-1 */</font>
+    uint32_t Random_32();                    <font color=blue>/* Returns a random 32-bit number */</font>
+    uint64_t Random_64();                    <font color=blue>/* Returns a random 64-bit number */</font>
+    void     Random_128(uint64_t *x);        <font color=blue>/* Returns a random 128-bit number */</font>
+    uint32_t Random_W(int w, int zero_ok);   <font color=blue>/* Returns a random w-bit number. (w &lt;= 32)*/</font>
+    void     Fill_Random_Region (void *reg, int size);   <font color=blue>/* reg should be aligned to 4 bytes, but
+                                                                   size can be anything. */</font>
+    void     Seed(uint32_t seed);            <font color=blue>/* Seed the RNG */</font>
+</pre></td></table></center><p>
+
+To demonstrate its simple use, the program
+<b><a href=gendouble.cpp>gendouble.cpp</a></b> reads a number from standard input, and then
+generates that many random doubles, between 0 and 1:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program uses the Mother of All random number generator from MOA.hpp to print
+   a bunch of random doubles between 0 and 1. */</font>
+
+#include "MOA.hpp"
 #include &lt;iostream&gt;
-#include &lt;sstream&gt;
-#include &lt;cstdlib&gt;
 #include &lt;cstdio&gt;
 using namespace std;
 
-main(int argc, char **argv)
+int main()
 {
+  MOA rng;
   double d;
   int n, i;
-  istringstream ss;
 
-  if (argc != 2) { cerr &lt;&lt; "usage: gendouble iterations\n"; exit(1); }
-  ss.str(argv[1]);
-  if (!(ss &gt;&gt; n)) { cerr &lt;&lt; "usage: gendouble iterations\n"; exit(1); }
+  <font color=blue>/* Read a value, n, from standard input. */</font>
 
-  d = 0;
+  if (!(cin &gt;&gt; n)) return 1;
+
+  <font color=blue>/* Generate n random doubles and print them. */</font>
+
+  rng.Seed(0);
   for (i = 0; i &lt; n; i++) {
-    d += drand48();
+    d = rng.Random_Double();
+    printf("%7.5lf\n", d);
   }
 
-  cout &lt;&lt; d &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
 
-When we run it, we expect the final sum to be roughly <b>n/2</b>, and it runs
-pretty quickly on my MacbookPro.  In fact, running it for roughly 1G iterations (<i>10<sup>9</sup>)</i>
-takes 30 seconds (<b>time</b> prints out timing information from the operating system -- the third word
-is the wall-clock time):
+It works as expected, and is pretty unexciting.  Since I set the seed to zero, you get
+the same random numbers every time.  If you don't set the seed, it sets the seed to the
+current time (in seconds), so you get a different sequence each time you run the program.
 
 <pre>
-UNIX> <font color=darkred><b>time gendouble 1000</b></font>
-497.784
-0.000u 0.001s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time gendouble 10000</b></font>
-4983.82
-0.001u 0.001s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time gendouble 100000</b></font>
-49964.4
-0.006u 0.001s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time gendouble 1000000</b></font>
-500184
-0.047u 0.001s 0:00.05 80.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time gendouble 10000000</b></font>
-5.00124e+06
-0.382u 0.002s 0:00.38 100.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time gendouble 100000000</b></font>
-5.00023e+07
-3.794u 0.012s 0:03.82 99.4%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time gendouble 1000000000</b></font>
-4.99991e+08
-37.854u 0.121s 0:38.13 99.5%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>echo 2 | ./gendouble</b></font>
+0.33661
+0.58429
+UNIX> <font color=darkred><b>echo 4 | ./gendouble</b></font>
+0.33661
+0.58429
+0.33730
+0.79562
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-Now, let's change the program slightly to append random doubles to a string
-<b><a href=genstring.cpp>genstring.cpp</a></b>
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;sstream&gt;
-#include &lt;cstdlib&gt;
-#include &lt;cstdio&gt;
-using namespace std;
-
-main(int argc, char **argv)
-{
-  string s;
-  int n, i;
-  istringstream ss;
-  ostringstream so;
-
-  if (argc != 2) { cerr &lt;&lt; "usage: gendouble iterations\n"; exit(1); }
-  ss.str(argv[1]);
-  if (!(ss &gt;&gt; n)) { cerr &lt;&lt; "usage: gendouble iterations\n"; exit(1); }
-
-  s = "";
-  for (i = 0; i &lt; n; i++) {
-    so.clear();
-    so.str("");
-    so &lt;&lt; drand48() &lt;&lt; endl;
-    s += so.str();
-  }
-  if (n &lt;= 10) cout &lt;&lt; s;
-}
-</pre></td></table></center><p>
-
-When we run it with an argument of 10, we get ten random doubles:
-
-<pre>
-UNIX> <font color=darkred><b>genstring 10</b></font>
-0.396465
-0.840485
-0.353336
-0.446583
-0.318693
-0.886428
-0.0155828
-0.58409
-0.159369
-0.383716
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-And when we try to time it, we get much slower running times than with <b>gendouble</b>:
-
-<pre>
-UNIX> <font color=darkred><b>time genstring 1000</b></font>
-0.002u 0.001s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time genstring 10000</b></font>
-0.019u 0.001s 0:00.02 50.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time genstring 100000</b></font>
-0.150u 0.004s 0:00.15 100.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time genstring 1000000</b></font>
-1.417u 0.038s 0:01.46 98.6%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time genstring 10000000</b></font>
-14.000u 0.314s 0:14.37 99.5%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time genstring 100000000</b></font>
-136.256u 2.652s 2:25.52 95.4%	0+0k 0+0io 6pf+0w
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-That last output line -- where it says "6pf+0w" -- means that we're starting to have
-problems finding memory for the program.  When we run it with twice that value, 
-we actually run out of memory!
-
-<pre>
-UNIX> <font color=darkred><b>time genstring 200000000</b></font>
-genstring(21164) malloc: *** mmap(size=1073745920) failed (error code=12)
-*** error: can't allocate region
-*** set a breakpoint in malloc_error_break to debug
-terminate called after throwing an instance of 'std::bad_alloc'
-  what():  St9bad_alloc
-Abort
-162.765u 2.998s 2:50.55 97.1%	0+0k 0+0io 10pf+0w
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-Think about it -- each random number consumes about 8 digits, so including the newline, each
-double consumes 9 bytes.  With 100,000,000 doubles, that is nearly a gigabyte of memory.
-My Macbook has 1.5 GB, so it's not surprising that I would run out of memory when <i>n</i> 
-equals 200,000,000.
-<p>
-The reason I go over this program is that with C++, it's <i>really</i> easy to write programs
-that behave pathelogically concerning memory, and memory-burning programs are much harder on
-a computer than CPU-burning programs.  Thus, I want you to start thinking about memory when
-you write your programs.
+The MOA generator is pretty simple and fast.
 
 <hr>
-<h3>Two useful string methods -- find and substr</h3>
+<h2>The String Methods Find() and Substr(), plus Polymorphism</h2>
+
+Strings have a method <b>find()</b> that allows you to look for characters and
+substrings.  You can call it in a variety of ways.  
 
 <b>Find()</b> is a method that allows you to find characters or substrings within strings.
 Read the 
 <a href=http://www.cppreference.com/wiki/string/basic_string/find>reference page</a>
 from <b><a href=http://www.cppreference.com>www.cppreference.com</a></b>.  It defines four
-<b>find</b> functions, and these can have multiple sets of parameters.  The
-program 
-<b><a href=string-find.cpp>string-find.cpp</a></b>
+<b>find()</b> methods, and these can have multiple sets of parameters.  
+The program <b><a href=string-find.cpp>string-find.cpp</a></b>
 illustrates all of those parameter combinations:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program demonstrates all of the ways to call the find() method of strings. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;cstdlib&gt;
 #include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   string a, b;
-  int i;
+  size_t i;
+
+  <font color=blue>/* Set two strings to use as examples. */</font>
 
   a = "Lighting Strikes.  Lightning Strikes Again.";
   b = "Light";
 
-  printf("    ");
-  for (i = 0; i &lt; 43; i++) printf("%d", i%10);
+  <font color=blue>/* Print out the strings with digits over the top, so that it's easier to see the digits. */</font>
+
+  cout &lt;&lt; "    ";
+  for (i = 0; i &lt; a.size(); i++) cout &lt;&lt; i%10;
+  cout &lt;&lt; endl;
+
+  cout &lt;&lt; "a = " &lt;&lt; a &lt;&lt; endl;
+  cout &lt;&lt; "b = " &lt;&lt; b &lt;&lt; endl;
+  cout &lt;&lt; endl;
+
+  <font color=blue>/* We call a.find() in a variety of ways.  Ignore the printf statements, because they
+     are a little confusing.  Just look at the calls on the right. */</font>
+
+  printf("a.find(b) = %ld\n",               a.find(b));
+  printf("a.find(b, 1) = %ld\n",            a.find(b, 1));
+  printf("a.find(b, 20) = %ld\n",           a.find(b, 20));
+  printf("a.find('g') = %ld\n",             a.find('g'));
+  printf("a.find('g', 20) = %ld\n",         a.find('g', 20));
+  printf("a.find(\"Strike\") = %ld\n",      a.find("Strike"));
+  printf("a.find(\"Strike\", 20) = %ld\n",  a.find("Strike", 20));
+  printf("a.find(\"Aging\", 0, 2) = %ld\n", a.find("Aging", 0, 2));
   printf("\n");
 
-  printf("a = %s\n", a.c_str());
-  printf("b = %s\n", b.c_str());
-  printf("a.find(b) = %ld\n", a.find(b));
-  printf("a.find(b, 1) = %ld\n", a.find(b, 1));
-  printf("a.find(b, 20) = %ld\n", a.find(b, 20));
-  printf("a.find('g') = %ld\n", a.find('g'));
-  printf("a.find('g', 20) = %ld\n", a.find('g', 20));
-  printf("a.find(\"Strike\") = %ld\n", a.find("Strike"));
-  printf("a.find(\"Strike\", 20) = %ld\n", a.find("Strike", 20));
-  printf("a.find(\"Aging\", 0, 2) = %ld\n", a.find("Aging", 0, 2));
   printf("string::npos = %ld\n", string::npos);
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -244,15 +203,16 @@ you should use <b>string::npos</b> rather than -1 to make your programs more por
 <p>
 The next two <b>find()</b>'s show finding a character, and the next two show finding a 
 C style substring.  The last one shows that if you give it a C style substring, a
-starting index and a third argument -- the length -- it will only look for <b>length</b>
+starting index and a third argument -- <b>count</b>-- it will only look for <b>count</b>
 characters of the substring.  Thus, even though "Aging" doesn't appear in the string, 
 we're only looking for the first two characters -- "Ag" -- which occur at index 37.
 
 <pre>
-UNIX> <font color=darkred><b>string-find</b></font>
+UNIX> <font color=darkred><b>./string-find</b></font>
     0123456789012345678901234567890123456789012
 a = Lighting Strikes.  Lightning Strikes Again.
 b = Light
+
 a.find(b) = 0
 a.find(b, 1) = 19
 a.find(b, 20) = -1
@@ -261,6 +221,7 @@ a.find('g', 20) = 21
 a.find("Strike") = 9
 a.find("Strike", 20) = 29
 a.find("Aging", 0, 2) = 37
+
 string::npos = -1
 UNIX> <font color=darkred><b></b></font>
 </pre>
@@ -273,13 +234,17 @@ For example, in
 we make a seemingly innocuous call of "<b>a.find(b, 1, 3)</b>":
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This shows how you get a compiler error if you make a find() call with the wrong
+   types of arguments.  In this instance, you are trying to call:
+
+   size_type find(const string &str, size_type pos, size_type count);
+
+   However, that combination of parameters is not supported. */</font>
+
 #include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;cstdlib&gt;
-#include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   string a, b;
   int i;
@@ -287,14 +252,11 @@ main()
   a = "Lighting Strikes.  Lightning Strikes Again.";
   b = "Light";
 
-  printf("    ");
-  for (i = 0; i &lt; 43; i++) printf("%d", i%10);
-  printf("\n");
-
-  printf("a = %s\n", a.c_str());
-  printf("a.find(b, 1, 3) = %d\n", a.find(b, 1, 3));
+  i = a.find(b, 1, 3);
+  return 0;
 }
 </pre></td></table></center><p>
+
 
 This doesn't compile, because there is no definition of <b>find(string, int, int)</b>.  There
 are the following definitions:
@@ -307,23 +269,16 @@ are the following definitions:
 <LI> <b>find(char *, int, int)</b>
 </UL>
 
-None of them match, so you get the following, rather cryptic and voluminous error message:
+None of them match, so you get a compiler error:
 
 <pre>
-UNIX> <font color=darkred><b>g++ -o bad-find bad-find.cpp</b></font>
-bad-find.cpp: In function 'int main()':
-bad-find.cpp:20: error: no matching function for call to 'std::basic_string<char, std::char_traits<char>, std::allocator<char> >::find(std::string&, int, int)'
-/usr/include/c++/4.4/bits/basic_string.tcc:714: note: candidates are: typename std::basic_string<_CharT, _Traits, _Alloc>::size_type std::basic_string<_CharT, _Traits, _Alloc>::find(const _CharT*, typename _Alloc::rebind<_CharT>::other::size_type, typename _Alloc::rebind<_CharT>::other::size_type) const [with _CharT = char, _Traits = std::char_traits<char>, _Alloc = std::allocator<char>]
-/usr/include/c++/4.4/bits/basic_string.h:1660: note:                 typename _Alloc::rebind<_CharT>::other::size_type std::basic_string<_CharT, _Traits, _Alloc>::find(const std::basic_string<_CharT, _Traits, _Alloc>&, typename _Alloc::rebind<_CharT>::other::size_type) const [with _CharT = char, _Traits = std::char_traits<char>, _Alloc = std::allocator<char>]
-/usr/include/c++/4.4/bits/basic_string.h:1674: note:                 typename _Alloc::rebind<_CharT>::other::size_type std::basic_string<_CharT, _Traits, _Alloc>::find(const _CharT*, typename _Alloc::rebind<_CharT>::other::size_type) const [with _CharT = char, _Traits = std::char_traits<char>, _Alloc = std::allocator<char>]
-/usr/include/c++/4.4/bits/basic_string.tcc:737: note:                 typename std::basic_string<_CharT, _Traits, _Alloc>::size_type std::basic_string<_CharT, _Traits, _Alloc>::find(_CharT, typename _Alloc::rebind<_CharT>::other::size_type) const [with _CharT = char, _Traits = std::char_traits<char>, _Alloc = std::allocator<char>]
-UNIX> <font color=darkred><b></b></font>
+UNIX> <font color=darkred><b>g++ bad-find.cpp</b></font>
+bad-find.cpp:19:9: error: no matching member function for call to 'find'
+  i = a.find(b, 1, 3);
+......
+UNIX>
 </pre>
 
-
-There are bunch of other types of <b>find()</b>.  Read
-<a href=http://www.cppreference.com/wiki/string/basic_string/start> the reference from www.cppreference.com</a>
-to see how they all work.
 
 <p>
 <b>Substr()</b> is a method that takes a starting index and an optional count, and returns a substring of
@@ -331,31 +286,37 @@ a string.  The simple example program is
 <b><a href=string-sub.cpp>string-sub.cpp</a></b>
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program demonstrates the substr() method of strings. */</font>
+
 #include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;cstdlib&gt;
-#include &lt;cstdio&gt;
 using namespace std;
 
-main()
+int main()
 {
   string a;
-  int i;
+  size_t i;
 
   a = "Lighting Strikes.  Lightning Strikes Again.";
 
-  printf("    ");
-  for (i = 0; i &lt; 43; i++) printf("%d", i%10);
-  printf("\n");
+  <font color=blue>/* Print out digits, so that it's easier to see the indices of the string. */</font>
 
-  printf("a = %s\n", a.c_str());
-  printf("a.substr(19) = %s\n", a.substr(19).c_str());
-  printf("a.substr(19, 13) = %s\n", a.substr(19, 13).c_str());
-  printf("a.substr(19, 13).substr(5) = %s\n", a.substr(19, 13).substr(5).c_str());
+  cout &lt;&lt; "    ";
+  for (i = 0; i &lt; a.size(); i++) cout &lt;&lt; i%10;
+  cout &lt;&lt; endl;
+
+  <font color=blue>/* Now make a few a.substr() calls. */</font>
+
+  cout &lt;&lt; "a = "                           &lt;&lt; a &lt;&lt; endl;
+  cout &lt;&lt; "a.substr(19) = "                &lt;&lt; a.substr(19) &lt;&lt; endl;
+  cout &lt;&lt; "a.substr(19, 13) = "            &lt;&lt; a.substr(19, 13) &lt;&lt; endl;
+  cout &lt;&lt; "a.substr(19, 13).substr(5) = "  &lt;&lt; a.substr(19, 13).substr(5) &lt;&lt; endl;
+
+  return 0;
 }
 </pre></td></table></center><p>
 
-When only one argument is given, it returns a substring from the given index to the
+When only one argument is given to <b>substr()</b>, 
+it returns a substring from the given index to the
 end of the string.  If two arguments are given, it returns the specified number of
 characters.  Since the substring is a string, you can call its methods, such as <b>c_str()</b>
 and <b>substr()</b>.
@@ -369,6 +330,190 @@ a.substr(19, 13) = Lightning Str
 a.substr(19, 13).substr(5) = ning Str
 UNIX> <font color=darkred><b></b></font>
 </pre>
+<hr>
+<h2>Exceptions</h3>
+
+As the name implies, exceptions are meant to handle unexpected things in your programs.
+I am not a big fan of their unbridled use, but they can simplify your code, especially with
+respect to handling errors.  The way to use an exception is to put the code that you care
+about inside a "try" clause.  When you discover an error, you call <b>throw()</b>, passing
+it an argument.  At the end of your "try" clause, you can then have one or more <b>catch()</b>
+clauses.  The "catch" clause must specify the type of the argument thrown by <b>throw()</b>.
+The control flow goes directly from the <b>throw()</b> to the <b>catch()</b>, skipping all
+code in between.  
+
+Let's exemplify, in 
+<b><a href=ex1.cpp>ex1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This is a program to demonstrate using exceptions to handle errors.
+   We process the command line, and when we get an error, we throw an
+   exception, passing a string to the "throw" call. When you throw the
+   exception, the control goes to a "catch" clause that specifies the
+   type of the thrown exception. */</font>
+
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+using namespace std;
+
+int main(int argc, char **argv)
+{
+  int a, b, c;
+  istringstream ss;
+
+  <font color=blue>/* Process the command line, and when you see something wrong, you throw
+     an exception.  Since the quoted strings are actually C-style strings, you 
+     need to typecast them to C++ strings when you throw them. */</font>
+
+  try {
+    if (argc != 4) throw((string) "usage: ./ex1 a b c");
+
+    ss.clear(); ss.str(argv[1]); if (!(ss &gt;&gt; a)) throw((string) "a is not an integer.");
+    ss.clear(); ss.str(argv[2]); if (!(ss &gt;&gt; b)) throw((string) "b is not an integer.");
+    ss.clear(); ss.str(argv[3]); if (!(ss &gt;&gt; c)) throw((string) "c is not an integer.");
+
+  <font color=blue>/* Here's where you "catch" a thrown exception. */</font>
+
+  } catch (string s) {
+    cerr &lt;&lt; s &lt;&lt; endl;
+    return 1;
+  }
+
+  <font color=blue>/* If the "try" clause was successful, you'll end up here, skipping the "catch" code. */</font>
+
+  printf("a = %d\n", a);
+  printf("b = %d\n", b);
+  printf("c = %d\n", c);
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we run this, you can see that whenever we discover an error, the control goes directly 
+to the <b>catch()</b> code.  If there's no error, the <b>catch()</b> code is skipped:
+
+<pre>
+UNIX> <font color=darkred><b>./ex1</b></font>
+usage: ./ex1 a b c
+UNIX> <font color=darkred><b>./ex1 no numbers here</b></font>
+a is not an integer.
+UNIX> <font color=darkred><b>./ex1 55 fred 77</b></font>
+b is not an integer.
+UNIX> <font color=darkred><b>./ex1 55 66 77 </b></font>
+a = 55
+b = 66
+c = 77
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You'll note that I did a typecast of the quoted string to a C++ string.  If you don't do that,
+you'll need to catch a <b>const char *</b>, or you won't catch the exception.  In 
+<b><a href=ex2.cpp>ex2.cpp</a></b>, I don't do the typecast, and as you see, the exception
+is not caught:
+
+<pre>
+UNIX> <font color=darkred><b>./ex2</b></font>
+libc++abi.dylib: terminating with uncaught exception of type char const*
+Abort
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can specify a <b>catch</b> that catches anything with:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+catch (...)
+</pre></td></table></center><p>
+
+You don't get the argument when you do this.
+
+<hr>
+<h3>Catching exceptions from procedures and methods</h3>
+
+You don't have to catch an exception in the same <b>try/catch</b> clause.  For example, you 
+can call a procedure, and catch its exception, if it doesn't catch it.  Here's a very simple
+example, in 
+<b><a href=ex3.cpp>ex3.cpp</a></b>.  The procedure <b>a()</b> throws an exception, which 
+it does not catch.  Instead, it is caught by <b>main()</b>.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This demonstrates catching an exception thrown by a procedure call. */</font>
+
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+<font color=blue>/* The procedure a() throws an exception that it does not catch. */</font>
+
+void a()
+{
+  printf("A is called, and is going to throw an exception of type int.\n");
+  throw(5);
+  printf("This code does not get called.\n");
+}
+
+<font color=blue>/* Instead, main() catches the exception and prints out its argument. */</font>
+
+int main()
+{
+  try {
+    printf("Calling a()\n");
+    a();
+    printf("A did not return, did it?\n");
+
+  } catch (int i) {
+    printf("I caught an integer: %d\n", i);
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+You should be able to trace through the code here to see the following output:
+
+<pre>
+UNIX> <font color=darkred><b>./ex3</b></font>
+Calling a()
+A is called, and is going to throw an exception of type int.
+I caught an integer: 5
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+If you are nested very deep in a sequence of procedure and method calls, and you throw an 
+exception, it will be caught by the closest caller who catches that type of exception.
+If no one catches it, then you'll see an error like the one with <b>ex2.cpp</b> above.
+<hr>
+<h3>My advice with exceptions</h3>
+
+As you can imagine, the robust use of exceptions can lead to pretty unreadable code.
+For years, I pretended that they didn't exist, but I believe that they can clean up code,
+and I'm all for that.  The problems come when you call code that may throw exceptions, and
+you don't really know what they are.  Or you have enormous <b>try</b> clauses .  So, here
+is my advice with exceptions:
+
+<UL>
+<LI> Avoid throwing an exception in one procedure/method and catching it in another.  There
+     are times you have to do this (e.g. in a constructor), but otherwise, avoid it.
+<p>
+<LI> As a corollary to this, I think it's best to have procedures return error values instead
+     of throwing exceptions.  
+<p>
+<LI> If you ignore my advice, and throw an exception in one procedure, but don't catch it, then
+     catch it in the calling procedure, not way up in a series of nested calls.
+<p>
+<LI> Try to throw strings.  You can see above how to force a double-quoted string to be a C++
+     string.  If you force yourself to throw string
+<p>
+<LI> As a corollary to this, don't throw exceptions with multiple types in a single try clause.
+     Keep it simple.
+<p>
+<LI> Attempt to keep your try clauses small, and once the period of exception-throwing is over,
+     end the try clause.  Once again, this is to keep your code readable, and help the reader
+     mentally stay on top of the the flow of control of your program.
+<p>
+<LI> (When we get to destructors): Don't call an exception in a destructor.  This is a 
+     deficiency in the methodology of using exceptions.
+</UL>
+
 <hr>
 <h3><font color=red>C style strings, C++ sytle strings, the const keyword  and memory</font></h3>
 <font color=red>These notes are optional.</font>

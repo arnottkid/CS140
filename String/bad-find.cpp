@@ -1,10 +1,14 @@
+/* This shows how you get a compiler error if you make a find() call with the wrong
+   types of arguments.  In this instance, you are trying to call:
+
+   size_type find(const string &str, size_type pos, size_type count);
+
+   However, that combination of parameters is not supported. */
+
 #include <iostream>
-#include <string>
-#include <cstdlib>
-#include <cstdio>
 using namespace std;
 
-main()
+int main()
 {
   string a, b;
   int i;
@@ -12,10 +16,6 @@ main()
   a = "Lighting Strikes.  Lightning Strikes Again.";
   b = "Light";
 
-  printf("    ");
-  for (i = 0; i < 43; i++) printf("%d", i%10);
-  printf("\n");
-
-  printf("a = %s\n", a.c_str());
-  printf("a.find(b, 1, 3) = %d\n", a.find(b, 1, 3));
+  i = a.find(b, 1, 3);
+  return 0;
 }
