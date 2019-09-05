@@ -1,36 +1,44 @@
-// roster_02_main.cpp
-// CS302
-// James S. Plank
-// EECS Department, University of Tennessee
-// August, 2009
-// Last Modification: February, 2011
-//
-#include <fstream>
-#include <sstream>
-#include "roster_02.h"
+/* roster_02_main.cpp has the user pass the number of columns for the HTML on the 
+   command line.  It passes this to the Print() method of the Roster class. */
 
-main(int argc, char **argv)
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
+#include "roster_02.hpp"
+using namespace std;
+
+int main(int argc, char **argv)
 {
   Roster r;
   ifstream fin;
   istringstream ss;
-  string name;
   int columns;
+  string line;
 
-  if (argc != 3) {
-    cerr << "usage: roster_main filename columns\n";
-    exit(1);
+  /* Parse the command line and exit if there is an error. */
+
+  try {
+    if (argc != 3) throw((string) "usage: roster_02_main filename columns");
+    ss.str(argv[2]);
+    if (!(ss >> columns) || columns <= 0) throw((string) "bad columns specification.");
+
+  } catch (string s) {
+    cerr << s << endl;
+    return 1;
   }
 
-  ss.str(argv[2]); 
-  if (!(ss >> columns) || columns <= 0) {
-    cerr << "usage: roster_main filename columns -- bad columns specification\n";
-    exit(1);
-  }
+  /* Open the specified file, and exit if there is an error. */
 
   fin.open(argv[1]);
-  if (fin.fail()) { perror(argv[1]); exit(1); }
+  if (fin.fail()) { perror(argv[1]); return 1; }
   
-  while (getline(fin, name)) r.Add_name(name);
+  /* Add all of the names to the roster, and then call the Print() method. */
+
+  while (getline(fin, line)) {
+    if (!r.Add_Line(line)) fprintf(stderr, "Line not the right format: %s\n", line.c_str());
+  }
+
   r.Print(columns);
+  return 0;
 }

@@ -31,26 +31,46 @@ to help memorize the names and faces.
 The HTML file will have the pictures displayed randomly, and there should
 be an option to either include the names with the pictures, or not.
 <p>
+We're going to do this implementation incrementally, which is how you 
+should always program.  It lets you test as you go, and you find bugs much more
+quickly.  Those of you in class typically get to see that first hand, as my programs
+usually have a few bugs as I write them.
+<p>
 We're going to structure this in a standard C++ way.  We're going to define a class
 called a <b>Roster</b>, in a header file
-<b><a href=roster_01.h>roster_01.h</a></b>:
+<b><a href=roster_01.hpp>roster_01.hpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;cstdlib&gt;
+<font color=blue>/* This is a basic class definition file for a program that I'm writing
+   to learn students' names.  Its structure is a standard structure in C++,
+   where a header file defines a class, and a separate C++ file, which includes
+   the header, implements the methods.  Other C++ files can use the class and
+   its methods.  This is typical modular code. */</font>
+
+<font color=blue>/* The pragma line prevents this file from being included more than once, even if
+   multiple files include it.  We also include the header for vectors, because
+   we use them in the class defintion.
+
+   You'll note that we don't say "using namespace std."  The reason is that some
+   people don't like to use the standard namespace, so we will not force them to
+   when they include our header file. As an unfortunate consequence, we now have to
+   put "std::" in front of a lot of things, such as strings and vectors. */</font>
+
+#pragma once
 #include &lt;vector&gt;
-#include &lt;string&gt;
-using namespace std;
+
+<font color=blue>/* We're going to build up this class.  For now, all we have is a protected vector of
+   names, plus a public method to add names to the vector, and a public method to 
+   print the vector. */</font>
 
 class Roster {
   public:
-    void Add_name(string name);
-    void Print();
+    void Add_Name(const std::string &name);
+    void Print() const;
   protected:
-    vector &lt;string&gt; names;
+    std::vector &lt;std::string&gt; Names;
 };
 </pre></td></table></center><p>
-
 Classes divide their data and methods into <b>public</b> and
 <b>protected</b>.  If something is <b>public</b>, then anyone may
 access it.  If something is <b>protected</b>, then the data/methods
@@ -62,60 +82,120 @@ access through the methods, which keeps the data safe.
 <p>
 In this example, we have one piece of <b>protected</b> data -- a 
 vector of names, which will contain the roster.  There are two
-methods -- <b>Add_name()</b> adds a name to the roster, and <b>Print()</b>
+methods -- <b>Add_Name()</b> adds a name to the roster, and <b>Print()</b>
 prints the roster.
 <p>
-We're going to do this implementation incrementally, which is how you 
-should always program.  It lets you test as you go, and you find bugs much more
-quickly.  Those of you in class typically get to see that first hand, as my programs
-usually have a few bugs as I write them.
+Please read the comment above about "using namespace std."  It is good programming
+practice <i>not</i> to put this line into your header files, and as a consequence,
+you have to write "std::" a lot.
+<p>
+Also, you'll note two uses of the <b>const</b> keyword.  The first allows us to pass
+a reference to a string, but be assured that the string will not be modified.  The
+second says that <b>Print()</b> will not modify the class -- it only reads the class'
+data.  In both usages of <b>const</b>, the compiler double-checks to make sure that:
+<UL>
+<LI> Your code does not modify <b>name</b> in <b>Add_Name()</b>.
+<LI> Your code does not modify any part of the <b>Roster</b> class in <b>Print()</b>.
+</UL>
 <p>
 We'll implement the class in 
-<b><a href=roster_01.cpp>roster_01.cpp</a></b>.  This is a very simple
-implementation: <b>Add_name()</b> simply appends the name to the vector,
-and <b>Print()</b> simply prints out the names:
+<b><a href=roster_01.cpp>roster_01.cpp</a></b>.  What this means is that we provide implementations
+for the methods specified in the <b>Roster</b> class.  These are simple, so let's look at the
+code before talking about specifics:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "roster_01.h"
+<font color=blue>/* Roster_01.cpp implements the class methods defined in roster_01.hpp. 
 
-void Roster::Add_name(string name)
+   You'll note that since roster_01.hpp does not say "using namespace std", we do
+   it here, so that we can use strings and vectors without having to say "std::". */</font>
+
+#include "roster_01.hpp"
+#include &lt;iostream&gt;
+using namespace std;
+
+void Roster::Add_Name(const string &name)
 {
-  names.push_back(name);
+  Names.push_back(name);
 }
 
-void Roster::Print()
+void Roster::Print() const
 {
-  int i;
+  size_t i;
 
-  for (i = 0; i &lt; names.size(); i++) cout &lt;&lt; names[i] &lt;&lt; endl;
+  for (i = 0; i &lt; Names.size(); i++) cout &lt;&lt; Names[i] &lt;&lt; endl;
 }
 </pre></td></table></center><p>
 
-We'll add a <b>main()</b> routine to complete the program in 
-<b><a href=roster_01_main.cpp>roster_01_main.cpp</a></b>.
-It does a little error checking, then reads the roster file, calling <b>Add_name()</b>
-with every name.  At the end, it calls <b>Print()</b>.
+There are a few things to note here:
+
+<UL>
+<LI> Since <b>roster_01.hpp</b> didn't use the namespace std, we do it here.  It makes
+     our life easier when we're writing code, and we're not forcing anyone else do to it,
+     like we would if we had put that line into the header file.
+<LI> We specify that we are implementing, for example, the <b>Add_Name()</b> method for the
+     class <b>Roster</b> with the line:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;fstream&gt;
-#include "roster_01.h"
+void Roster::Add_Name(const string &name)
+</pre></td></table></center><p>
 
-main(int argc, char **argv)
+This definition of <b>Add_Name()</b> has to match the prototype in the class definition.
+Because it is implementing a method of the <b>Roster</b> class, it can use any of the class'
+variables and methods, regardless of whether they are <b>public</b> or <b>protected</b>, like
+they are local variables.  What that means here is that you get to use <b>Names</b>, which is
+a protected vector, like a local variable.
+
+<LI> Because of the <b>const</b> keywords, the compiler will check to make sure that you don't
+     modify <b>name</b> in <b>Add_Names()</b>, and that you don't modify any part of the
+     class in <b>Print()</b>.
+</UL>
+
+<p>
+Finally, we create a third file called 
+<b><a href=roster_01_main.cpp>roster_01_main.cpp</a></b>, which has a <b>main()</b>.  It too
+includes <b>roster_01.hpp</b> and declares an instance of the <b>Roster</b> class in the variable
+<b>r</b>.  It opens a file and reads lines from it, and calls <b>r.Add_Name()</b> on each line.
+At the end, it calls <b>r.Print()</b>.  You'll note, it can only use the <b>public</b> parts of
+<b>Roster</b>, and not the <b>protected</b> parts.  Those may only be used inside method of the
+<b>Roster</b> class.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* roster_01_main.cpp uses the Roster class, which is defined in roster_01.hpp and 
+   implemented in roster_01.cpp.  This means that may use the public methods of the
+   class, but not the protected data.  
+
+   Here, it simply calls the Add_Name() method for every line of text in the file Roster.txt,
+   and then in calls the Print() method. */</font>
+
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+#include "roster_01.hpp"
+using namespace std;
+
+int main(int argc, char **argv)
 {
   Roster r;
   ifstream fin;
   string name;
 
+  <font color=blue>/* Parse the command line and exit if there is an error. */</font>
+
   if (argc != 2) {
     cerr &lt;&lt; "usage: roster_main filename\n";
-    exit(1);
+    return 1;
   }
 
+  <font color=blue>/* Open the specified file, and exit if there is an error. */</font>
+
   fin.open(argv[1]);
-  if (fin.fail()) { perror(argv[1]); exit(1); }
+  if (fin.fail()) { perror(argv[1]); return 1; }
   
-  while (getline(fin, name)) r.Add_name(name);
+  <font color=blue>/* Add all of the names to the roster, and then call the Print() method. */</font>
+
+  while (getline(fin, name)) r.Add_Name(name);
   r.Print();
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -134,7 +214,7 @@ Let's think a little about how we structured this program:
 
 <p><center><table border=0><td><img src=three-files.jpg></td></table></center><p>
 
-There are three files.  The <i>header</i> in <b>roster_01.h</b> contains definitions only.
+There are three files.  The <i>header</i> in <b>roster_01.hpp</b> contains definitions only.
 It must be included by the programs that use it and define it.  The <b>#include</b> statement
 uses double-quotes because the header file is in the current directory.  
 <p>
@@ -146,7 +226,7 @@ it is allowed to use all parts of the class, both public and protected.
 It specifies the method being implemented by tagging it with "<b>Roster::</b>."  This
 is how you know that it is implementing a method, and not simply a normal procedure.
 The implementations are allowed to use all parts of the class as local variables.  Thus,
-when the implementation of <b>Print()</b> uses <b>names</b>, that refers to the 
+when the implementation of <b>Print()</b> uses <b>Names</b>, that refers to the 
 vector that is defined in the class.
 
 <p>We can compile the files with one line of g++:
@@ -177,6 +257,9 @@ Alexandra Spicebush
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
+You'll notice that we didn't put <b>roster_01.hpp</b> on the command line.  That's because
+the two cpp files include it, and the compiler does not have to.
+<p>
 Alternatively, we can do what is known as <i>separate compilation</i>, to incrementally
 compile the program.  We do this by first compiling each <b>.cpp</b> program to an
 <i>object file</i>, which has a <b>.o</b> extension.  This is done by passing <b>-c</b>
@@ -207,13 +290,14 @@ The program <b>make</b> lets you automate this task.  If I type "make clean" and
 
 <pre>
 UNIX> <font color=darkred><b>make clean</b></font>
-rm -f *.o roster_??
+rm -f *.o roster_01 roster_02 roster_03 roster_ev roster_04 roster_05_bad_1 roster_05_bad_2 roster_05_good roster_06
 UNIX> <font color=darkred><b>make roster_01</b></font>
-g++ -c roster_01.cpp 
-g++ -c roster_01_main.cpp 
-g++ -o roster_01 roster_01.o roster_01_main.o
+g++ -Wall -Wextra -c roster_01.cpp 
+g++ -Wall -Wextra -c roster_01_main.cpp 
+g++ -Wall -Wextra -o roster_01 roster_01.o roster_01_main.o
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 If I type "make roster_01" again, nothing happens, because <b>make</b> looks at
 the modification times of all the files to determine whether any recompilation 
@@ -257,48 +341,103 @@ and pictures.  Here are the relevant HTML tags for tables:
 </UL>
 
 We're going to update our <b>Print()</b> method so that the user may specify the
-number of columns in the HTML table, and then the user specifies that on the
-command line.  The changed files are
-<b><a href=roster_02.h>roster_02.h</a></b>,
-<b><a href=roster_02.cpp>roster_02.cpp</a></b> and
-<b><a href=roster_02_main.cpp>roster_02_main.cpp</a></b>.
-The main modification is the <b>Print()</b> method in 
+number of columns in the HTML table as a parameter to the <b>Print()</b> statement,
+and the <b>Print()</b> method will print out the HTML table.  First, we make the
+change in the header file (which is now
+<b><a href=roster_02.hpp>roster_02.hpp</a></b>):
 
-<b><a href=roster_02.cpp>roster_02.cpp</a></b>
+<pre>
+UNIX> <font color=darkred><b>grep 'Print(' roster_02.hpp</b></font>
+    void Print(int columns) const;              <font color=blue>// This line is the only change.</font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+We're going to have our main program, "roster_02_main.cpp" read the number of columns on the
+command line, and pass that to the print routine.  This is straightforward code, but note the
+use of <b>throw()</b> to clean up the error checking:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-void Roster::Print(int columns)
+<font color=blue>/* roster_02_main.cpp has the user pass the number of columns for the HTML on the 
+   command line.  It passes this to the Print() method of the Roster class. */</font>
+
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;cstdlib&gt;
+#include "roster_02.hpp"
+using namespace std;
+
+int main(int argc, char **argv)
 {
-  int i;
+  Roster r;
+  ifstream fin;
+  istringstream ss;
+  int columns;
+  string name;
 
-  cout &lt;&lt; "&lt;table border=2&gt;\n";
+  <font color=blue>/* Parse the command line and exit if there is an error. */</font>
 
-  for (i = 0; i &lt; names.size(); i++) {
-    if (i % columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";            // Start a new row when i%columns == 0
-    printf("&lt;td&gt;%s&lt;/td&gt;\n", names[i].c_str());
-    if (i % columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";   // End the row when i%columns == columns -1
+  try {
+    if (argc != 3) throw((string) "usage: roster_main filename columns");
+    ss.str(argv[2]);
+    if (!(ss &gt;&gt; columns) || columns &lt;= 0) throw((string) "bad columns specification.");
+
+  } catch (string s) {
+    cerr &lt;&lt; s &lt;&lt; endl;
+    return 1;
   }
 
-  if (i%columns != 0) cout &lt;&lt; "&lt;/tr&gt;\n";               // If the last row is incomplete, end it.
-  cout &lt;&lt; "&lt;/table&gt;\n";
+  <font color=blue>/* Open the specified file, and exit if there is an error. */</font>
+
+  fin.open(argv[1]);
+  if (fin.fail()) { perror(argv[1]); return 1; }
+  
+  <font color=blue>/* Add all of the names to the roster, and then call the Print() method. */</font>
+
+  while (getline(fin, name)) r.Add_Name(name);
+  r.Print(columns);
+  return 0;
 }
 </pre></td></table></center><p>
+
+Finally, 
+<b><a href=roster_02.cpp>roster_02.cpp</a></b> implements the change to the <b>Print()</b>
+method.  Again, nothing fancy here -- it's just making an HTML table:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void Roster::Print(int columns) const
+{
+  size_t i;
+
+  printf("&lt;table border=2&gt;\n");
+
+  for (i = 0; i &lt; Names.size(); i++) {
+    if (i % columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";            <font color=blue>// Start a new row when i%columns == 0</font>
+    printf("&lt;td&gt;%s&lt;/td&gt;\n", Names[i].c_str());
+    if (i % columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";   <font color=blue>// End the row when i%columns == columns -1</font>
+  }
+
+  if (i % columns != 0) printf("&lt;/tr&gt;\n");             <font color=blue>// If the last row is incomplete, end it.</font>
+  printf("&lt;/table&gt;\n");
+
+}
+</pre></td></table></center><p>
+
 <p>
 We compile and run it below:
 
 <pre>
 UNIX> <font color=darkred><b>make roster_02</b></font>
-g++ -c roster_02.cpp 
-g++ -c roster_02_main.cpp 
-g++ -o roster_02 roster_02.o roster_02_main.o
-UNIX> <font color=darkred><b>roster_02</b></font>
+g++ -Wall -Wextra -c roster_02.cpp 
+g++ -Wall -Wextra -c roster_02_main.cpp 
+g++ -Wall -Wextra -o roster_02 roster_02.o roster_02_main.o
+UNIX> <font color=darkred><b>./roster_02</b></font>
 usage: roster_main filename columns
-UNIX> <font color=darkred><b>roster_02 Roster.txt 6 > roster_02_example.html</b></font>
+UNIX> <font color=darkred><b>./roster_02 Roster.txt 6 > roster_02_example.html</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-You can look at the resulting HTML file in <a href=roster_02_example.html><b>roster_02_example.html</b></a> (Click
-the link to see it as an HTML file):
+You can look at the resulting HTML file in <a href=roster_02_example.html><b>roster_02_example.html</b></a> (Click the link to see it as an HTML file).  Here it is as text:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 &lt;table border=2&gt;
@@ -331,6 +470,17 @@ the link to see it as an HTML file):
 <hr>
 
 <h3>roster_03 -- Using a constructor to initialize the Roster</h3>
+
+I'm going to add two more command lines to my program.  The first is the name
+of the directory to find the pictures (in this case, the directory will
+be <b>Pictures</b>).  The second is the name of the first file, which here
+is <b>001001.jpg</b>. We're going to take advantage of the fact that our pictures
+are numbered consecutively from 001001.  The leading zero's, however, are a bit
+unfortunate, because when we store that number as 1001, we've lost the leading
+zeros.
+
+
+
 
 I'd like to add another command line argument to the program -- the starting
 number of the first picture.  You'll note that the first file in <b>Pictures</b>
