@@ -1,1036 +1,1075 @@
 <title>CS140 Lecture Notes</title>
-<h2>CS140 Lecture Notes - Classes, Header Files, Constructors, Etc.</h2>
+<h2>CS140 Lecture Notes - Classes, Header/Source/Object/Executable Files</h2>
 <UL>
 <LI> James S. Plank, with help from Brad Vander Zanden
-<LI> Original Lecture: August 29, 2009.  Last modification: February, 2016 .
+<LI> Original Lecture: August 29, 2009.
+     Complete Overhaul: September, 2019.
 <LI> Directory: <b>/home/plank/cs140/Notes/Classes</b>
 </UL>
 
-To motivate this lecture, our job is to write a program that helps us
-memorize people's names using their pictures.  This is what I 
-do in CS302/CS360 to learn students' names (there are too many of you
-in CS140 this year!)
-The program will take
-as input a "roster" file that contains names, and a directory
-that has pictures that correspond to the names.  
-As an example, we will use a fictitious CS140 class with 18 students.  Here
-are their names and pictures:
-<p><center><table border=3><td><img src=Screenshot.jpg></td></table></center><p>
+<h2> Overview, Compilation and Structure</h2>
 
-For the program that we write, we will put their names into a file called
-<b><a href=Roster.txt>Roster.txt</a></b>, and their pictures into the 
-directory <a href=Pictures><b>Pictures</b></a>, starting with the
-file <a href=Pictures/001001.jpg><b>001001.jpg</b></a> and 
-ending with
-<a href=Pictures/001018.jpg><b>001018.jpg</b></a>.  
-The first file corresponds to the first name in the roster (Alexander Blinn).
-The second file corresponds to the second name in the roster (Brody Fairport), etc.
-<p>
-Our goal is to write a program that will create an HTML file that one can use
-to help memorize the names and faces.  
-The HTML file will have the pictures displayed randomly, and there should
-be an option to either include the names with the pictures, or not.
-<p>
-We're going to do this implementation incrementally, which is how you 
-should always program.  It lets you test as you go, and you find bugs much more
-quickly.  Those of you in class typically get to see that first hand, as my programs
-usually have a few bugs as I write them.
-<p>
-We're going to structure this in a standard C++ way.  We're going to define a class
-called a <b>Roster</b>, in a header file
-<b><a href=roster_01.hpp>roster_01.hpp</a></b>:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-<font color=blue>/* This is a basic class definition file for a program that I'm writing
-   to learn students' names.  Its structure is a standard structure in C++,
-   where a header file defines a class, and a separate C++ file, which includes
-   the header, implements the methods.  Other C++ files can use the class and
-   its methods.  This is typical modular code. */</font>
-
-<font color=blue>/* The pragma line prevents this file from being included more than once, even if
-   multiple files include it.  We also include the header for vectors, because
-   we use them in the class defintion.
-
-   You'll note that we don't say "using namespace std."  The reason is that some
-   people don't like to use the standard namespace, so we will not force them to
-   when they include our header file. As an unfortunate consequence, we now have to
-   put "std::" in front of a lot of things, such as strings and vectors. */</font>
-
-#pragma once
-#include &lt;vector&gt;
-
-<font color=blue>/* We're going to build up this class.  For now, all we have is a protected vector of
-   names, plus a public method to add names to the vector, and a public method to 
-   print the vector. */</font>
-
-class Roster {
-  public:
-    void Add_Name(const std::string &name);
-    void Print() const;
-  protected:
-    std::vector &lt;std::string&gt; Names;
-};
-</pre></td></table></center><p>
-Classes divide their data and methods into <b>public</b> and
-<b>protected</b>.  If something is <b>public</b>, then anyone may
-access it.  If something is <b>protected</b>, then the data/methods
-may only be used within the implementation of a class' method.
-Typically, we make all of the data <b>protected</b>, and only have
-the methods be <b>public</b>.  The reason for this is so that 
-users of a data structure cannot mess up the data -- they only gain 
-access through the methods, which keeps the data safe.
-<p>
-In this example, we have one piece of <b>protected</b> data -- a 
-vector of names, which will contain the roster.  There are two
-methods -- <b>Add_Name()</b> adds a name to the roster, and <b>Print()</b>
-prints the roster.
-<p>
-Please read the comment above about "using namespace std."  It is good programming
-practice <i>not</i> to put this line into your header files, and as a consequence,
-you have to write "std::" a lot.
-<p>
-Also, you'll note two uses of the <b>const</b> keyword.  The first allows us to pass
-a reference to a string, but be assured that the string will not be modified.  The
-second says that <b>Print()</b> will not modify the class -- it only reads the class'
-data.  In both usages of <b>const</b>, the compiler double-checks to make sure that:
-<UL>
-<LI> Your code does not modify <b>name</b> in <b>Add_Name()</b>.
-<LI> Your code does not modify any part of the <b>Roster</b> class in <b>Print()</b>.
-</UL>
-<p>
-We'll implement the class in 
-<b><a href=roster_01.cpp>roster_01.cpp</a></b>.  What this means is that we provide implementations
-for the methods specified in the <b>Roster</b> class.  These are simple, so let's look at the
-code before talking about specifics:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-<font color=blue>/* Roster_01.cpp implements the class methods defined in roster_01.hpp. 
-
-   You'll note that since roster_01.hpp does not say "using namespace std", we do
-   it here, so that we can use strings and vectors without having to say "std::". */</font>
-
-#include "roster_01.hpp"
-#include &lt;iostream&gt;
-using namespace std;
-
-void Roster::Add_Name(const string &name)
-{
-  Names.push_back(name);
-}
-
-void Roster::Print() const
-{
-  size_t i;
-
-  for (i = 0; i &lt; Names.size(); i++) cout &lt;&lt; Names[i] &lt;&lt; endl;
-}
-</pre></td></table></center><p>
-
-There are a few things to note here:
+This is a big lecture.  My goal with this is to show you a typical well-structured
+Unix directory which includes a C++ class, and a suite of programs that make use of it.
+The class that we are going to implement is a game player for Tic-Tac-Toe.  Before
+going into the code, let's talk about our directory structure.  We have four directories:
 
 <UL>
-<LI> Since <b>roster_01.hpp</b> didn't use the namespace std, we do it here.  It makes
-     our life easier when we're writing code, and we're not forcing anyone else do to it,
-     like we would if we had put that line into the header file.
-<LI> We specify that we are implementing, for example, the <b>Add_Name()</b> method for the
-     class <b>Roster</b> with the line:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-void Roster::Add_Name(const string &name)
-</pre></td></table></center><p>
-
-This definition of <b>Add_Name()</b> has to match the prototype in the class definition.
-Because it is implementing a method of the <b>Roster</b> class, it can use any of the class'
-variables and methods, regardless of whether they are <b>public</b> or <b>protected</b>, like
-they are local variables.  What that means here is that you get to use <b>Names</b>, which is
-a protected vector, like a local variable.
-
-<LI> Because of the <b>const</b> keywords, the compiler will check to make sure that you don't
-     modify <b>name</b> in <b>Add_Names()</b>, and that you don't modify any part of the
-     class in <b>Print()</b>.
+<LI> <b>include</b>: This contains header files.  They all have the suffix <b>.hpp</b>.
+<LI> <b>src</b>: This contains source code.  All of the files have the suffix <b>.cpp</b>.
+<LI> <b>obj</b>: This contains <i>object</i> files.  These are compiled source code files, but
+     not programs.  When you break up a program over multiple source code files, you can compile
+     each to an object file, and then <i>link</i> the object files to create an executable.
+     Each object file does not have to have a <b>main()</b>, and it doesn't have to have all
+     procedures/methods/classes defined.  However, when you link them together, everything has
+     to be defined in one of the object files.
+<LI> <b>bin</b>: This contains <i>executable</i> programs.  Each of these is created by <i>linking</i>
+     multiple object (and/or source) files, which contain all of the definitions/implementations.
 </UL>
 
+In this lecture, we define a class called <tt>Tic_Tac_Toe</tt> in the header file 
+<b>include/tic_tac_toe.hpp</b>.  This defines the methods and variables in the class.  However, it
+does not implement the methods.  That is done in <b>src/tic_tac_toe.cpp</b>.  When we compile 
+<b>src/tic_tac_toe.cpp</b>, it will be to the object file <b>obj/tic_tac_toe.o</b>.  
 <p>
-Finally, we create a third file called 
-<b><a href=roster_01_main.cpp>roster_01_main.cpp</a></b>, which has a <b>main()</b>.  It too
-includes <b>roster_01.hpp</b> and declares an instance of the <b>Roster</b> class in the variable
-<b>r</b>.  It opens a file and reads lines from it, and calls <b>r.Add_Name()</b> on each line.
-At the end, it calls <b>r.Print()</b>.  You'll note, it can only use the <b>public</b> parts of
-<b>Roster</b>, and not the <b>protected</b> parts.  Those may only be used inside method of the
-<b>Roster</b> class.
+Since <b>src/tic_tac_toe.cpp</b> does not have a <b>main()</b>, it is not a complete program.
+I have three different programs that have <b>main()'s</b>, and make use of the <tt>Tic_Tac_Toe</tt>
+class.  These are:
+
+<UL>
+<LI> <b>src/ttt_tester.cpp</b>: This is a program that I've written so that I can test 
+     my implementation.  It is a little cumbersome to use, but it was helpful for me when I
+     developed the code for <b>src/tic_tac_toe.cpp</b>.
+<p>
+<LI> <b>src/ttt_player.cpp</b>: This is a program that uses the class to play the game interactively
+    in a more natural way than  <b>src/ttt_tester.cpp</b>. 
+<p>
+<LI> <b>src/ttt_random.cpp</b>: This is a program where I choose random places for X and O, with the
+     exception of the first move for X, which I put in the middle square.  The idea here is to see if
+     that gives X an advantage, even when X plays randomly for the rest of the game.
+</UL>
+
+Now, each <b>.cpp</b> file will have the line:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-<font color=blue>/* roster_01_main.cpp uses the Roster class, which is defined in roster_01.hpp and 
-   implemented in roster_01.cpp.  This means that may use the public methods of the
-   class, but not the protected data.  
-
-   Here, it simply calls the Add_Name() method for every line of text in the file Roster.txt,
-   and then in calls the Print() method. */</font>
-
-#include &lt;fstream&gt;
-#include &lt;iostream&gt;
-#include &lt;cstdlib&gt;
-#include "roster_01.hpp"
-using namespace std;
-
-int main(int argc, char **argv)
-{
-  Roster r;
-  ifstream fin;
-  string name;
-
-  <font color=blue>/* Parse the command line and exit if there is an error. */</font>
-
-  if (argc != 2) {
-    cerr &lt;&lt; "usage: roster_main filename\n";
-    return 1;
-  }
-
-  <font color=blue>/* Open the specified file, and exit if there is an error. */</font>
-
-  fin.open(argv[1]);
-  if (fin.fail()) { perror(argv[1]); return 1; }
-  
-  <font color=blue>/* Add all of the names to the roster, and then call the Print() method. */</font>
-
-  while (getline(fin, name)) r.Add_Name(name);
-  r.Print();
-  return 0;
-}
+#include "tic_tac_toe.hpp"
 </pre></td></table></center><p>
 
-First, if you haven't seen an <b>ifstream</b> before, these are how you read from files
-in C++.  You <b>open()</b> the <b>ifstream</b> by associating it with a file (in a 
-C-style string, by the way).  Then you can treat <b>fin</b> just like you treat
-<b>cin</b> to read from the terminal; however, now, you are reading from the 
-file.  You can also write files with an <b>ofstream</b>.
-We'll see that later.
-<p>
-Since we declared <b>r</b> as a local variable, the instance of the <b>Roster</b> class is
-created as soon as the <b>main()</b> program starts.  That class starts with an empty <b>names</b>
-vector.  For that reason, we do not need to do any initialization of the <b>Roster</b> class.
-<p>
-Let's think a little about how we structured this program:
+That means that every <b>.cpp</b> file has the same specification of the <tt>Tic_Tac_Toe</tt> class.
+To compile each source file into an object file, we will do the following, using <b>src/tic_tac_toe.cpp</b>
+as an example:
 
-<p><center><table border=0><td><img src=three-files.jpg></td></table></center><p>
-
-There are three files.  The <i>header</i> in <b>roster_01.hpp</b> contains definitions only.
-It must be included by the programs that use it and define it.  The <b>#include</b> statement
-uses double-quotes because the header file is in the current directory.  
-<p>
-The <i>main</i> file in <b>roster_01_main.cpp</b> uses the public methods in the 
-<b>Roster</b> class to store names and then print out the <b>Roster</b>.
-<p>
-The <i>implementation</i> file in <b>roster_01.cpp</b> implements the methods.  As such,
-it is allowed to use all parts of the class, both public and protected.
-It specifies the method being implemented by tagging it with "<b>Roster::</b>."  This
-is how you know that it is implementing a method, and not simply a normal procedure.
-The implementations are allowed to use all parts of the class as local variables.  Thus,
-when the implementation of <b>Print()</b> uses <b>Names</b>, that refers to the 
-vector that is defined in the class.
-
-<p>We can compile the files with one line of g++:
 
 <pre>
-UNIX> <font color=darkred><b>g++ -o roster_01 roster_01.cpp roster_01_main.cpp</b></font>
-UNIX> <font color=darkred><b>roster_01 </b></font>
-usage: roster_main filename
-UNIX> <font color=darkred><b>roster_01 Roster.txt</b></font>
-Alexander Blinn
-Brody Fairport
-Taylor Toxin
-Kayla Metro
-William Grantee
-Sofia Doleful
-Layla Simplex
-Henry Betide
-Ella Grievous
-Landon Lockheed
-Hannah Sleep
-Andrew Domingo
-Daniel Petrify
-Eli Jayden Olivine
-Grace Convoke
-Gianna Deportation
-Zachary Obviate
-Alexandra Spicebush
+UNIX> <font color=darkred><b>g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe.o src/tic_tac_toe.cpp</b></font>
+</pre>
+UNIX> 
+
+Let's go over each part of this:
+
+<UL>
+<LI> <tt>-std=c++98</tt> means we are using the 1998 standard of C++.
+<LI> <tt>-Wall and -Wextra</tt> have the compiler spit out more warnings than usual.  This helps us find bugs.
+<LI> <tt>-Iinclude</tt> says to look in the directory <b>include</b> to find header files that are inside double-quotes.  That allows us to say <tt>#include "tic_tac_toe.hpp"</tt>, and the compiler
+will find the file <b>include/tic_tac_toe.hpp</b>.
+<LI> <tt>-c</tt> says to just create an object file, and not to try to create an executable.
+<LI> <tt>-o obj/tic_tac_toe.o</tt> says to put the object file into the <b>obj</b> directory with the given filename.  If we didn't specify <tt>-o</tt>, then the object file would go into the 
+current directory.
+<LI> <tt>src/tic_tac_toe.cpp</tt> specifies the file that we are compiling.
+</UL>
+
+When we want to create an executable, we <i>link</i> together the object files, where one of them 
+has a <b>main()</b>, and the others contain implementations of everything that is used.  For example,
+when we want to make an executable from <b>src/ttt_tester.cpp</b>, we do:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_tester obj/ttt_tester.o obj/tic_tac_toe.o</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-You'll notice that we didn't put <b>roster_01.hpp</b> on the command line.  That's because
-the two cpp files include it, and the compiler does not have to.
-<p>
-Alternatively, we can do what is known as <i>separate compilation</i>, to incrementally
-compile the program.  We do this by first compiling each <b>.cpp</b> program to an
-<i>object file</i>, which has a <b>.o</b> extension.  This is done by passing <b>-c</b>
-as a flag to the compiler:
+Since we don't include the <tt>-c</tt> flag, it makes the executable.  The <b>main()</b> is defined in
+<b>src/ttt_tester.o</b>.  It uses the <tt>Tic_Tac_Toe</tt> class, so we include <b>src/tic_tac_toe.o</b>,
+which implements all of the methods of the class.  If we don't include <b>src/tic_tac_toe.o</b>, 
+then we'll get a compiler error, saying that methods have not been implemented:
 
 <pre>
-UNIX> <font color=darkred><b>g++ -c roster_01.cpp</b></font>
-UNIX> <font color=darkred><b>g++ -c roster_01_main.cpp</b></font>
+UNIX> <font color=darkred><b>g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_tester obj/ttt_tester.o </b></font>
+Undefined symbols for architecture x86_64:
+  "Tic_Tac_Toe::Clear_Game()", referenced from:
+      _main in ttt_tester.o
+  "Tic_Tac_Toe::Make_Move(char, unsigned long, unsigned long)", referenced from:
+      _main in ttt_tester.o
+  "Tic_Tac_Toe::Tic_Tac_Toe()", referenced from:
+      _main in ttt_tester.o
+  "Tic_Tac_Toe::Game_State() const", referenced from:
+      _main in ttt_tester.o
+  "Tic_Tac_Toe::Board_String() const", referenced from:
+      _main in ttt_tester.o
+  "Tic_Tac_Toe::Print() const", referenced from:
+      _main in ttt_tester.o
+  "Tic_Tac_Toe::Stats(std::__1::vector<int, std::__1::allocator<int> >&) const", referenced from:
+      _main in ttt_tester.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-We then <i>link</i> the object files to create an <i>executable</i> that we can run:
-
-<pre>
-UNIX> <font color=darkred><b>g++ -o roster_01 roster_01.o roster_01_main.o</b></font>
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-The reason why separate compilation is nice is that compiling from object files is
-faster than from the <i>source</i> files (the <b>.cpp</b>) ones.  Thus, when we
-compile incrementally, and we change a source file, we recompile the changes source
-to its object file and then relink all the object files.  That is faster than
-calling <b>g++</b> on all the source files.
-
-<p>
-The program <b>make</b> lets you automate this task.  If I type "make clean" and then
-"make roster_01", then <b>make</b> performs the incremental compilation:
+Now, the file <b><a href=makefile>makefile</a></b> automates the compilation.  If you type
+"make clean", then it will remove all of the object files and executables.  Then, if you type
+"make" or "make all", it will make all of the object files and executables.
 
 <pre>
 UNIX> <font color=darkred><b>make clean</b></font>
-rm -f *.o roster_01 roster_02 roster_03 roster_ev roster_04 roster_05_bad_1 roster_05_bad_2 roster_05_good roster_06
-UNIX> <font color=darkred><b>make roster_01</b></font>
-g++ -Wall -Wextra -c roster_01.cpp 
-g++ -Wall -Wextra -c roster_01_main.cpp 
-g++ -Wall -Wextra -o roster_01 roster_01.o roster_01_main.o
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_tester.o src/ttt_tester.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe.o src/tic_tac_toe.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_tester obj/ttt_tester.o obj/tic_tac_toe.o
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_player.o src/ttt_player.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_player obj/ttt_player.o obj/tic_tac_toe.o
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_random.o src/ttt_random.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_random obj/ttt_random.o obj/tic_tac_toe.o
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
+Let me draw a picture of what is going on.  This shows how the source files all include the
+include file, how they are compiled to object files, and which object files are linked together to 
+make which executables:
 
-If I type "make roster_01" again, nothing happens, because <b>make</b> looks at
-the modification times of all the files to determine whether any recompilation 
-needs to occur.  Since the object files are newer than the source files, and the
-executable file is newer than the object files, no recompilation is necessary:
-
-<pre>
-UNIX> <font color=darkred><b>make roster_01</b></font>
-make: `roster_01' is up to date.
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-However, if I type "touch roster_01.cpp", which updates its modification time,
-then "make roster_01" will incrementally recompile <b>roster_01.cpp</b>, but
-not <b>roster_01_main.cpp</b>, and then make 
-the executable:
-
-<pre>
-UNIX> <font color=darkred><b>touch roster_01.cpp</b></font>
-UNIX> <font color=darkred><b>make roster_01</b></font>
-g++ -c roster_01.cpp 
-g++ -o roster_01 roster_01.o roster_01_main.o
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-<b>Make</b> reads a <b>makefile</b> to determine what it compiles.  Writing
-makefiles is a bit of an art form.  I'll try to have them in the lecture note
-and lab directories when needed.
-
+<p><center><table border=3><td><img src=structure.png width=600></td></table></center><p>
 
 <hr>
-<h3>roster_02 -- Turning the names into HTML</h3>
+<h3>The header file: include/tic_tac_toe.hpp</h3>
 
-I don't want to go into a HTML tutorial here -- we are going to create a HTML table of names
-and pictures.  Here are the relevant HTML tags for tables:
+Let's take a look at the header file in 
+<b><a href=include/tic_tac_toe.hpp>include/tic_tac_toe.hpp</a></b>.  It defines a class
+with a constructor and six public methods.  The comments tell you what the methods do.  It also
+defines four protected variables.  We'll talk more about them later.
 
-<UL>
-<LI> &lt;table&gt; starts a table and &lt;/table&gt; ends it.
-<LI> &lt;tr&gt; starts a new row within a table and &lt;/tr&gt; ends it.
-<LI> &lt;td&gt; starts a new column within a row and &lt;/td&gt; ends it.
-</UL>
+<p><center><table border=3 cellpadding=3><td><pre>
+#pragma once
+ 
+#include &lt;vector&gt;
+#include &lt;string&gt;
 
-We're going to update our <b>Print()</b> method so that the user may specify the
-number of columns in the HTML table as a parameter to the <b>Print()</b> statement,
-and the <b>Print()</b> method will print out the HTML table.  First, we make the
-change in the header file (which is now
-<b><a href=roster_02.hpp>roster_02.hpp</a></b>):
+class Tic_Tac_Toe
+{
+  public:
+    Tic_Tac_Toe();                    <font color=blue>/* Constructor */</font>
+    void Clear_Game();                <font color=blue>/* Turn the current board into an empty board */</font>
+    char Game_State() const;          <font color=blue>/* Return the state of the game:
+                                           'B' = beginning of game
+                                           'X' = X's turn
+                                           'O' = O's turn
+                                           'x' = Game is over and X has won.
+                                           'o' = Game is over and O has won.
+                                           'd' = Game is over and it's a draw. */</font>
+
+    char Make_Move(char xo, size_t row, size_t col);  <font color=blue>/* This does the move.  
+                                                         xo must be 'X' or 'O'.
+                                                         Returns 'E' on an error.
+                                                         Otherwise it returns resulting game state. */</font>
+
+    void Print() const;                         <font color=blue>/* Prints the board. */</font>
+    std::string Board_String() const;           <font color=blue>/* Returns a 9-character string of X's, O's and -'s */</font>
+    void Stats(std::vector &lt;int&gt; &xod) const;   <font color=blue>/* Sets xod to a three element vector: 
+                                                   X wins, O wins, draws */</font>
+
+  protected:
+    std::vector &lt;std::string&gt; Board;    <font color=blue>/* The board */</font>
+    char State;                         <font color=blue>/* Game state -- same values as Game_State() above */</font>
+    std::vector &lt;int&gt; X_O_D;            <font color=blue>/* The three stats */</font>
+    int Open_Squares;                   <font color=blue>/* The number of open squares on the board. */</font>
+};
+</pre></td></table></center><p>
+
+First, you'll note that the methods are <b>public</b>.  That means that anyone who creates an instance of
+the class can use the methods.  The methods give you enough power to run tic-tac-toe games, and keep track
+of the winners.  Second, you should see the use of the <b>const</b> keyword.  Here it is put at the end
+of any method that doesn't change the class.  For example, <b>Print()</b> prints the game board, but doesn't
+change anything.  That allows the compiler to double-check that indeed your implementation doesn't
+change anything, and it helps you find bugs.  Third, there's no "using namespace std" in the header
+file, so when I need to use things that are part of the "std" namespace, I need to put "std::" in front
+of them.  You see that I've done this with <b>vector</b> and <b>string</b>.  This is good practice, because
+some programmers don't want to have "using namespace std" in their code, and this way, you don't force them
+to do so.  You can always put it in your own source (.cpp) files.  Fourth, the variables are all
+<b>protected</b>.  That means that they can only be accessed by the methods of the class, and not
+by any other code.  Thus, the only way that you can use the class is through its methods.
+
+<p>
+Last, I have no executable code in the header file.  This is something in which I believe firmly -- header
+files should have no executable code.  That includes have a constructor that sets default values.  That should
+be in the implementation.
+
+<hr>
+<h3>Starting to implement the class: src/tic_tac_toe_1.cpp</h3>
+
+Having defined my class, I need to implement and test it.  You need to resist the temptation to do this all
+in one shot, even with a class that's as easy as this one.  Here's what I did to implement the class.
+The first thing I did was write 
+<b><a href=src/tic_tac_toe_1.cpp>src/tic_tac_toe_1.cpp</a></b>.  This simply has dummy methods
+for every method in the class.  I want to write some testing code next, and this allows me to 
+compile and make sure that at least it's calling stuff correctly.  Put another way, it allows
+me to test my header to make sure that it's correct and usable.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This implementation file simply has dummy methods for every method in the class.
+   It allows me to write a testing program and have it compile.  Then, I'll start
+   to implement the methods. */</font>
+
+#include "tic_tac_toe.hpp"
+using namespace std;
+
+Tic_Tac_Toe::Tic_Tac_Toe() {}
+
+void Tic_Tac_Toe::Clear_Game() {}
+
+void Tic_Tac_Toe::Print() const {}
+
+char Tic_Tac_Toe::Game_State() const { return '-'; }
+
+string Tic_Tac_Toe::Board_String() const { return "-"; }
+
+void Tic_Tac_Toe::Stats(vector &lt;int&gt; &xod) const 
+{ 
+  xod.resize(3, 0); 
+}
+
+char Tic_Tac_Toe::Make_Move(char xo, size_t row, size_t col) 
+{ 
+  (void) xo;        <font color=blue>// These statements shut the compiler up about not using the parameters.</font>
+  (void) row;
+  (void) col;
+  return 'E'; 
+}
+</pre></td></table></center><p>
+
+You can see that I've put "using namespace std" here -- that's because I'm happy to 
+use the "std" namespace, and make my code more readable.
+<p>
+I've added a "make develop" to my makefile, which is where I specify how to compile
+the code that I'm using while I'm writing the program.   I won't use it yet -- here, I'll
+simply type "make obj/tic_tac_toe_1.o", because I've configure that to just compile
+<b>src/tic_tac_toe_1.cpp</b>:
 
 <pre>
-UNIX> <font color=darkred><b>grep 'Print(' roster_02.hpp</b></font>
-    void Print(int columns) const;              <font color=blue>// This line is the only change.</font>
+UNIX> <font color=darkred><b>make obj/tic_tac_toe_1.o</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe_1.o src/tic_tac_toe_1.cpp
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
-We're going to have our main program, "roster_02_main.cpp" read the number of columns on the
-command line, and pass that to the print routine.  This is straightforward code, but note the
-use of <b>throw()</b> to clean up the error checking:
+<hr>
+<h3>The testing program: src/ttt_tester.cpp</h3>
+
+Next, I wrote my testing program, which is in 
+<b><a href=src/ttt_tester.cpp>src/ttt_tester.cpp</a></b>. I write a lot of testing
+programs like this -- pretty much for every class that I create.  The structure is simple
+-- it reads lines of text and converts them to vectors of words.  It processes one line
+at a time, using the first word as a command.  You can see the commands below in the
+procedure <b>print_commands()</b>.  What you see is that there is a command to test each
+method of the class.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-<font color=blue>/* roster_02_main.cpp has the user pass the number of columns for the HTML on the 
-   command line.  It passes this to the Print() method of the Roster class. */</font>
-
-#include &lt;fstream&gt;
+#include "tic_tac_toe.hpp"
 #include &lt;iostream&gt;
 #include &lt;sstream&gt;
-#include &lt;cstdlib&gt;
-#include "roster_02.hpp"
+#include &lt;vector&gt;
+#include &lt;cstdio&gt;
+#include &lt;string&gt;
 using namespace std;
+
+<font color=blue>/* It's good to put this in a procedure at the beginning of your file -- that
+   way you know where it is for reference, while you're writing the program. */</font>
+
+void print_commands()
+{
+  cout &lt;&lt; "usage: ttt_tester -- commands on stdin." &lt;&lt; endl;
+  cout &lt;&lt; endl;
+  cout &lt;&lt; "commands:" &lt;&lt; endl;
+  cout &lt;&lt; "  C            - Clear game state." &lt;&lt; endl;
+  cout &lt;&lt; "  GS           - Print the game state char." &lt;&lt; endl;
+  cout &lt;&lt; "  P            - Print the board." &lt;&lt; endl;
+  cout &lt;&lt; "  BS           - Print the Board String." &lt;&lt; endl;
+  cout &lt;&lt; "  S            - Print stats." &lt;&lt; endl;
+  cout &lt;&lt; "  M X/O R C    - Move X or O to space at row R, col C." &lt;&lt; endl;
+  cout &lt;&lt; "  Q            - Quit." &lt;&lt; endl;
+  cout &lt;&lt; "  ?            - Print commands." &lt;&lt; endl;
+}
+
+
+int main()
+{
+  string s, line;         <font color=blue>// I use these to read a line of text and turn it into a </font>
+  vector &lt;string&gt; sv;     <font color=blue>// vector of strings (which is in sv).</font>
+  istringstream ss;
+
+  Tic_Tac_Toe ttt;        <font color=blue>// Here's my tic-tac-toe game.</font>
+  vector &lt;int&gt; stats;     <font color=blue>// This is for when I call ttt.Stats()</font>
+
+  int row, col;           <font color=blue>// These are for the ttt.Make_Move(xo, row, col) call.</font>
+  char xo;
+
+  while (1) {
+ 
+    <font color=blue>/* Print a prompt, and read in a line. */</font>
+
+    cout &lt;&lt; "TTT&gt; ";
+    cout.flush();
+    if (!getline(cin, line)) return 0;
+
+    <font color=blue>/* Use a stringstream to turn the line into a vector of words. */</font>
+
+    sv.clear();
+    ss.clear();
+    ss.str(line);
+    while (ss &gt;&gt; s) sv.push_back(s);
+
+    <font color=blue>/* Ignore blank lines and lines that start with the pound sign. */</font>
+
+    if (sv.size() == 0 || sv[0][0] == '#') {
+
+    <font color=blue>/* Handle the simple commands: */</font>
+
+    } else if (sv[0] == "P") {
+      ttt.Print();
+    } else if (sv[0] == "C") {
+      ttt.Clear_Game();
+    } else if (sv[0] == "GS") {
+      printf("%c\n", ttt.Game_State());
+    } else if (sv[0] == "BS") {
+      printf("%s\n", ttt.Board_String().c_str());
+
+    <font color=blue>/* Stats */</font>
+
+    } else if (sv[0] == "S") {
+      ttt.Stats(stats);
+      printf("X Wins: %4d\n", stats[0]);
+      printf("O Wins: %4d\n", stats[1]);
+      printf("Draws:  %4d\n", stats[2]);
+
+    <font color=blue>/* Make a move.  
+       You'll note that I'm not using a stringstream for row/col.  This code
+       is simpler, and since row and col have to be between 0 and 2, it works
+       just fine.  You'll note that I'm not doing much error-checking here.
+       That will be handled in Make_Move() which returns 'E' if it is called
+       incorrectly.  */</font>
+
+    } else if (sv[0] == "M") {
+      if (sv.size() != 4) {
+        printf("Usage M X/O row col\n");
+      } else {
+        xo = sv[1][0];
+        row = sv[2][0] - '0';
+        col = sv[3][0] - '0';
+        printf("Result of move: %c\n", ttt.Make_Move(xo, row, col));
+      }
+
+    <font color=blue>/* Quit, print commands or a bad command. */</font>
+
+    } else if (sv[0] == "Q") {
+      return 0;
+    } else if (sv[0] == "?") {
+      print_commands();
+    } else {
+      printf("Unknown command %s\n", sv[0].c_str());
+    }
+  }
+}
+</pre></td></table></center><p>
+
+The program is really simple, and it lets me write <b>tic_tac_toe.cpp</b> incrementally, by writing
+a few methods at a time, and then testing.  This compiles with 
+<b>src/tic_tac_toe_1.cpp</b>, and now you can "test" it.  Of course, it doesn't really do anything, but
+at least you have everything compiling together are are ready to start implementing.   In my makefile,
+I have this compile with <b>src/tic_tac_toe_1.cpp</b> to make the executable <b>bin/ttt_tester_1</b>:
+
+<pre>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make bin/ttt_tester_1</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_tester.o src/ttt_tester.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe_1.o src/tic_tac_toe_1.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_tester_1 obj/ttt_tester.o obj/tic_tac_toe_1.o
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+I'll run it, and it won't do much, but it lets me see that the methods are being called:
+
+<pre>
+UNIX> <font color=darkred><b>bin/ttt_tester_1</b></font>
+TTT> <font color=darkred><b>?</b></font>
+usage: ttt_tester -- commands on stdin.
+
+commands:
+  C            - Clear game state.
+  GS           - Print the game state char.
+  P            - Print the board.
+  BS           - Print the Board String.
+  S            - Print stats.
+  M X/O R C    - Move X or O to space at row R, col C.
+  Q            - Quit.
+  ?            - Print commands.
+TTT> <font color=darkred><b>C</b></font>                                        <font color=blue># call ttt.Clear()</font>
+TTT> <font color=darkred><b>GS</b></font>                                       <font color=blue># call ttt.Game_State()</font>
+-
+TTT> <font color=darkred><b>P</b></font>                                        <font color=blue># call ttt.Print()</font>
+TTT> <font color=darkred><b>BS</b></font>                                       <font color=blue># call ttt.Board_String()</font>
+-
+TTT> <font color=darkred><b>S</b></font>                                        <font color=blue># call ttt.Stats()</font>
+X Wins:    0
+O Wins:    0
+Draws:     0
+TTT> <font color=darkred><b>M - - - </b></font>                                 <font color=blue># call ttt.Make_Move()</font>
+Result of move: E
+TTT> <font color=darkred><b>Q</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Implementing the easy methods: src/tic_tac_toe_2.cpp</h3>
+
+In
+<b><a href=src/tic_tac_toe_2.cpp>src/tic_tac_toe_2.cpp</a></b>, I implement all of the methods,
+except for <b>Make_Move()</b>. These are all really straightforward, and you can read what
+they do in their comments:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* In this program, I implement the easy methods, which is all of the methods besides Make_Move() */</font>
+
+#include "tic_tac_toe.hpp"
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* The constructor calls Clear_Game() to set up the empty board.
+   It also creates the X_O_D vector and sets its entries to zero. */</font>
+
+Tic_Tac_Toe::Tic_Tac_Toe() 
+{
+  Clear_Game();
+  X_O_D.resize(3, 0);
+}
+
+<font color=blue>/* Clear_Game() creates an empty board with all dashes.  It sets the game state
+   to 'B', for "Beginning", and sets the number of open squares to 9, since 
+   all of the squares are empty. */</font>
+
+void Tic_Tac_Toe::Clear_Game() 
+{
+  State = 'B';
+  Board.clear();
+  Board.push_back("---");
+  Board.push_back("---");
+  Board.push_back("---");
+  Open_Squares = 9;
+}
+
+<font color=blue>/* Print() is simple, printing out the Board, one row per line. */</font>
+
+void Tic_Tac_Toe::Print() const 
+{
+  size_t i;
+
+  for (i = 0; i &lt; Board.size(); i++) cout &lt;&lt; Board[i] &lt;&lt; endl;
+}
+
+<font color=blue>/* Game_State() is also simple, simply returning the State variable. */</font>
+
+char Tic_Tac_Toe::Game_State() const 
+{
+  return State; 
+}
+
+<font color=blue>/* Board_String() concatenates the three rows of the Board together to make a single
+   string without any newlines. */</font>
+
+string Tic_Tac_Toe::Board_String() const 
+{ 
+  string rv;
+
+  rv = Board[0] + Board[1] + Board[2];
+  return rv;
+}
+
+<font color=blue>/* State() just copies X_O_D to its argument, which is a reference parameter. */</font>
+
+void Tic_Tac_Toe::Stats(vector &lt;int&gt; &xod) const 
+{ 
+  xod = X_O_D;
+}
+
+<font color=blue>/* Make_Move() is still unwritten. */</font>
+
+char Tic_Tac_Toe::Make_Move(char xo, size_t row, size_t col) 
+{
+  (void) xo;
+  (void) row;
+  (void) col;
+  return '.'; 
+}
+</pre></td></table></center><p>
+
+We can go ahead and test to see if these all work -- again, they are pretty simple, and 
+since you can't make a move, they don't ever change.  The makefile will compile this
+and <b>src/ttt_tester.o</b> into <b>bin/ttt_tester_2</b>:
+
+<pre>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make bin/ttt_tester_2</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_tester.o src/ttt_tester.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe_2.o src/tic_tac_toe_2.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_tester_2 obj/ttt_tester.o obj/tic_tac_toe_2.o
+UNIX> bin/ttt_tester_2
+TTT> <font color=darkred><b>P</b></font>
+---
+---
+---
+TTT> <font color=darkred><b>GS</b></font>
+B
+TTT> <font color=darkred><b>S</b></font>
+X Wins:    0
+O Wins:    0
+Draws:     0
+TTT> <font color=darkred><b>BS</b></font>
+---------
+TTT> <font color=darkred><b>C</b></font>
+TTT> <font color=darkred><b>P</b></font>
+---
+---
+---
+TTT> <font color=darkred><b>Q</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Implementing and testing Make_Move()</h3>
+
+<b>Make_Move()</b> is the hard procedure.  It is implemented in
+<b><a href=src/tic_tac_toe.cpp>src/tic_tac_toe.cpp</a></b> -- all of the other
+methods are copied over from <b>src/tic_tac_toe_2.cpp</b>.  The implementation is
+explained in the comments.  The code to test whether the caller has won feels a 
+little clunky, but it is at least straightforward: 
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Make_Move() goes through the following steps:
+
+   - Error check the arguments
+   - Update the Board and Open_Squares
+   - Test to see if whoever called Make_Move() has now won the game.  If so,
+     update the stats and set the State to 'x' or 'o'.
+   - Otherwise, test to see if the game is a Draw, and set its state to 'D'.
+   - Finally, if the game isn't over, set the game state to 'X' or 'O' 
+     to indicate whose turn it is. */</font>
+
+char Tic_Tac_Toe::Make_Move(char xo, size_t row, size_t col) 
+{
+  bool win;                  <font color=blue>// This is used to record whether the caller has won the game.</font>
+ 
+  <font color=blue>/* Error Check */</font>
+
+  if (xo != 'X' && xo != 'O') return 'E';
+  if (xo == 'X' && State != 'B' && State != 'X') return 'E';
+  if (xo == 'O' && State != 'B' && State != 'O') return 'E';
+  if (row &gt;= 3) return 'E';
+  if (col &gt;= 3) return 'E';
+  if (Board[row][col] != '-') return 'E';
+
+  <font color=blue>/* Update the Board and decrement the number of open squares */</font>
+
+  Board[row][col] = xo;
+  Open_Squares--;
+
+  <font color=blue>/* Test to see if whoever calls Make_Move has won.  The tests go in the following order:
+       - Check to see if the move completed a row.
+       - Check to see if the move completed a column.
+       - Check to see if the move completed the \ diagonal
+       - Check to see if the move completed the / diagonal */</font>
+
+  if (Board[row][0] == Board[row][1] && Board[row][0] == Board[row][2]) {
+    win = true;
+  } else if (Board[0][col] == Board[1][col] && Board[0][col] == Board[2][col]) {
+    win = true;
+  } else if (row == col && Board[0][0] == Board[1][1] && Board[0][0] == Board[2][2]) {
+    win = true;
+  } else if (row+col == 2 && Board[0][2] == Board[1][1] && Board[2][0] == Board[1][1]) {
+    win = true;
+  } else {
+    win = false;
+  }
+
+  <font color=blue>/* If the player won the game, update the stats and state accordingly. */</font>
+
+  if (win) {
+    if (xo == 'X') {
+      State = 'x';
+      X_O_D[0]++;
+    } else if (xo == 'O') {
+      State = 'o';
+      X_O_D[1]++;
+    }
+
+  <font color=blue>/* Otherwise, if the game is a draw, then update the stats and state accordingly. */</font>
+
+  } else if (Open_Squares == 0) {
+    State = 'D';
+    X_O_D[2]++;
+
+  <font color=blue>/* Otherwise, set the State to whoever's turn it is. */</font>
+
+  } else if (xo == 'X') {
+    State = 'O';
+  } else {
+    State = 'X';
+  }
+
+  <font color=blue>/* Finally, return the state. */</font>
+
+  return State;
+}
+</pre></td></table></center><p>
+
+We can now compile <b>bin/ttt_tester</b>, and test the program:
+
+<pre>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make bin/ttt_tester</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_tester.o src/ttt_tester.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe.o src/tic_tac_toe.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_tester obj/ttt_tester.o obj/tic_tac_toe.o
+UNIX> <font color=darkred><b>bin/ttt_tester</b></font>
+TTT> <font color=darkred><b>M Fred Binky Luigi</b></font>                   <font color=blue># Error checking</font>
+Result of move: E
+TTT> <font color=darkred><b>M X 5 3</b></font>
+Result of move: E
+TTT> <font color=darkred><b>M X 1 1</b></font>                              <font color=blue># Put an X in the middle square (remember, 0-indexing)</font>
+Result of move: O
+TTT> <font color=darkred><b>M O 0 1</b></font>                              <font color=blue># Put an O into the top middle square</font>
+Result of move: X
+TTT> <font color=darkred><b>P</b></font>                                    <font color=blue># Print the board</font>
+-O-
+-X-
+---
+TTT> <font color=darkred><b>M X 2 2 </b></font>                             <font color=blue># Put an X in bottom right square</font>
+Result of move: O
+TTT> <font color=darkred><b>M O 0 0</b></font>                              <font color=blue># Put an O in the top left square</font>
+Result of move: X
+TTT> <font color=darkred><b>P</b></font>                                    <font color=blue># Print the board</font>
+OO-
+-X-
+--X
+TTT> <font color=darkred><b>M X 0 2</b></font>                              <font color=blue># Put an X in top right square.  O is in trouble.</font>
+Result of move: O
+TTT> <font color=darkred><b>M O 0 2</b></font>                              <font color=blue># Error check putting an O into a square with an X</font>
+Result of move: E
+TTT> <font color=darkred><b>M O 1 2</b></font>                              <font color=blue># Put an O in the middle right square.</font>
+Result of move: X
+TTT> <font color=darkred><b>P</b></font>                                    <font color=blue># Print the board</font>
+OOX
+-XO
+--X
+TTT> <font color=darkred><b>M X 2 0</b></font>                              <font color=blue># X will now win the game.</font>
+Result of move: x                         <font color=blue># This is confirmed by the state of 'x'</font>
+TTT> <font color=darkred><b>P</b></font>
+OOX
+-XO
+X-X
+TTT> <font color=darkred><b>GS</b></font>                                   <font color=blue># Confirm the game state</font>
+x
+TTT> <font color=darkred><b>S</b></font>                                    <font color=blue># Show the stats.</font>
+X Wins:    1
+O Wins:    0
+Draws:     0
+TTT> <font color=darkred><b>Q</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can see that the testing program is a pain to use to play the game, but it's good at testing.
+It's a good idea here to test all of <b>Make_Move()</b> -- best thing is to create a file that
+has commands, and then confirm that running the program on the file gives you the output
+that you want.  Let me give you a simple example that plays the same game as above, but just 
+prints out the board strings that result.  The program <b>sed</b> is really useful here to strip
+out those "TTT>" strings, and to remove the lines that say "Result of move".
+<p>
+The input file is in 
+<b><a href=test_game_input_1.txt>test_game_input_1.txt</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+# This plays the game where X wins on the left-to-right diagonal:
+M X 1 1
+BS
+M O 0 1
+BS
+M X 2 2
+BS
+M O 0 0
+BS
+M X 0 2
+BS
+M O 1 2
+BS
+M X 2 0
+BS
+GS
+P
+</pre></td></table></center><p>
+
+When we run it, the output is pretty clunky:
+
+<pre>
+UNIX> <font color=darkred><b>bin/ttt_tester < test_game_input_1.txt </b></font>
+TTT> TTT> Result of move: O
+TTT> ----X----
+TTT> Result of move: X
+TTT> -O--X----
+TTT> Result of move: O
+TTT> -O--X---X
+TTT> Result of move: X
+TTT> OO--X---X
+TTT> Result of move: O
+TTT> OOX-X---X
+TTT> Result of move: X
+TTT> OOX-XO--X
+TTT> Result of move: x
+TTT> OOX-XOX-X
+TTT> x
+TTT> OOX
+-XO
+X-X
+TTT> UNIX>
+</pre>
+
+However, piping it through a few <b>sed</b> commands makes it pretty clean:
+
+<pre>
+UNIX> <font color=darkred><b>bin/ttt_tester < test_game_input_1.txt | sed 's/TTT> //' | sed '/Result/d'</b></font>
+----X----
+-O--X----
+-O--X---X
+OO--X---X
+OOX-X---X
+OOX-XO--X
+OOX-XOX-X
+x
+OOX
+-XO
+X-X
+
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3> A more natural game player -- src/ttt_player.cpp</h3>
+
+In 
+<b><a href=src/ttt_player.cpp>src/ttt_player.cpp</a></b>, I have a program that
+runs a command-line version of the game which is a lot less cumbersome than
+<b>src/ttt_tester.cpp</b>.  It starts by having 'X' start the game, and then it 
+alternates 'X' and 'O' starting the subsequent games.  It's a pretty simple program,
+and leverages the <b>Game_State()</b> method so that it doesn't even have to keep 
+track of whose turn it is.  Please read the comments for explanation.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program runs a more natural command-line version of tic-tac-toe than
+   src/ttt_tester.cpp.  Note how it makes use of the game state to help it
+   play the game. */</font>
+
+#include "tic_tac_toe.hpp"
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;sstream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main()
+{
+  Tic_Tac_Toe ttt;                  <font color=blue>// The game player</font>
+  vector &lt;int&gt; stats;               <font color=blue>// This is for reading the stats</font>
+  size_t row, col;                  <font color=blue>// These are entered on standard input for Make_Move()</font>
+  char start;                       <font color=blue>// 'X' or 'O' for who starts the game</font>
+  char turn;                        <font color=blue>// 'X' or 'O' for whose turn it is</font>
+  char state;                       <font color=blue>// The game state.</font>
+  
+  <font color=blue>/* Set it up so that 'X' plays the first game.  
+     We will alternate this between games. */</font>
+
+  start = 'X';
+
+  while (1) {
+ 
+    <font color=blue>/* Get the game state, and print the board. */</font>
+
+    state = ttt.Game_State();
+    cout &lt;&lt; endl;
+    ttt.Print();
+    cout &lt;&lt; endl;
+
+    <font color=blue>/* If we're playing the game, then figure out whose turn it is,
+       and then get the player's move from standard input. */</font>
+
+    if (state == 'B' || state == 'X' || state == 'O') {
+      turn = (state == 'B') ? start : state;
+      cout &lt;&lt; turn  &lt;&lt; "'s Move: ";
+      cout.flush();
+      if (!(cin &gt;&gt; row &gt;&gt; col)) return 0;
+
+      <font color=blue>/* If the move is illegal, then we print an error message.
+         Then, regardless of whether the move was legal or illegal,
+         we're simply going to go to the top of the while loop.
+         If there was an error, we'll simply repeat this code.
+         Otherwise, the game will move on. */</font>
+
+      if (ttt.Make_Move(turn, row, col) == 'E') {
+        cout &lt;&lt; endl &lt;&lt; "Bad input -- try again, please." &lt;&lt; endl;
+      }
+        
+    <font color=blue>/* Otherwise, the game is over.  We're going to do the following things:
+        - Print the winner (or whether it's a draw).
+        - Print the stats.
+        - Start a new game
+        - Set the starting player to the other player. */</font>
+
+    } else {
+      if (state == 'D') {
+        printf("Draw\n");
+      } else {
+        printf("%c Wins!\n", state + ('A' - 'a'));   <font color=blue>// This converts the lower-case to upper-case.</font>
+      }
+
+      ttt.Stats(stats);
+      printf("Stats: X:%d O:%d D:%d\n", stats[0], stats[1], stats[2]);
+
+      ttt.Clear_Game();
+      start = (start == 'X') ? 'O' : 'X';
+    }
+  }
+}
+</pre></td></table></center><p>
+
+Let's compile it, and play the same game as above -- you'll note, it's a lot easier
+than using <b>bin/ttt_tester</b>.  (However, I'll contend that <b>bin/ttt_tester</b> is
+a better program for testing).
+
+<pre>
+UNIX> <font color=darkred><b>make bin/ttt_player</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/ttt_player.o src/ttt_player.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/tic_tac_toe.o src/tic_tac_toe.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ttt_player obj/ttt_player.o obj/tic_tac_toe.o
+UNIX> <font color=darkred><b>bin/ttt_player</b></font>
+
+---
+---
+---
+
+
+
+X's Move: <font color=darkred><b>1 1</b></font>
+
+---
+-X-
+---
+
+O's Move: <font color=darkred><b>0 1</b></font>
+
+-O-
+-X-
+---
+
+X's Move: <font color=darkred><b>2 2</b></font>
+
+-O-
+-X-
+--X
+
+O's Move: <font color=darkred><b>0 0</b></font>
+
+OO-
+-X-
+--X
+
+X's Move: <font color=darkred><b>0 2</b></font>
+
+OOX
+-X-
+--X
+
+O's Move: <font color=darkred><b>1 2</b></font>
+
+OOX
+-XO
+--X
+
+X's Move: <font color=darkred><b>2 0</b></font>
+
+OOX
+-XO
+X-X
+
+X Wins!
+Stats: X:1 O:0 D:0
+
+---
+---
+---
+
+O's Move: <font color=darkred><b>Q</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3> Performing a scientific experiment - src/ttt_random.cpp</h3>
+
+Our last progrom to utilize the <tt>Tic_Tac_Toe</tt> class does a little scientific
+experiment.  Both the X and the O players are going to play the game randomly, with 
+just one difference -- if X begins the game, he/she will choose the middle square.
+The program to do is in 
+<b><a href=src/ttt_random.cpp>src/ttt_random.cpp</a></b>. It takes two command-line arguments --
+a number of iterations (games), and a seed for the random number generators.  It then 
+plays games randomly, except for when X starts a game, in which case X will choose the
+middle square.
+<p>
+Go ahead and read the comments for an explanation of how the code works.  The important part
+of the code is how we read the board string, in the variable <i>bs</i>, and figure out the 
+legal moves, which correspond to the dashes in the string.  Each of those is pushed onto the
+vectors <b>legal_moves_r</b> and 
+<b>legal_moves_c</b>, and we choose a random one by choosing a random index into these vectors:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program allows us to do a scientific experiment on tic-tac-toe.  The hypothesis is that
+   if you start the game in the middle square, and then play the game randomly, you will do 
+   betting than simply playing randomly. 
+
+   The program is a nice demonstration of how our Tic_Tac_Toe class can serve multiple
+   goals (playing the game interactively, and doing a scientific experiment. */</font>
+
+#include "tic_tac_toe.hpp"
+#include "MOA.hpp"
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+<font color=blue>/* On the command line, we're going to read a number of iterations and a seed
+   for a random number generator (this is why we included "MOA.hpp" above). */</font>
 
 int main(int argc, char **argv)
 {
-  Roster r;
-  ifstream fin;
-  istringstream ss;
-  int columns;
-  string name;
+  Tic_Tac_Toe ttt;                     <font color=blue>// The game player</font>
+  vector &lt;int&gt; stats;                  <font color=blue>// For the final Stats() call</font>
+  MOA rng;                             <font color=blue>// Random number generator</font>
+  istringstream ss;                    <font color=blue>// For parsing the command line arguments</font>
 
-  <font color=blue>/* Parse the command line and exit if there is an error. */</font>
+  size_t iterations;                   <font color=blue>// The number of games to play</font>
+  size_t seed;                         <font color=blue>// Seed for the random number generator</font>
+  size_t games_played;                 <font color=blue>// Keeping track of the number of games played</font>
+  char start;                          <font color=blue>// Who starts the game</font>
+  char turn;                           <font color=blue>// Whose turn it is</font>
+  char state;                          <font color=blue>// The game state</font>
+  string bs;                           <font color=blue>// The board string, which helps do the random choosing</font>
+  vector &lt;size_t&gt; legal_moves_r;       <font color=blue>// Legal moves -- the row numbers</font>
+  vector &lt;size_t&gt; legal_moves_c;       <font color=blue>// Legal moves -- the column numbers</font>
+  
+  size_t i;
+
+  <font color=blue>/* Parse and error check the command line */</font>
 
   try {
-    if (argc != 3) throw((string) "usage: roster_main filename columns");
-    ss.str(argv[2]);
-    if (!(ss &gt;&gt; columns) || columns &lt;= 0) throw((string) "bad columns specification.");
-
+    if (argc != 3) throw((string) "usage: bin/ttt_random iterations seed");
+    ss.clear(); ss.str(argv[1]); if (!(ss &gt;&gt; iterations)) throw((string) "Bad iterations");
+    ss.clear(); ss.str(argv[2]); if (!(ss &gt;&gt; seed)) throw((string) "Bad seed");
   } catch (string s) {
-    cerr &lt;&lt; s &lt;&lt; endl;
+    cout &lt;&lt; s &lt;&lt; endl;
     return 1;
   }
 
-  <font color=blue>/* Open the specified file, and exit if there is an error. */</font>
+  <font color=blue>/* Initialize everything */</font>
 
-  fin.open(argv[1]);
-  if (fin.fail()) { perror(argv[1]); return 1; }
+  rng.Seed(seed);
+  start = 'X';
+  games_played = 0;
   
-  <font color=blue>/* Add all of the names to the roster, and then call the Print() method. */</font>
+  <font color=blue>/* Keep going until you complete enough games.
+     You only increment games_played when a game is over. */</font>
 
-  while (getline(fin, name)) r.Add_Name(name);
-  r.Print(columns);
+  while (games_played &lt; iterations) {
+ 
+    <font color=blue>// printf("%s\n", ttt.Board_String().c_str());     This is useful for debugging.</font>
+
+    <font color=blue>/* If the game isn't over, then determine whose turn it is, and then
+       determine the legal moves that can be made.  Choose one of them randomly.
+       When it's X's turn and it's the beginning of a game, set it up so that
+       the only legal move is to use the center square. */</font>
+
+    state = ttt.Game_State();
+    if (state == 'B' || state == 'X' || state == 'O') {
+      turn = (state == 'B') ? start : state;
+      legal_moves_r.clear();
+      legal_moves_c.clear();
+
+      <font color=blue>/* This is how to handle when the game is starting and it's X's turn. */</font>
+
+      if (state == 'B' && turn == 'X') {
+        legal_moves_r.push_back(1);
+        legal_moves_c.push_back(1);
+
+      <font color=blue>/* Otherwise, use the dashes in the board string to determine the legal moves. */</font>
+
+      } else {
+        bs = ttt.Board_String();
+        for (i = 0; i &lt; bs.size(); i++) {
+          if (bs[i] == '-') {
+            legal_moves_r.push_back(i/3);
+            legal_moves_c.push_back(i%3);
+          }
+        }
+      }
+
+      <font color=blue>/* Choose a random legal move and make it. */</font>
+
+      i = rng.Random_Integer()%legal_moves_r.size();
+      ttt.Make_Move(turn, legal_moves_r[i], legal_moves_c[i]);
+
+    <font color=blue>/* Otherwise, the game is over.  Update the games played, and set the
+       starting player to the other player. */</font>
+
+    } else {
+      games_played++;
+      ttt.Clear_Game();
+      start = (start == 'X') ? 'O' : 'X';
+    }
+  }
+
+  <font color=blue>/* At the end, print the stats. */</font>
+
+  ttt.Stats(stats);
+  printf("Stats: X:%d O:%d D:%d\n", stats[0], stats[1], stats[2]);
   return 0;
 }
 </pre></td></table></center><p>
 
-Finally, 
-<b><a href=roster_02.cpp>roster_02.cpp</a></b> implements the change to the <b>Print()</b>
-method.  Again, nothing fancy here -- it's just making an HTML table:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-void Roster::Print(int columns) const
-{
-  size_t i;
-
-  printf("&lt;table border=2&gt;\n");
-
-  for (i = 0; i &lt; Names.size(); i++) {
-    if (i % columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";            <font color=blue>// Start a new row when i%columns == 0</font>
-    printf("&lt;td&gt;%s&lt;/td&gt;\n", Names[i].c_str());
-    if (i % columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";   <font color=blue>// End the row when i%columns == columns -1</font>
-  }
-
-  if (i % columns != 0) printf("&lt;/tr&gt;\n");             <font color=blue>// If the last row is incomplete, end it.</font>
-  printf("&lt;/table&gt;\n");
-
-}
-</pre></td></table></center><p>
-
-<p>
-We compile and run it below:
+To debug this, you'll note that I have <b>printf()</b> statement that I have commented out.
+Those let me look at the <b>Board_String<b/> strings to make sure that everything looks good.
+Let's call it on 1,000,000 games:
 
 <pre>
-UNIX> <font color=darkred><b>make roster_02</b></font>
-g++ -Wall -Wextra -c roster_02.cpp 
-g++ -Wall -Wextra -c roster_02_main.cpp 
-g++ -Wall -Wextra -o roster_02 roster_02.o roster_02_main.o
-UNIX> <font color=darkred><b>./roster_02</b></font>
-usage: roster_main filename columns
-UNIX> <font color=darkred><b>./roster_02 Roster.txt 6 > roster_02_example.html</b></font>
-UNIX> <font color=darkred><b></b></font>
+UNIX> <font color=darkred><b>bin/ttt_random 1000000 40</b></font>
+Stats: X:490563 O:388761 D:120676
+UNIX> <font color=darkred><b>bin/ttt_random 1000000 41</b></font>
+Stats: X:490699 O:388937 D:120364
+UNIX> <font color=darkred><b>bin/ttt_random 1000000 42</b></font>
+Stats: X:490144 O:388883 D:120973
+UNIX> <font color=darkred><b>bin/ttt_random 1000000 43</b></font>
+Stats: X:491100 O:387998 D:120902
+UNIX> <font color=darkred><b>≈</b></font>
 </pre>
 
-You can look at the resulting HTML file in <a href=roster_02_example.html><b>roster_02_example.html</b></a> (Click the link to see it as an HTML file).  Here it is as text:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-&lt;table border=2&gt;
-&lt;tr&gt;
-&lt;td&gt;Alexander Blinn&lt;/td&gt;
-&lt;td&gt;Brody Fairport&lt;/td&gt;
-&lt;td&gt;Taylor Toxin&lt;/td&gt;
-&lt;td&gt;Kayla Metro&lt;/td&gt;
-&lt;td&gt;William Grantee&lt;/td&gt;
-&lt;td&gt;Sofia Doleful&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Layla Simplex&lt;/td&gt;
-&lt;td&gt;Henry Betide&lt;/td&gt;
-&lt;td&gt;Ella Grievous&lt;/td&gt;
-&lt;td&gt;Landon Lockheed&lt;/td&gt;
-&lt;td&gt;Hannah Sleep&lt;/td&gt;
-&lt;td&gt;Andrew Domingo&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Daniel Petrify&lt;/td&gt;
-&lt;td&gt;Eli Jayden Olivine&lt;/td&gt;
-&lt;td&gt;Grace Convoke&lt;/td&gt;
-&lt;td&gt;Gianna Deportation&lt;/td&gt;
-&lt;td&gt;Zachary Obviate&lt;/td&gt;
-&lt;td&gt;Alexandra Spicebush&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-</pre></td></table></center><p>
-<hr>
-
-<h3>roster_03 -- Using a constructor to initialize the Roster</h3>
-
-I'm going to add two more command lines to my program.  The first is the name
-of the directory to find the pictures (in this case, the directory will
-be <b>Pictures</b>).  The second is the name of the first file, which here
-is <b>001001.jpg</b>. We're going to take advantage of the fact that our pictures
-are numbered consecutively from 001001.  The leading zero's, however, are a bit
-unfortunate, because when we store that number as 1001, we've lost the leading
-zeros.
-
-
-
-
-I'd like to add another command line argument to the program -- the starting
-number of the first picture.  You'll note that the first file in <b>Pictures</b>
-is <a href=Pictures/001001.jpg><b>001001.jpg</b></a>.  I'd like to have the number 1001
-be a command line argument, and then I'll use that to construct all of the 
-proper filenames for the pictures.  
-<p>
-I'd like to have this number be part of the class.  It will be a piece of
-the class's <b>protected</b> data, and I'll set it when I create an instance
-of the class.  To do that, I need to define a <i>constructor</i> method for
-the class, which takes the starting number as a parameter.  Here is the 
-new class defintion, in 
-<b><a href=roster_03.h>roster_03.h</a></b>
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;cstdlib&gt;
-#include &lt;vector&gt;
-#include &lt;string&gt;
-using namespace std;
-
-class Roster {
-  public:
-    Roster(int starting_number);     // The constructor, which takes an integer as a parameter.
-    void Add_name(string name);
-    void Print(int columns);
-  protected:
-    vector &lt;string&gt; names;
-    int start;
-};
-</pre></td></table></center><p>
-
-In <b><a href=roster_03.cpp>roster_03.cpp</a></b>, we define the constructor, which simply 
-sets the new <b>start</b> variable to the constructor's parameter, and then
-constructs the filename in the <b>Print()</b> procedure:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include "roster_03.h"
-
-Roster::Roster(int starting_number)
-{
-  start = starting_number;
-}
-
-void Roster::Add_name(string name)
-{
-  names.push_back(name);
-}
-
-void Roster::Print(int columns)
-{
-  int i;
-
-  cout &lt;&lt; "&lt;table border=2&gt;\n";
-
-  for (i = 0; i &lt; names.size(); i++) {
-    if (i % columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";            // Start a new row when i%columns == 0
-    printf("&lt;td&gt;");
-    printf("Filename: Pictures/%06d.jpg, %s", i+start, names[i].c_str());
-    printf("&lt;/td&gt;\n");
-    if (i % columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";   // End the row when i%columns == columns -1
-  }
-
-  if (i%columns != 0) cout &lt;&lt; "&lt;/tr&gt;\n";               // If the last row is incomplete, end it.
-  cout &lt;&lt; "&lt;/table&gt;\n";
-}
-</pre></td></table></center><p>
-
-Remember that <b>printf()</b> statement -- it pads the number to six digits, 
-and includes leading zeros.
-<p>
-Finally, we have an issue with our <b>main()</b> routine.  Previously, we
-had declared <b>r</b> is a parameter, which was fine since it did not take
-an explicit constructor.  If we try that now, we'll get a compilation 
-error.  To fix it, we change <b>r</b> to be a <i>pointer</i>, and call <b>new</b>
-with the starting number as a parameter, which is passed to the constructor.
-<p>
-This delays creating the instance of the roster class until the <b>new</b> statement
-has been reached.  It also means that <b>r</b> is a </i>pointer</i>, which points
-to the new instance.  To access the members of the class, you have to use "->" 
-instead of ".".  If you copy <b>r</b>, it only copies the pointer and not the
-instance.  This allows you to have multiple data structures that point to one
-data structure, which is sometimes exactly what you want.  Without pointers, you'd
-have to make copies.
-
-<p>
-Here is the code for
-<b><a href=roster_03_main.cpp>roster_03_main.cpp</a></b>:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;fstream&gt;
-#include &lt;sstream&gt;
-#include "roster_03.h"
-
-main(int argc, char **argv)
-{
-  Roster *r;
-  ifstream fin;
-  istringstream ss;
-  string name;
-  int columns, starting_number;
-
-  if (argc != 4) {
-    cerr &lt;&lt; "usage: roster_main filename starting_number columns\n";
-    exit(1);
-  }
-
-  ss.clear(); ss.str(argv[2]); 
-  if (!(ss &gt;&gt; starting_number)) {
-    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad starting number\n";
-    exit(1);
-  }
-
-  ss.clear(); ss.str(argv[3]); 
-  if (!(ss &gt;&gt; columns) || columns &lt;= 0) {
-    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad columns specification\n";
-    exit(1);
-  }
-
-  r = new Roster(starting_number);
-
-  fin.open(argv[1]);
-  if (fin.fail()) { perror(argv[1]); exit(1); }
-  
-  while (getline(fin, name)) r-&gt;Add_name(name);
-  r-&gt;Print(columns);
-}
-</pre></td></table></center><p>
-
-
-<pre>
-UNIX> <font color=darkred><b>make roster_03</b></font>
-g++ -c roster_03.cpp 
-g++ -c roster_03_main.cpp 
-g++ -o roster_03 roster_03.o roster_03_main.o
-UNIX> <font color=darkred><b>roster_03</b></font>
-usage: roster_main filename starting_number columns
-UNIX> <font color=darkred><b>roster_03 Roster.txt 1001 6 > roster_03_example.html</b></font>
-UNIX> <b></b>
-</pre>
-
-Here's 
-<b><a href=roster_03_example.html>roster_03_example.html</a></b>.
-
+You can see that X is winning over O significantly, so I think this is a pretty conclusive
+experiment!
 
 <hr>
-<h3>roster_03_evil -- "But I don't like pointers."</h3>
+<h3>Summary of the Main Points of this Lecture</h3>
 
-The fact that we need to construct our instance of <b>r</b> <i>after</i> parsing
-the command line means that we have to use a pointer and <b>new</b>. You might
-ask, "Can I do it without a pointer?"  The answer is yes you can, but I don't 
-like it.  I've put the code in 
-<b><a href=roster_03_evil.cpp>roster_03_evil.cpp</a></b>:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;fstream&gt;
-#include &lt;sstream&gt;
-#include "roster_03.h"
-
-main(int argc, char **argv)
-{
-  ifstream fin;
-  istringstream ss;
-  string name;
-  int columns, starting_number;
-
-  if (argc != 4) {
-    cerr &lt;&lt; "usage: roster_main filename starting_number columns\n";
-    exit(1);
-  }
-
-  ss.clear(); ss.str(argv[2]); 
-  if (!(ss &gt;&gt; starting_number)) {
-    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad starting number\n";
-    exit(1);
-  }
-
-  ss.clear(); ss.str(argv[3]); 
-  if (!(ss &gt;&gt; columns) || columns &lt;= 0) {
-    cerr &lt;&lt; "usage: roster_main filename starting_number columns -- bad columns specification\n";
-    exit(1);
-  }
-
-  Roster r(starting_number);
-
-  fin.open(argv[1]);
-  if (fin.fail()) { perror(argv[1]); exit(1); }
-  
-  while (getline(fin, name)) r.Add_name(name);
-  r.Print(columns);
-}
-</pre></td></table></center><p>
-
-You'll note that I've put the variable declaration after the processing of the command
-line.  That way, <b>r</b> does not get constructed until <b>starting_number</b> has
-been initialized.  It works fine:
-
-<pre>
-UNIX> <font color=darkred><b>make roster_ev</b></font>
-g++ -c roster_03_evil.cpp 
-g++ -o roster_ev roster_03.o roster_03_evil.o
-UNIX> <font color=darkred><b>roster_ev Roster.txt 1001 6 > roster_ev_example.html</b></font>
-UNIX> <b></b>
-</pre>
-
-However, I really don't like that style of programming.  Why?  Because in my opinion, 
-programs and procedures should have variable declarations and then code.  When variables
-are declared inline, it makes the code that much harder to read and debug.  I believe
-you do much better to declare a pointer with the variable declarations, and then use
-<b>new</b>.  You will not see me ever declare variables in the middle of a procedure.
-I would prefer that you not do that either.
-
-<hr>
-<h3>roster_04 -- Some simple modifications</h3>
-
-I've made some simple modifications in 
-<b><a href=roster_04.h>roster_04.h</a></b>,
-<b><a href=roster_04.cpp>roster_04.cpp</a></b> and
-<b><a href=roster_04_main.cpp>roster_04_main.cpp</a></b>.
-
-These are:
-
-<OL>
-<LI> I have changed the HTML to include the image tags for the pictures.
-<LI> I have added an extra command line argument <b>print_names</b>, which 
-says whether or not to print the names in the final HTML. 
-<LI> I have changed the <b>Print()</b> method to take an integer <b>print_names</b>
-which says whether or not the method should print the names in the final
-HTML.
-</OL>
-
-I won't put them here -- click on the links to see the changes.  Here they
-are in use:
-
-<pre>
-UNIX> <font color=darkred><b>make roster_04</b></font>
-g++ -c roster_04.cpp 
-g++ -c roster_04_main.cpp 
-g++ -o roster_04 roster_04.o roster_04_main.o
-UNIX> <font color=darkred><b>roster_04 </b></font>
-usage: roster_main filename starting_number columns print_names(yes/no)
-UNIX> <font color=darkred><b>roster_04 Roster.txt 1001 6 yes > roster_04_names.html</b></font>
-UNIX> <font color=darkred><b>roster_04 Roster.txt 1001 6 no > roster_04_no_names.html</b></font>
-</pre>
-
-Take a look at the two output files:
-
-<UL>
-<LI> <a href=roster_04_names.html><b>roster_04_names.html</b></a> has the names with the pictures.
-<LI> <a href=roster_04_no_names.html><b>roster_04_no_names.html</b></a> has only the pictures.
-</UL>
-
-<hr>
-<h3>roster_05_bad_1 -- Randomizing the output badly, #1</h3>
-
-Finally, I'd like the pictures to be randomly ordered, to help me test myself
-better.  There are many ways to randomize a list, some good, some bad.  I'll
-show you two bad and one good.  The first bad one is in 
-<b><a href=roster_05_bad_1.cpp>roster_05_bad_1.cpp</a></b>, and I'm only showing 
-the <b>Print()</b> implementation:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-void Roster::Print(int columns, int print_names)
-{
-  int i;
-  int rn;
-
-  cout &lt;&lt; "&lt;table border=2&gt;\n";
-
-  for (i = 0; i &lt; names.size(); i++) {
-
-    if (i%columns == 0) cout &lt;&lt; "&lt;tr&gt;\n";   
-
-    rn = lrand48()%names.size();
-    cout &lt;&lt; "&lt;td&gt;";
-    printf("&lt;IMG src=Pictures/%06d.jpg height=100&gt;", rn+start);
-    if (print_names) cout &lt;&lt; "&lt;br&gt;" &lt;&lt; names[rn];
-    cout &lt;&lt; "&lt;/td&gt;" &lt;&lt; endl;
-
-    if (i%columns == columns-1) cout &lt;&lt; "&lt;/tr&gt;\n";
-  }
-
-  if (i%columns != 0) cout &lt;&lt; "&lt;/tr&gt;\n";   
-  cout &lt;&lt; "&lt;/table&gt;\n";
-}
-</pre></td></table></center><p>
-
-Instead of printing out the names and pictures from 0 to <b>names.size()-1</b>,
-we use <b>lrand48()</b> to pick a random number between 0 and 
-<b>names.size()-1</b> and print that out at each iteration.  This is 
-a pretty bad technique, because you're very likely to pick the same number
-twice, which means you get multiple pictures of the same person, and some
-people won't show up at all.  For example:
-
-<pre>
-UNIX> <font color=darkred><b>make roster_05_bad_1</b></font>
-g++ -c roster_05_bad_1.cpp 
-g++ -c roster_05_main.cpp 
-g++ -o roster_05_bad_1 roster_05_bad_1.o roster_05_main.o
-UNIX> <font color=darkred><b>roster_05_bad_1 Roster.txt 1001 6 yes > roster_05_bad_1.html</b></font>
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-When you look at <a href=roster_05_bad_1.html><b>roster_05_bad_1.html</b></a>, you see
-a lot of duplicates: Andrew Domingo, William Grantee, Taylor Toxin.  There is no
-Grace Convoke or Daniel Petrify.
-<p>
-In class, someone mentioned that I forgot to seed the random number generator (with <b>srand48()</b>).
-That was intentional on my part: when you're debugging code that uses random numbers, it's
-good either to not seed the random number generator, or to seed it with the same value over
-and over.  This is because you'll get the same random numbers, which is helpful if you have
-to chase down a bug that involves the random numbers.
-
-<hr>
-<h3>roster_05_bad_2 -- Randomizing the output badly, #2</h3>
-
-My second attempt is one that I've read in textbooks.  You are going to create
-a vector <b>random</b>, which contains the numbers from 0 to <b>names.size()-1</b>
-in random order.  To do this, you use a second vector <b>inrandom</b>, which 
-is the same size as <b>random</b> and is initialized to zeros.  You use
-<b>inrandom</b> to create <b>random</b>.  For each element of <b>random</b>,
-you choose a random number <i>rn</i> between 0 and <b>names.size()-1</b>.  If 
-<b>inrandom[<i>rn</i>]</b> is zero, you set <b>random[<i>i</i>]</b> to equal
-<i>rn</i> and <b>inrandom[<i>rn</i>]</b> to one.  If 
-<b>inrandom[<i>rn</i>]</b> is one, you try again.
-<p>
-The code is in 
-<b><a href=roster_05_bad_2.cpp>roster_05_bad_2.cpp</a></b>, where
-the following code initializes <b>random</b>:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-void Roster::Print(int columns, int print_names)
-{
-  int i, rn;
-  vector &lt;int&gt; random, inrandom;
-
-  inrandom.resize(names.size(), 0);
-  for (i = 0; i &lt; names.size(); i++) {
-    do {
-      rn = lrand48()%names.size(); 
-    } while (inrandom[rn]);
-    inrandom[rn] = 1;
-    random.push_back(rn);
-  }
-  ...
-</pre></td></table></center><p>
-
-First off, how can we be sure that this code works?  While reasoning about it 
-and convincing yourself it works is one way, another more compelling way is
-to test it.  To do that, I've written
-<b><a href=rb1.cpp>rb1.cpp</a></b>, which randomizes the numbers from 0 to 99
-with the above code:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;cstdlib&gt;
-#include &lt;cstdio&gt;
-#include &lt;vector&gt;
-#include &lt;string&gt;
-using namespace std;
-
-main()
-{
-  int i, rn;
-  vector &lt;int&gt; inrandom;
-
-  inrandom.resize(100, 0);
-  for (i = 0; i &lt; 100; i++) {
-    do {
-      rn = lrand48()%100;
-    } while (inrandom[rn]);
-    inrandom[rn] = 1;
-    printf("%3d\n", rn);
-  }
-}
-</pre></td></table></center><p>
-
-I first run it and look at the output -- looks random.  To prove that all numbers
-are there, though, I'll run the following Unix command:
-
-<pre>
-UNIX> <font color=darkred><b>rb1 | sort -u | wc</b></font>
-     100     100     400
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-The <b>sort</b> command sorts the lines of standard input, and when you pass it the "-u"
-flag, it removes duplicate lines.  Thus, if you have no duplicates, it will emit 100
-lines.  If you have duplicates, it will emit fewer.  The <b>wc</b> command prints the
-number of lines, words and characters on standard input.  It confirms that <b>sort -u</b>
-emitted 100 lines, and our code is working.  
-<p>
-To demonstrate it catching a bug, 
-<b><a href=rb1-buggy.cpp>rb1-buggy.cpp</a></b> is identical to 
-<b><a href=rb1.cpp>rb1.cpp</a></b>, except I deleted the "<b>inrandom[rn] = 1;</b>" line.
-Running the above Unix command illustrates that it only produces 66 unique lines -- it has
-printed lots of duplicates!
-
-<pre>
-UNIX> <font color=darkred><b>rb1-buggy | sort -u | wc</b></font>
-      66      66     264
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-While I don't test you on these things, it's good for you to learn some of the Unix
-commands, like <b>grep</b>, <b>sed</b>, <b>sort</b>, <b>diff</b> and <b>wc</b>.  They
-are powerful tools to help you debug your programs!
-<p>
-Now, why is 
-<b><a href=roster_05_bad_2.cpp>roster_05_bad_2.cpp</a></b> a bad program?  Think about
-how many times you run through that <b>do-while</b> loop.  When <i>i</i> is zero, you
-will run it once.  
-When <i>i</i> is one, you have a 1 in <b>names.size()</b> chance of
-picking the number you picked last time.  
-When <i>i</i> is <b>names.size()-1</b>, you only have 1 in <b>names.size()</b> chance of
-<i>not</i> picking the number you have previously picked.  On average, at iteration
-<i>i</i>, you're going to run the <b>do-while</b> loop <i>n/(n-i)</i> times.  If <b>n</b> is
-equal to <b>names.size()</b>, our average total number of times iterating through the
-<b>do-while</b> loop  is:
-
-<p><center><table border=0><td><img src=summation.jpg></td></table></center><p>
-
-That's expensive -- think about it.  If <b>n</b> is 1000, that is 6,908 times.
-Of course, in our program <b>names.size()</b> is 22, so the program runs quickly.
-However, part of my job is to teach you good algorithm design, and this program
-is bad because of how many times you will run through that <b>do-while</b> loop.
-
-
-<hr>
-<h3>roster_05_good -- A good way to randomize the output</h3>
-
-My last randomization program is much better.  What we're going to do
-is initialize <b>random</b> so that <b>random[<i>i</i>]</b> contains <i>i</i>.
-Next, we're going to iterate from <i>i</i> = <b>names.size()-1</b> down to 0,
-and at each iteration, we're going to swap element <i>i</i> with a random element
-whose index is less than or equal to <i>i</i>.   
-<p>
-For example, suppose we want to randomize the numbers 0, 1, 2, 3, 4 with this
-algorithm.  The following table shows how it works:
-
-<p><center><table border=3>
-<tr>
-<td align=center><i>i</i></td>
-<td align=center><b>random</b> before swapping</td>
-<td align=center><b>lrand48()%(i+1)</b></td>
-<td align=center><b>random</b> after swapping</td>
-</tr>
-<tr>
-<td align=center>4</td>
-<td align=center>{ 0, 1, 2, 3, 4 } </td>
-<td align=center>2</td>
-<td align=center>{ 0, 1, <b><font color=darkred>4</b></font>, 3, <b><font color=darkred>2</b></font> } </td>
-</tr>
-<tr>
-<td align=center>3</td>
-<td align=center>{ 0, 1, 4, 3, 2 } </td>
-<td align=center>1</td>
-<td align=center>{ 0, <b><font color=darkred>3</b></font>, 4, <b><font color=darkred>1</b></font>, 2 } </td>
-</tr>
-<tr>
-<td align=center>2</td>
-<td align=center>{ 0, 3, 4, 1, 2 } </td>
-<td align=center>2</td>
-<td align=center>{ 0, 3, <b><font color=darkred>4</b></font>, 1, 2 } </td>
-</tr>
-<tr>
-<td align=center>1</td>
-<td align=center>{ 0, 3, 4, 1, 2 } </td>
-<td align=center>0</td>
-<td align=center>{ <b><font color=darkred>3</b></font>, <b><font color=darkred>0</b></font>, 4, 1, 2 } </td>
-</tr>
-<tr>
-<td align=center>0</td>
-<td align=center>{ 3, 0, 4, 1, 2 } </td>
-<td align=center>0</td>
-<td align=center>{ <b><font color=darkred>3</b></font>, 0, 4, 1, 2 } </td>
-</tr>
-</table></center><p>
-
-You're only calling <b>lrand48()</b> once per iteration, for a total of <b>names.size()</b>
-times.  That's much better than <b>roster_05_bad_2.cpp</b>.  Here's the code
-in 
-<b><a href=roster_05_good.cpp>roster_05_good.cpp</a></b>:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-void Roster::Print(int columns, int print_names)
-{
-  int i, rn, tmp;
-  vector &lt;int&gt; random;
-
-  for (i = 0; i &lt; names.size(); i++) random.push_back(i);
-  for (i = random.size()-1; i &gt;= 0; i--) {
-    rn = lrand48()%(i+1);
-    tmp = random[i];
-    random[i] = random[rn];
-    random[rn] = tmp;
-  }
-
-  ...
-</pre></td></table></center><p>
-
-It runs as we'd like.  Finally, 
-<b><a href=roster_06.h>roster_06.h</a></b>,
-<b><a href=roster_06.cpp>roster_06.cpp</a></b> and
-<b><a href=roster_06_main.cpp>roster_06_main.cpp</a></b> are copies of the previous program
-with one modification -- <b>srand48(time(0))</b> is called in 
-<b><a href=roster_06_main.cpp>roster_06_main.cpp</a></b> so that we get different
-HTML files whenever we run it:
-
-<pre>
-UNIX> <font color=darkred><b>make roster_06</b></font>
-g++ -c roster_06.cpp 
-g++ -c roster_06_main.cpp 
-g++ -o roster_06 roster_06.o roster_06_main.o
-UNIX> <font color=darkred><b>roster_06 Roster.txt 1001 6 yes > roster_06.html</b></font>
-UNIX> <font color=darkred><b>sleep 1</b></font>
-UNIX> <font color=darkred><b>roster_06 Roster.txt 1001 6 yes > roster_06_2.html</b></font>
-UNIX> <font color=darkred><b></b></font>
-</pre>
-
-<b><a href=roster_06.html>roster_06.html</a></b> and
-<b><a href=roster_06_2.html>roster_06_2.html</a></b> are indeed different.
-
-<hr>
-<h3>Lessons Learned</h3>
-
-We've covered a <i>lot</i> of material in this lecture.  To summarize, we've
-learned:
-
-<UL>
-<LI> A standard way of laying out a C++ class: Data is <b>protected</b>
-and methods are <b>public</b>.  That way, users of the class are only
-allowed to access the data through the methods, which safeguards the
-data.
-<p>
-<LI> Compiling multiple C++ files that are connected with a header file.
-Moreover, we've learned how to perform incremental compilation, and 
-how <b>make</b> can do this for us.
-<p>
-<LI> Creating a customized constructor for a class that contains a
-parameter:  When this happens, you often need to use a pointer to the
-class when you create an instance of it.  This is because you don't know
-the value of the parameter until runtime, so you can't construct it in
-the variable declaration part of a procedure.  I don't approve of declaring
-variables in the middle of a procedure, so the only way to construct
-the instance of the class is to use <b>new</b>.
-<p>
-<LI> Changing the parameters that a method uses.
-<p>
-<LI> How to make a basic HTML table.
-<p>
-<LI> Good and bad ways to randomize an array of integers.
-</UL>
+I'm going to write these tomorrow or wednesday.

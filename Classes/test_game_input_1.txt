@@ -1,0 +1,17 @@
+# This plays the game where X wins on the left-to-right diagonal:
+M X 1 1
+BS
+M O 0 1
+BS
+M X 2 2
+BS
+M O 0 0
+BS
+M X 0 2
+BS
+M O 1 2
+BS
+M X 2 0
+BS
+GS
+P

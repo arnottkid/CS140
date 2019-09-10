@@ -1,57 +1,64 @@
-ALL = roster_01 roster_02 roster_03A_good roster_04 roster_05_bad_1 roster_05_bad_2 \
-      roster_05_good roster_06
+CFLAGS ?= -std=c++98 -Wall -Wextra -Iinclude
 
-CFLAGS ?= -Wall -Wextra
+# -------------------------
+# This means that when you just type "make", you make all of the executables
+
+ALL = bin/ttt_tester \
+      bin/ttt_player \
+      bin/ttt_random
+
 all: $(ALL)
 
+# -------------------------
+# "make develop" makes two programs that I used when I was writing tic_tac_toe.cpp
+
+DEVELOP = bin/ttt_tester_1 \
+          bin/ttt_tester_2
+
+develop: $(DEVELOP)
+
+# -------------------------
+# "make clean" deletes the object files and binaries
+
 clean:
-	rm -f *.o $(ALL)
+	rm -f obj/* bin/*
 
-.SUFFIXES: .cpp .o
+# -------------------------
+# Object files
 
-.cpp.o:
-	g++ $(CFLAGS) -c $*.cpp 
+obj/tic_tac_toe_1.o: src/tic_tac_toe_1.cpp include/tic_tac_toe.hpp
+	g++ $(CFLAGS) -c -o obj/tic_tac_toe_1.o src/tic_tac_toe_1.cpp
 
-roster_01.o: roster_01.hpp
-roster_01_main.o: roster_01.hpp
-roster_01: roster_01.o roster_01_main.o
-	g++ $(CFLAGS) -o roster_01 roster_01.o roster_01_main.o
+obj/tic_tac_toe_2.o: src/tic_tac_toe_2.cpp include/tic_tac_toe.hpp
+	g++ $(CFLAGS) -c -o obj/tic_tac_toe_2.o src/tic_tac_toe_2.cpp
 
-roster_02.o: roster_02.hpp
-roster_02_main.o: roster_02.hpp
-roster_02: roster_02.o roster_02_main.o
-	g++ $(CFLAGS) -o roster_02 roster_02.o roster_02_main.o
+obj/tic_tac_toe.o: src/tic_tac_toe.cpp include/tic_tac_toe.hpp
+	g++ $(CFLAGS) -c -o obj/tic_tac_toe.o src/tic_tac_toe.cpp
 
-roster_03.o: roster_03.hpp
-roster_03A_good_main.o: roster_03.hpp
-roster_03A_good: roster_03.o roster_03A_good_main.o
-	g++ $(CFLAGS) -o roster_03A_good roster_03.o roster_03A_good_main.o
+obj/ttt_tester.o: src/ttt_tester.cpp include/tic_tac_toe.hpp
+	g++ $(CFLAGS) -c -o obj/ttt_tester.o src/ttt_tester.cpp
 
-roster_05_bad_1.o: roster_05.hpp
-roster_05_main.o: roster_05.hpp
-roster_05_bad_1: roster_05_bad_1.o roster_05_main.o
-	g++ $(CFLAGS) -o roster_05_bad_1 roster_05_bad_1.o roster_05_main.o
+obj/ttt_player.o: src/ttt_player.cpp include/tic_tac_toe.hpp
+	g++ $(CFLAGS) -c -o obj/ttt_player.o src/ttt_player.cpp
 
-roster_05_bad_2.o: roster_05.hpp
-roster_05_main.o: roster_05.hpp
-roster_05_bad_2: roster_05_bad_2.o roster_05_main.o
-	g++ $(CFLAGS) -o roster_05_bad_2 roster_05_bad_2.o roster_05_main.o
+obj/ttt_random.o: src/ttt_random.cpp include/tic_tac_toe.hpp
+	g++ $(CFLAGS) -c -o obj/ttt_random.o src/ttt_random.cpp
 
-roster_05_good.o: roster_05.hpp
-roster_05_main.o: roster_05.hpp
-roster_05_good: roster_05_good.o roster_05_main.o
-	g++ $(CFLAGS) -o roster_05_good roster_05_good.o roster_05_main.o
+# -------------------------
+# Executables
 
-roster_06.o: roster_06.hpp
-roster_06_main.o: roster_06.hpp
-roster_06: roster_06.o roster_06_main.o
-	g++ $(CFLAGS) -o roster_06 roster_06.o roster_06_main.o
+bin/ttt_tester_1: obj/ttt_tester.o obj/tic_tac_toe_1.o
+	g++ $(CFLAGS) -o bin/ttt_tester_1 obj/ttt_tester.o obj/tic_tac_toe_1.o
 
-roster_04.o: roster_04.hpp
-roster_04_main.o: roster_04.hpp
-roster_04: roster_04.o roster_04_main.o
-	g++ $(CFLAGS) -o roster_04 roster_04.o roster_04_main.o
+bin/ttt_tester_2: obj/ttt_tester.o obj/tic_tac_toe_2.o
+	g++ $(CFLAGS) -o bin/ttt_tester_2 obj/ttt_tester.o obj/tic_tac_toe_2.o
 
-roster_03_evil.o: roster_03.hpp
-roster_ev: roster_03.o roster_03_evil.o
-	g++ $(CFLAGS) -o roster_ev roster_03.o roster_03_evil.o
+bin/ttt_tester: obj/ttt_tester.o obj/tic_tac_toe.o
+	g++ $(CFLAGS) -o bin/ttt_tester obj/ttt_tester.o obj/tic_tac_toe.o
+
+bin/ttt_player: obj/ttt_player.o obj/tic_tac_toe.o
+	g++ $(CFLAGS) -o bin/ttt_player obj/ttt_player.o obj/tic_tac_toe.o
+
+bin/ttt_random: obj/ttt_random.o obj/tic_tac_toe.o
+	g++ $(CFLAGS) -o bin/ttt_random obj/ttt_random.o obj/tic_tac_toe.o
+
