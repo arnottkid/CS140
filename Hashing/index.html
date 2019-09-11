@@ -1,0 +1,810 @@
+<title>CS140 Lecture notes -- Hashing</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Hashing</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>~jplank/cs140/notes/Hashing</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Hashing>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Hashing</b></a>
+<LI> Last modification date: <i>
+Mon Feb  3 17:18:21 EST 2014
+</i>
+<hr>
+
+<h3>Wikipedia Links</h3>
+
+If you want additional material about hashing, here are Wikipedia Links.  As usual
+with Wikipedia, they tell you far more than you need to know, but you may enjoy the
+reference material.
+
+<UL>
+<LI> <a href=http://en.wikipedia.org/wiki/Hash_table>Hash Tables</a>.
+<LI> <a href=http://en.wikipedia.org/wiki/Hash_function>Hash Functions</a>. 
+<LI> <A href=http://en.wikipedia.org/wiki/Linear_probing>Linear Probing</a>. 
+<LI> <A href=http://en.wikipedia.org/wiki/Quadratic_probing>Quadratic Probing</a>.
+<LI> <A href=http://en.wikipedia.org/wiki/Double_hashing>Double Hashing</a>.
+</UL>
+
+<hr>
+<h2>Overview</h2>
+
+Hashing is an important concept in Computer Science.  A <i>Hash Table</i> is a data
+structure that allows you to store and retrieve data very quickly.  Later in the 
+class, we will learn about other ways to store and retrieve data, and frankly, they
+will be more convenient than using hash tables.  However, there are times where 
+hash tables are by far the best data structure to use for the problem, and the 
+concepts behind them are important.  
+<p>
+There are three components that are involved with 
+performing storage and retrieval with Hash Tables:
+<UL>
+<LI> <b>A hash table</b>.  This is a fixed size table that stores data of a given type.
+<LI> <b>A hash function</b>: This is a function that converts a piece of data into an
+integer.  Sometimes we call this integer a <b>hash value</b>.  The integer should be 
+at least as big as the hash table.  When we store a value in a hash table, we compute
+its hash value with the hash function, take that value modulo the hash table size, and
+that's where we store/retrieve the data.
+<LI> <b>A collision resolution strategy</b>: There are times when two pieces of 
+data have hash values that, when taken modulo the hash table size, yield the same
+value.  That is called a <i>collision</i>.  You need to handle collisions.  We will
+detail four collision resolution strategies: Separate chaining, linear probing, quadratic
+probing, and double hashing.  
+</UL>
+<p>
+An example helps to illustrate the basic concept.  Let's suppose that our hash table
+is of size 10, and that we are hashing strings.  We'll talk about hash functions later, 
+but let's suppose that we have four strings that we want to store in our hash table:
+"Luther," "Rosalita", "Binky" and "Dontonio."  Let's also suppose that we have a 
+hash function that converts these strings into the following values:
+<UL>
+<LI> "Luther" has a hash value of 3249384281.
+<LI> "Rosalita" has a hash value of 2627953124.
+<LI> "Binky" has a hash value of 216319842.
+<LI> "Dontonio" has a hash value of 2797174031.
+</UL>
+
+So, we start with an empty hash table, and let's store "Luther".  "Luther"'s hash value
+modulo 10 is 1, so "Luther" goes into index 1 of the hash table:
+
+<p><center><table><td><img src=HE9.jpg></td></table></center><p>
+
+Similarly, "Rosalita" goes into index 4, and "Binky" into index 2.  If we insert them into
+the hash table, the table looks as follows:
+
+<p><center><table><td><img src=HE1.jpg></td></table></center><p>
+
+To find a string in the hash table, we calculate its hash value modulo ten, and we look 
+at that index in the hash table.  For example, if we want to see if "Luther" is in the
+hash table, we look in index 1.  
+<p>
+Now, suppose we want to look for "Dontonio" in the hash table.  Since its hash value is
+2797174031, we look in index 1. It's not there.  Now suppose we wanted to insert "Dontonio."
+Well, that's a problem, because "Luther" is already at index one.  That is a collision.
+<p>
+I'm not going to fix this problem until later in these lecture notes when we discuss
+collision resolution strategies.  However, it demonstrates why collisions are problems.
+
+<h3>Properties of hash tables and hash functions</h3>
+
+First, we define the <b>load factor</b> of a hash table to be:
+<center>
+<p>
+(Number of data elements in the hash table) / (Size of the hash table)
+</center>
+<p>
+That's a pretty intuitively named property.  In the hash table pictured above, the load
+factor is 0.3, because there are three strings in the hash table, and the table size is ten.
+We can typically quantify how well a hash table is functioning by its load factor.
+<p>
+The selection of a hash function is very important.  You want your hash function to have two
+important properties:
+<UL>
+<LI> It should be quick to compute, often constant time, or linear in the size of the data
+that you are hashing.
+<LI> The hash values that it computes should be uniformly distributed from zero to one minus
+the hash table size.  That minimizes collisions.  
+</UL>
+
+Sometimes this is really easy.  For example,
+if you're storing people based on their social security numbers, then the social security number
+itself is a good hash function.  Other times, it is a challenge.    And if you get it wrong,
+it can hurt performance severely.  We explore hash functions
+in the context of strings below.
+
+<hr>
+<h2>Interesting Hash Functions for Strings</h2>
+
+<a href=http://www.cse.yorku.ca/~oz/hash.html>This page from York University in Canada</a> has
+some interesting comments about hashing strings.  I have programmed up three hash functions
+for strings -- two from that web page, and one from an article from the journal
+<i>Communications of the ACM</i> [Pearson90].
+<p>
+We start with the most obvious hash function for strings -- add up the ASCII values
+of the characters.  I'm going to call this hash function "<b>BAD</b>".
+I have this programmed in 
+<b><a href=badhash.cpp>badhash.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+unsigned int bad_hash(string &s)
+{
+  int i;
+  unsigned int h;
+  
+  h = 0;
+
+  for (i = 0; i &lt; s.size(); i++) {
+    h += s[i];
+  }
+  return h;
+}
+
+main()
+{
+  string s;
+  unsigned int h;
+
+  while (getline(cin, s)) {
+    h = bad_hash(s);
+    cout &lt;&lt; h &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+
+Why the <b>unsigned int</b>?  The reason is that I want to allow my hash values to go into
+any 32-bit integer, and I don't want negative numbers.  To do that, I specify that the
+integer be <b>unsigned</b>.  Knowing that the ASCII value of 'A' is 65 and that the
+ASCII value of 'a' is 97, we can verify that the hash function works as advertised:
+
+<pre>
+UNIX> <font color=darkred><b>badhash</b></font>
+<font color=darkred><b>A</b></font>
+65
+<font color=darkred><b>a</b></font>
+97
+<font color=darkred><b>Aa</b></font>
+162
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The program in 
+<b><a href=djbhash.cpp>djbhash.cpp</a></b>
+programs the "<b>DJB</b>" hash function from 
+<a href=http://www.cse.yorku.ca/~oz/hash.html>the York University page</a>:
+
+
+<p><center><table border=3 cellpadding=3><td><pre>
+unsigned int djb_hash(string &s)
+{
+  int i;
+  unsigned int h;
+  
+  h = 5381;
+
+  for (i = 0; i &lt; s.size(); i++) {
+    h = (h &lt;&lt; 5) + h + s[i];
+  }
+  return h;
+}
+</pre></td></table></center><p>
+
+Although the web page says that this is equivalent to: 
+
+<p><center><table border=3 cellpadding=3><td>
+<i>h<sub>i</sub> = </i>33<i>h<sub>i-1</sub> ^ <b>s[i]</b></i>
+</td></table></center><p>
+
+where the carat operator is bitwise exclusive-or, that is not what is implemented.
+Instead, we take 
+<i>h<sub>i-1</sub></i>
+and "bit-shift" it, five places to the left.  That is equivalent to multiplying by 32,
+which is 2<sup>5</sup>.  However if any of the leftmost 5 bits of the number are set,
+they are "shifted away" -- they go away.  We then add 
+<i>h<sub>i-1</sub></i> -- that is how the author performs multiplication by 33.
+Finally, we add <b>s[i]</b> rather than performing the bitwise exclusive-or.  I don't
+know why -- I'm just copying code from the web page.  
+<p>
+We can double-check ourselves though:  
+<pre>
+UNIX> <font color=darkred><b>djbhash</b></font>
+<font color=darkred><b>a</b></font>
+177670                                  <font color=darkgreen>5381 * 33 + 97 = 177670</font>
+<font color=darkred><b>aA</b></font>
+5863175                               <font color=darkgreen>177670 * 33 + 65 = 5863175</font>
+<font color=darkred><b>aAA</b></font>
+193484840                            <font color=darkgreen>5863175 * 33 + 65 = 193484840</font>
+<font color=darkred><b>aAAA</b></font>
+2090032489
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<p>
+That last number takes a little work to verify.  First, let's look at 193484840
+in hexadecimal (you can do this in C++, but the scripting language <b>awk</b> supports
+<b>printf</b>, so it's easier):
+
+<pre>
+UNIX> <font color=darkred><b>echo 193484840 | awk '{ printf "0x%08x\n", $1 }'</b></font>
+0x0b885828
+UNIX> 
+</pre>
+
+As mentioned in previous lectures, hexadecimal allows you to look at bytes -- every two
+hex digits is a byte: 0b, 88, 58, 28.  Breaking this down further, each hexadecimal digit
+represents four bits, so the number is:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+0000 1<font color=blue>011   1000 1000   0101 1000   0010 1000</font>
+</pre></td></table></center><p>
+
+Performing the left bit-shift by 5 turns this number into:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>0111 0001   0000 1011   0000 0101   000</font>0 0000
+</pre></td></table></center><p>
+
+I've tried to use the blue color to help you -- those are the original bits that
+remain after the bit-shift.
+This is 0x710b0500 in hex, which is 1896547584 in decimal (see your lab for how to
+do that conversion).  And finally, 1896547584 + 193484840 + 65 = 2090032489.  We've
+verified that the function works!!
+
+<p>
+One last hash function comes from [Pearson10].  We'll call it <b>ACM</b>.
+It uses a permutation table to 
+calculate the hashes:
+<b><a href=acmhash.cpp>acmhash.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+static unsigned char perm_table[256] = {
+  1, 87, 49, 12, 176, 178, 102, 166, 121, 193, 6, 84, 249, 230, 44, 163,
+  14, 197, 213, 181, 161, 85, 218, 80, 64, 239, 24, 226, 236, 142, 38, 200,
+  110, 177, 104, 103, 141, 253, 255, 50, 77, 101, 81, 18, 45, 96, 31, 222,
+  25, 107, 190, 70, 86, 237, 240, 34, 72, 242, 20, 214, 244, 227, 149, 235,
+  97, 234, 57, 22, 60, 250, 82, 175, 208, 5, 127, 199, 111, 62, 135, 248,
+  174, 169, 211, 58, 66, 154, 106, 195, 245, 171, 17, 187, 182, 179, 0, 243,
+  132, 56, 148, 75, 128, 133, 158, 100, 130, 126, 91, 13, 153, 246, 216, 219,
+  119, 68, 223, 78, 83, 88, 201, 99, 122, 11, 92, 32, 136, 114, 52, 10,
+  138, 30, 48, 183, 156, 35, 61, 26, 143, 74, 251, 94, 129, 162, 63, 152,
+  170, 7, 115, 167, 241, 206, 3, 150, 55, 59, 151, 220, 90, 53, 23, 131,
+  125, 173, 15, 238, 79, 95, 89, 16, 105, 137, 225, 224, 217, 160, 37, 123,
+  118, 73, 2, 157, 46, 116, 9, 145, 134, 228, 207, 212, 202, 215, 69, 229,
+  27, 188, 67, 124, 168, 252, 42, 4, 29, 108, 21, 247, 19, 205, 39, 203,
+  233, 40, 186, 147, 198, 192, 155, 33, 164, 191, 98, 204, 165, 180, 117, 76,
+  140, 36, 210, 172, 41, 54, 159, 8, 185, 232, 113, 196, 231, 47, 146, 120,
+  51, 65, 28, 144, 254, 221, 93, 189, 194, 139, 112, 43, 71, 109, 184, 209};
+
+unsigned int acm_hash(string &s)
+{
+  int i, j;
+  unsigned int h;
+  unsigned char byte_hash[4];
+  
+  for (j = 0; j &lt; 4; j++) byte_hash[j] = 0;
+  j = 0;
+  for (i = 0; i &lt; s.size(); i++) {
+    byte_hash[j] = perm_table[byte_hash[j]] ^ s[i];
+    j++;
+    if (j == 4) j = 0;
+  }
+  h = 0;
+  for (j = 0; j &lt; 4; j++) h = (h &lt;&lt; 8) | byte_hash[j]; 
+  return h;
+}
+</pre></td></table></center><p>
+
+Now, I know this is a little confusing, but such is life.  The permutation table
+contains a permutation of the numbers between 0 and 255.  We then calculate the
+hashes as follows:
+
+	<p>
+<center>
+<i>h<sub>-4</sub></i> = 
+<i>h<sub>-3</sub></i> = 
+<i>h<sub>-2</sub></i> = 
+<i>h<sub>-1</sub></i> = 0
+</center>
+<p>
+Otherwise: <i>h<sub>i</sub></i> = 
+<b>perm_table[</b><i>h<sub>i-4</sub></i><b>]</b> ^ <b>s[i]</b><br>
+</center>
+<p>
+Again, the carat is the bitwise exclusive-or operator.
+After calculating all the <i>h<sub>i</sub></i>, we only consider
+the last four.  These are held in the array <b>byte_hash</b>.
+Specifically, <b>byte_hash[0]</b> holds whichever of the last four
+<i>h<sub>i</sub></i> has <i>(i%4)</i> = 0.
+<b>byte_hash[0]</b> holds whichever of the last four
+<i>h<sub>i</sub></i> has <i>(i%4)</i> = 1, and so on.  We
+then construct <i>h</i> so that 
+<b>byte_hash[0]</b> is the first byte, 
+<b>byte_hash[1]</b> is the second byte, and so on.
+<p>
+Let's walk through some examples:
+
+<pre>
+UNIX> <font color=darkred><b>acmhash</b></font>
+<font color=darkred><b>a</b></font>
+1610612736
+<font color=darkred><b>aaaa</b></font>
+1616928864
+<font color=darkred><b>aaaaa</b></font>
+3848298592
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+In the first example, we have:
+<p>
+<center>
+<table>
+<tr><td> <i>h<sub>0</sub></i></td><td>=</td><td><b>perm_table[h<sub>-4</sub></i>]</b> ^ 97</td></tr>
+<tr><td> </td><td>=</td><td><b>perm_table[0]</b> ^ 97</td></tr>
+<tr><td> </td><td>=</td><td>1 ^ 97</td></tr>
+<tr><td> </td><td>=</td><td>96</td></tr>
+</table>
+</center><p>
+
+96 is 0x60 in hexadecimal.  Therefore, <b>h</b> is equal to 0x60000000.  Check it out:
+
+<pre>
+UNIX> <font color=darkred><b>echo 1610612736 | awk '{ printf "0x%08x\n", $1 }'</b></font>
+0x60000000
+UNIX>
+</pre>
+
+When we try "aaaa", 
+<i>h<sub>0</sub></i> =
+<i>h<sub>1</sub></i> =
+<i>h<sub>2</sub></i> =
+<i>h<sub>3</sub></i> = 96.  Therefore <b>h</b> is equal to 0x60606060:
+
+<pre>
+UNIX> <font color=darkred><b>echo 1616928864 | awk '{ printf "0x%08x\n", $1 }'</b></font>
+0x60606060
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+And finally, when we do "aaaaa", we have
+
+<p>
+<center>
+<table>
+<tr><td> <i>h<sub>4</sub></i></td><td>=</td><td><b>perm_table[h<sub>0</sub></i>]</b> ^ 97</td></tr>
+<tr><td> </td><td>=</td><td><b>perm_table[96]</b> ^ 97</td></tr>
+<tr><td> </td><td>=</td><td>132 ^ 97</td></tr>
+<tr><td> </td><td>=</td><td>0x84 ^ 0x61</td></tr>
+<tr><td> </td><td>=</td><td>(1000 0100) ^ (0110 0001)</td></tr>
+<tr><td> </td><td>=</td><td>(1110 0101)</td></tr>
+<tr><td> </td><td>=</td><td>0xe5</td></tr>
+</table>
+</center><p>
+
+Thus, <b>h</b> is equal to 0xe5606060:
+
+<pre>
+UNIX> <font color=darkred><b>echo 3848298592 | awk '{ printf "0x%08x\n", $1 }'</b></font>
+0xe5606060
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Yay!!
+<p>
+I know that was detailed and probably very difficult.  I'll make sure we go over it
+in class.
+
+<h3>Evaluating how good those three hash functions are</h3>
+
+Ok -- now, the claim is that <b>DJB</b> and <b>ACM</b> are good, and <b>BAD</b> is
+not.  Let's do a simple example.  The file
+<b><a href=names_100000.txt>names_100000.txt</a></b>
+has 100,000 randomly generated names:
+
+<pre>
+UNIX> <font color=darkred><b>wc names_100000.txt</b></font>
+  100000  216288 1599207 names_100000.txt
+UNIX> <font color=darkred><b>head names_100000.txt</b></font>
+Charlie Muffin
+Alexandra Map
+Sophia Compensatory
+Jack Havoc PhD
+Joseph Tawny
+Kaylee Torture
+Addison Oppressor
+Sophie Tercel
+Caleb Troglodyte
+Victoria Garish
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Let's suppose we wanted to create a hash table with these names, and that
+the hash table's load factor is 0.5.
+Thus, we'll make the table size 200,000.  We can see the hash
+values generated by piping <b>badhash</b>, 
+<b>djbhash</b> and 
+<b>acmhash</b> to <b>awk</b>, which will print the hash value mod 200,000:
+
+<pre>
+UNIX> <font color=darkred><b>head names_100000.txt | badhash | awk '{ print $1%200000 }'</b></font>
+1341
+1230
+1928
+1190
+1180
+1392
+1711
+1255
+1572
+1471
+UNIX> <font color=darkred><b>head names_100000.txt | djbhash | awk '{ print $1%200000 }'</b></font>
+121954
+19475
+49837
+65483
+86881
+97205
+141524
+12204
+127017
+54052
+UNIX> <font color=darkred><b>head names_100000.txt | acmhash | awk '{ print $1%200000 }'</b></font>
+10430
+173738
+65289
+133744
+46463
+21690
+76893
+59060
+133035
+185216
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You should see a red flag with <b>BAD</b>.  All of those numbers are between 1000 and 2000.
+That's because the ASCII values of characters are between 67 and 127 (roughly), and if a name
+has 15 characters, that will give you hash values between 67*15 and 127*15.  In other words, 
+roughly between 1000 and 2000.  That's not very good.  The others look more random.
+<p>
+To evaluate even more, let's calculate all 100,000 hash values, pipe it through <b>awk</b> to 
+print the numbers mod 200,000 and then pipe that through <b>sort -un</b>.  This sorts the 
+values numerically, stripping out duplicates.  If we pipe that to <b>wc</b>, we can see how
+many distinct values are produced.  The higher that number, the fewer collisions there are:
+
+<pre>
+UNIX> <font color=darkred><b>cat names_100000.txt | badhash | awk '{ print $1%200000 }' | sort -un | wc</b></font>
+    2305    2305   11106
+UNIX> <font color=darkred><b>cat names_100000.txt | djbhash | awk '{ print $1%200000 }' | sort -un | wc</b></font>
+   78605   78605  506578
+UNIX> <font color=darkred><b>cat names_100000.txt | acmhash | awk '{ print $1%200000 }' | sort -un | wc</b></font>
+   78610   78610  506934
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can see how <b>BAD</b> produces just 2305 distinct hash values, while the others produce roughly 
+78600.  They do a <i>much</i> better job of reducing collisions: only 25% of the hash values collide.
+
+<hr>
+<h2>Collision Resolution Strategy Number One: Separate Chaining</h2>
+
+Separate Chaining is really simple.  Instead of having each element of the hash table store
+a piece of data, each element stores a vector of data.  When you insert something new into
+the table, you simply call <b>push_back()</b> on the vector at the proper index.  When you
+search for a piece of data, you have to search through the vector.  
+<p>
+The nice thing about separate chaining is that it does not place limitations on the load
+factor.  It should be pretty clear that if the load factor of a hash table with separate
+chaining is <i>x</i>, then the average size of each vector is <i>x</i>.  That means that
+to find a piece of data in a hash table, the performance is going to linearly dependent on <i>x</i>.
+We'll demonstrate that below.
+<p>
+The code in 
+<b><a href=cc_hacker.cpp>cc_hacker.cpp</a></b>
+programs up a simple hash table with separate chaining.  
+It stores names and credit card numbers in the hash table.  As command line
+arguments, it accepts a hash table size and a file of credit card numbers/names
+as in
+<b><a href=cc_names_10.txt>cc_names_10.txt</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+5034036940778753 Samantha Bustle
+9614647402933149 Sydney Macaque
+9520044178288547 Eli Boone
+4591437720049815 Lillian Handiwork
+9464976002919633 Carson Shipmen
+1263239861455040 Joshua Lucid IV
+1750256670725811 Aaron Flaunt
+8988852954721062 Brooklyn Samantha Hoofmark
+8293347969318340 Avery Parsifal
+1579529982933479 Alyssa Kissing
+</pre></td></table></center><p>
+
+For each line, it creates a <b>Person</b> instance, calculates
+a hash of the name using <B>DJB</b> and then inserts the name
+into the hash table.  Since we're using separate chaining, the hash
+table is a table of <b>Person</b> vectors.  To insert a <b>Person</b>,
+we calculate the hash of the name, take it modulo the table size and
+call <b>push_back()</b> on the vector that is there.
+
+<p>
+After reading the table, we read names on standard input, and 
+look them up in the table.
+<p>
+Here's an example:
+
+<pre>
+UNIX> <font color=darkred><b>djbhash</b></font>
+<font color=darkred><b>Sydney Macaque</b></font>
+1929449534
+<font color=darkred><b>Eli Boone</b></font>
+3852330034
+<font color=darkred><b>Samantha Bustle</b></font>
+2419233313
+<font color=darkred><b>Jim Plank</b></font>
+2620064763
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b>cc_hacker 10 cc_names_10.txt</b></font>
+Enter a name> <font color=darkred><b>Sydney Macaque</b></font>
+Found it: Table entry 4: Sydney Macaque 9614647402933149
+Enter a name> <font color=darkred><b>Eli Boone</b></font>
+Found it: Table entry 4: Eli Boone 9520044178288547
+Enter a name> <font color=darkred><b>Samantha Bustle</b></font>
+Found it: Table entry 3: Samantha Bustle 5034036940778753
+Enter a name> <font color=darkred><b>Jim Plank</b></font>
+Not found.  Table entry 3
+Enter a name> <font color=darkred><b>&lt;CNTL-C&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Both "Eli Boone" and "Sydney Macaque" have hash values that equal 4 modulo 10.
+Therefore, they are in the same "chain".  "Samantha Bustle" and "Jim Plank"
+both have hash values of 3 -- "Samantha Bustle" is in the hash table, and
+"Jim Plank" is not.
+
+<p>
+As mentioned above, the average number of entries in each "chain" is equal to the load factor.
+Therefore, the performance of lookup will be proportional to the load factor.
+<p>
+To demonstrate this, the file 
+<b><a href=cc_names_100K.txt>cc_names_100K.txt</a></b>
+has 100,000 random names/credit cards, and 
+<b><a href=cc_just_names_100K.txt>cc_just_names_100K.txt</a></b>
+has just the names, in a different order.
+<p>
+As we increase the table size, the program runs faster:  (Redirecting standard output
+to <b>/dev/null</b> simply says to not print standard output).
+
+<pre>
+UNIX> <font color=darkred><b>time cc_hacker 10 cc_names_100K.txt < cc_just_names_100K.txt > /dev/null</b></font>
+18.283u 0.234s 0:18.51 100.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time cc_hacker 100 cc_names_100K.txt < cc_just_names_100K.txt > /dev/null</b></font>
+2.294u 0.098s 0:02.39 99.5%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time cc_hacker 1000 cc_names_100K.txt < cc_just_names_100K.txt > /dev/null</b></font>
+0.545u 0.072s 0:00.61 100.0%	0+0k 0+1io 0pf+0w
+UNIX> <font color=darkred><b>time cc_hacker 10000 cc_names_100K.txt < cc_just_names_100K.txt > /dev/null</b></font>
+0.385u 0.070s 0:00.45 100.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+If we instead try to look up 100,000 names that are <i>not</i> in the table, will
+it run faster or slower?  You tell me.
+
+<hr>
+<h2>Collision Resolution Strategies 2-4: Open Addressing</h2>
+
+The remaining three collision resolution strategies fall under the heading of
+<b>open addressing</b>.  In these strategies, each element of the hash table holds
+exactly one piece of data.  For that reason, you cannot have a load factor greater
+than one.  In all of these, the ideal load factor is around 0.5.  Is that wasteful?  Probably
+not too much, especially if the size of your data is large (the table will store pointers,
+so the table itself won't consume much room).  
+<p>
+You may think that open addressing is stupid -- computers have tons of memory these days,
+so separate chaining should work easily.  However, suppose you have to work in constrained
+environments (e.g. embedded processors) with much tighter memory requirements.  Then, being
+able to preallocate your hash table might be very important.  
+
+<p>
+The remainder of these lecture notes are without computer code, because I want to 
+give you the joy of programming these collision resolution strategies yourself!
+<p>
+With open addressing, you will generate a sequence of hash values for a given key
+until you find a value that corresponds to a free slot in the hash table.  
+To be precise, you will generate a sequence of hash values, 
+<i>h<sub>0</sub></i>,
+<i>h<sub>1</sub></i>,
+<i>h<sub>2</sub></i>, ..., and you look at each in the hash table until you find 
+the value (when you are doing look up), or until you find an
+empty hash table entry (when you are inserting, or when you are looking up a value that is
+not there).
+The various <i>h<sub>i</sub></i> are defined as:
+<p>
+<center>
+<i>h<sub>i</sub></i> =
+<i>H(key) + F(i, key)</i>, modulo the table size.
+</center>
+<p>
+<i>H()</i> is the hash function, and <i>F()</i> is a function that defines how to
+resolve collisions.  It is usually convenient to make sure that <i>F(0, key)</i> equals
+zero, and it is necessary for <i>F(i, key)</i> not to equal zero when <i>i</i> doesn't 
+equal zero.  
+
+<p>
+<h3>Linear Probing</h3>
+
+With linear probing, <i>F(i, key) = i</i>.  Thus, you check consecutive hash sequences
+starting with <i>H(key)</i> until you find an empty one.
+Here's an example.  Suppose our hash table size is ten, and we want to insert the
+keys "Luther", "Rosalita", "Binky", "Dontonio", and "Frenchy", using the <B>DJB</b>
+hash function.  Let's first look at their hash values:
+
+<pre>
+UNIX> <font color=darkred><b>djbhash</b></font>
+<font color=darkred><b>Luther</b></font>
+3249384281
+<font color=darkred><b>Rosalita</b></font>
+2627953124
+<font color=darkred><b>Binky</b></font>
+216319842
+<font color=darkred><b>Dontonio</b></font>
+2797174031
+<font color=darkred><b>Frenchy</b></font>
+561643892
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+These are the same hash values as in the beginning of these notes, so 
+when we insert "Luther", "Rosalita" and "Binky", they will hash to indices
+1, 4 and 2 respectively, so there are no collisions.  Here's the hash table:
+
+<p><center><table border=0><td><img src=HE1.jpg></td></table></center><p>
+
+Dontonio hashes to 1, so we have a collision.  Formally:
+<p>
+<center>
+<table>
+<tr><td><i>h<sub>0</sub></i></td><td> = </td><td> (2797174031 + 0) % 10 = 1</td><tr>
+<tr><td><i>h<sub>1</sub></i></td><td> = </td><td> (2797174031 + 1) % 10 = 2</td><tr>
+<tr><td><i>h<sub>2</sub></i></td><td> = </td><td> (2797174031 + 2) % 10 = 3</td><tr>
+</table></center><p>
+
+Therefore, we insert "Dontonio" into index 3:
+
+<p><center><table border=0><td><img src=HE2.jpg></td></table></center><p>
+
+Similarly, "Frenchy" hashes to 2, so it collides and ends up in index 5:
+
+<p><center><table border=0><td><img src=HE3.jpg></td></table></center><p>
+
+If we try to find the key "Baby-Daisy", we first find its hash value using <b>djbhash</b>:
+2768631242.  We'll have to check indices 2, 3, 4 and 5 before we find that index 6 is
+empty and we can conclude that "Baby-Daisy" is not in the table.
+
+
+<h3>Quadratic Probing</h3>
+
+As the 
+<A href=http://en.wikipedia.org/wiki/Quadratic_probing>wikipedia page</a> says, with 
+quadratic probing, <i>F(i, key) = c<sub>1</sub>i + c<sub>2</sub>i<sup>2</sup></i>.  That's
+pretty general.  Typically, when you learn quadratic probing, 
+<i>F(i, key) = i<sup>2</sup></i>.  We'll go with that in these lecture notes, and if I ask
+for a definition of quadratic probing, please just say that 
+<i>F(i, key) = i<sup>2</sup></i>.  
+<p>
+We'll use the same example -- "Luther", "Rosalita" and "Binky" are in the hash table and
+we want to insert "Dontonio".
+
+<p><center><table border=0><td><img src=HE1.jpg></td></table></center><p>
+
+Since there is a collision, we test values of <i>h<sub>i</sub></i> until we find one
+that's not in the table:
+
+<p>
+<center>
+<table>
+<tr><td><i>h<sub>0</sub></i></td><td> = </td><td> (2797174031 + 0<sup>2</sup>) % 10 = 1</td><tr>
+<tr><td><i>h<sub>1</sub></i></td><td> = </td><td> (2797174031 + 1<sup>2</sup>) % 10 = 2</td><tr>
+<tr><td><i>h<sub>2</sub></i></td><td> = </td><td> (2797174031 + 2<sup>2</sup>) % 10 = 5</td><tr>
+</table></center><p>
+
+Thus, "Dontonio" goes into index 5:
+
+<p><center><table border=0><td><img src=HE4.jpg></td></table></center><p>
+
+Now when we insert "Frenchy", it collides at <i>h<sub>0</sub></i> = 2, but not at <i>h<sub>1</sub></i> = 3:
+
+<p><center><table border=0><td><img src=HE5.jpg></td></table></center><p>
+
+If we try to find "Baby-Daisy", we'll check indices 2, 3 and 6 to determine that she is not in the
+table.
+<p>
+Quadratic Probing can have an issue that all hash table entries are not checked by the various 
+<i>h<sub>i</sub></i>.  For example, suppose we've inserted "Luther" (3249384281), "Rosalita" (2627953124), "Princess" (2493584940),
+"Thor" (2089609346), Waluigi (385020695) and "Dave" (2089026949) into the table:
+
+<p><center><table border=0><td><img src=HE6.jpg></td></table></center><p>
+
+Suppose we want to now insert "Peach", which has has a hash value of 232764550.  We go through the 
+following sequences of <i>h<sub>i</sub></i>:
+
+<p>
+<center>
+<table>
+<tr><td><i>h<sub>0</sub></i></td><td> = </td><td> (232764550 + 0<sup>2</sup>) % 10 = 0</td><tr>
+<tr><td><i>h<sub>1</sub></i></td><td> = </td><td> (232764550 + 1<sup>2</sup>) % 10 = 1</td><tr>
+<tr><td><i>h<sub>2</sub></i></td><td> = </td><td> (232764550 + 2<sup>2</sup>) % 10 = 4</td><tr>
+<tr><td><i>h<sub>3</sub></i></td><td> = </td><td> (232764550 + 3<sup>2</sup>) % 10 = 9</td><tr>
+<tr><td><i>h<sub>4</sub></i></td><td> = </td><td> (232764550 + 4<sup>2</sup>) % 10 = 6</td><tr>
+<tr><td><i>h<sub>5</sub></i></td><td> = </td><td> (232764550 + 5<sup>2</sup>) % 10 = 5</td><tr>
+<tr><td><i>h<sub>6</sub></i></td><td> = </td><td> (232764550 + 6<sup>2</sup>) % 10 = 6</td><tr>
+<tr><td><i>h<sub>7</sub></i></td><td> = </td><td> (232764550 + 7<sup>2</sup>) % 10 = 9</td><tr>
+<tr><td><i>h<sub>8</sub></i></td><td> = </td><td> (232764550 + 8<sup>2</sup>) % 10 = 4</td><tr>
+<tr><td><i>h<sub>9</sub></i></td><td> = </td><td> (232764550 + 9<sup>2</sup>) % 10 = 1</td><tr>
+<tr><td><i>h<sub>10</sub></i></td><td> = </td><td> (232764550 + 10<sup>2</sup>) % 10 = 0</td><tr>
+<tr><td><i>h<sub>11</sub></i></td><td> = </td><td> (232764550 + 11<sup>2</sup>) % 10 = 1</td><tr>
+<tr><td>...</td><tr>
+</table></center><p>
+
+That's a problem, as we can't put "Peach" into the table.  You need to do a little math to 
+help ensure that <i>h<sub>i</sub></i> covers all possible values.  Having the table size
+be prime helps, as would different settings of 
+<i>c<sub>1</sub></i> and <i>c<sub>2</sub></i> in the more general version of 
+quadratic probing.
+
+
+<h3>Double Hashing</h3>
+
+With double-hashing, you have a separate hash function, <i>H2</i>.  Then, <i>F(i, key) = H2(key)*i</i>.
+For this to work, <i>H2(key)</i> modulo the table size cannot equal zero.  
+<p>
+Let's try an example -- let's have <i>H2</i> be equal to <b>acmhash</b> modulo the table size,
+and if that value is equal to 0, then set it to one.  We'll start with "Luther", "Rosalita" and "Binky" in the table:
+
+<p><center><table border=0><td><img src=HE1.jpg></td></table></center><p>
+
+Again, we want to insert "Dontonio", whose hash value is 2797174031.  Since that collides,
+we need to calculate <i>H2("Dontonio")</i>, which equals 2511778359%10 = 9.  Thus
+<i>h<sub>1</sub></i> = (2797174031+9)%10 = 0, and we can put "Dontonio" into index zero:
+
+<p><center><table border=0><td><img src=HE7.jpg></td></table></center><p>
+
+Next comes "Frenchy", whose hash value is 561643892.  That collides, so we calculate
+<i>H2("Frenchy")</i>, which equals 3425106287%10 = 7.  Thus 
+<i>h<sub>1</sub></i> = (561643892+7)%10 = 9, and we can put "Frenchy" into index nine:
+
+<p><center><table border=0><td><img src=HE8.jpg></td></table></center><p>
+
+Suppose we want to find
+"Baby-Daisy".  Her hash value is 2768631242, which collides with "Binky".  
+<i>H2("Baby-Daisy")</i> is equal to 2774673939%10=9.  Therefore, we'll check hash 
+locations 1, 0, 9 and 8 before seeing that she is not in the hash table.
+<p>
+Finally, as with quadratic probing, you need to be careful with double hashing.  
+Suppose I try to insert "Ryan" into the hash table.  The <B>DJB</b> hash value is 2089555519
+and the <b>ACM</b> hash value is 1400397935.  Do you see why that's problematic:
+
+<p>
+<center>
+<table>
+<tr><td><i>h<sub>0</sub></i></td><td> = </td><td> (2089555519 + 0*5) % 10 = 9</td><tr>
+<tr><td><i>h<sub>1</sub></i></td><td> = </td><td> (2089555519 + 1*5) % 10 = 4</td><tr>
+<tr><td><i>h<sub>2</sub></i></td><td> = </td><td> (2089555519 + 2*5) % 10 = 9</td><tr>
+<tr><td><i>h<sub>3</sub></i></td><td> = </td><td> (2089555519 + 3*5) % 10 = 4</td><tr>
+<tr><td>...</td><tr>
+</table></center><p>
+
+You can fix the problem in a few ways.  The easiest, as with
+quadratic probing, is to make sure that the table size is a prime number.  There are 
+other fixes, but I won't go into them (maybe in class).
+
+<hr>
+<h2>Summary</h2>
+
+You've learned a lot about hash tables in this lecture.  You are responsible for pretty
+much everything in this set of lecture notes, except I won't make you memorize the DJB
+or ACM hashing algorithms.  
