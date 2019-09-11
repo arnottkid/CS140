@@ -1,0 +1,360 @@
+<title>CS140 Lecture notes -- Bit Arithmetic</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Bit Arithmetic</h1>
+<UL>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>~cs140/www-home/notes/Bits</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~cs140/notes/Bits>
+    <b>http://web.eecs.utk.edu/~cs140/notes/Bits</b></a>
+<LI> Original Lecture Notes: Thu Nov  5 13:08:14 EST 1998
+<LI> Latest modification: Thu Sep  8 10:06:06 EDT 2016
+</UL>
+<hr>
+
+I am not going to go over things in this level of detail in 
+class, so if class left you a bit fuzzy on bit arithmetic, go over
+these notes thoroughly.
+
+<hr>
+<h2>Bit Arithmetic</h2>
+
+C and C++ have operations for bit arithmetic about which students are 
+often unaware.  As you know, each data type is a certain number
+of bytes, and each byte is eight bits.  You can kind of see
+the bit structure of a byte by printing it in hexadecimal or
+in octal.  To truly see the bits, you have write some code.
+<p>
+Look at the program 
+<a href=printbits.c><b>printbits.c</b></a>:
+<pre>
+
+print_bits(unsigned char c)
+{
+  ....
+}
+
+main()
+{
+  unsigned char c;
+  int i;
+
+  while (1) {
+    printf("Enter an integer between 0 and 255: ");
+    fflush(stdout);
+    if (scanf("%d", &i) != 1) exit(0);
+    if (i < 0 || i > 255) {
+      printf("Bad value of i\n");
+    } else {
+      c = (unsigned char) i;
+      print_bits(c);
+      putchar('\n');
+    }
+  }
+}
+</pre>
+
+This repeatedly takes an integer between 0 and 255, puts it
+into an <b>unsigned char</b> (i.e. one byte), and then
+calls <b>print_bits()</b> on it.  <b>Print_bits()</b> prints
+out the bits.  Don't worry about how it is implemented yet.
+The output should be straightforward -- the bits look as you 
+think they should:
+
+<pre>
+UNIX> <b>printbits</b>
+Enter an integer between 0 and 255: <font color=darkred><b>0</b></font>
+00000000
+Enter an integer between 0 and 255: <font color=darkred><b>1</b></font>
+00000001
+Enter an integer between 0 and 255: <font color=darkred><b>2</b></font>
+00000010
+Enter an integer between 0 and 255: <font color=darkred><b>3</b></font>
+00000011
+Enter an integer between 0 and 255: <font color=darkred><b>4</b></font>
+00000100
+Enter an integer between 0 and 255: <font color=darkred><b>5</b></font>
+00000101
+Enter an integer between 0 and 255: <font color=darkred><b>255</b></font>
+11111111
+Enter an integer between 0 and 255: <font color=darkred><b>254</b></font>
+11111110
+Enter an integer between 0 and 255: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX>
+</pre>
+
+<hr>
+<h3>Bitwise-and</h3>
+
+The bit operations in C/C++ operate on these bits.  The first
+operation is <i>bitwise-and</i>.  It is the ampersand.  
+The bitwise-and of two numbers simply goes through the bit
+position and sets that position to 1 if the two bits in that
+position are 1, and 0 otherwise.  Look at 
+<a href=and.c><b>and.c</b></a>.  This takes two bytes and 
+prints out their bitwise-and.  You'll note, 0 bitwise-and anything
+is zero.  255 bitwise-and <i>x</i> is <i>x</i>, because all the bits
+of 255 are one.  
+
+<pre>
+UNIX> <b>and</b>                                                          
+Enter two integers between 0 and 255: <font color=darkred><b>1 0</b></font>
+00000001 & 00000000 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>1 1</b></font>
+00000001 & 00000001 = 00000001
+Enter two integers between 0 and 255: <font color=darkred><b>1 2</b></font>
+00000001 & 00000010 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>1 3</b></font>
+00000001 & 00000011 = 00000001
+Enter two integers between 0 and 255: <font color=darkred><b>2 3</b></font>
+00000010 & 00000011 = 00000010
+Enter two integers between 0 and 255: <font color=darkred><b>0 40</b></font>
+00000000 & 00101000 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>255 40</b></font>
+11111111 & 00101000 = 00101000
+Enter two integers between 0 and 255: <font color=darkred><b>0 89</b></font>
+00000000 & 01011001 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>255 89</b></font>
+11111111 & 01011001 = 01011001
+Enter two integers between 0 and 255: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> 
+</pre>
+
+If a number is all zeros except for a one
+in the <i>i</i>-th position (this means that the number is <i>2<sup>(i-1)</sup></i>)
+then that number bitwise-and <i>x</i> 
+is equal to zero or that number, depending on whether 
+<i>x</i> has a bit set in the <i>i</i>-th position.
+Therefore (4 & 7) equals 4 since 7 has its bit in the third position
+set.
+<p>
+Similarly, if you are interested in what the lowest <i>i</i> bits of
+a byte are, you can take that byte bitwise-and <i>(2<sup>i</sup>)-1</i>.
+For example, if you want to see what the lowest three bits are of
+a byte, you take that byte bitwise-and <i>(2<sup>3</sup>)-1 = 7</i>.  For example,
+the lowest three bits of 89 are (89&7)=1:
+
+<pre>
+UNIX> <b>and</b>                                                          
+Enter two integers between 0 and 255: <font color=darkred><b>4 7</b></font>
+00000100 & 00000111 = 00000100
+Enter two integers between 0 and 255: <font color=darkred><b>4 2</b></font>
+00000100 & 00000010 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>89 7</b></font>
+01011001 & 00000111 = 00000001
+Enter two integers between 0 and 255: <font color=darkred><b>91 7 </b></font>
+01011011 & 00000111 = 00000011
+Enter two integers between 0 and 255: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> 
+</pre>
+
+
+<hr>
+<h3>Bitwise-or</h3>
+
+Bitwise-or works like bitwise-and, only it sets the bit to one
+if either of the numbers has its bit in that position set to one.
+It's operator is the pipe character (|).
+You'll note that (0|x) = x, and (255|x) = 255.
+
+<pre>
+UNIX> <b>or</b>                                                          
+Enter two integers between 0 and 255: <font color=darkred><b>0 1</b></font>
+00000000 | 00000001 = 00000001
+Enter two integers between 0 and 255: <font color=darkred><b>1 2</b></font>
+00000001 | 00000010 = 00000011
+Enter two integers between 0 and 255: <font color=darkred><b>1 3</b></font>
+00000001 | 00000011 = 00000011
+Enter two integers between 0 and 255: <font color=darkred><b>0 40</b></font>
+00000000 | 00101000 = 00101000
+Enter two integers between 0 and 255: <font color=darkred><b>255 40</b></font>
+11111111 | 00101000 = 11111111
+Enter two integers between 0 and 255: <font color=darkred><b>0 89</b></font>
+00000000 | 01011001 = 01011001
+Enter two integers between 0 and 255: <font color=darkred><b>255 89</b></font>
+11111111 | 01011001 = 11111111
+Enter two integers between 0 and 255: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> 
+</pre>
+
+
+<hr>
+<h3>Other bitwise operations</h3>
+
+There is also bitwise exclusive-or, which returns whether the
+two bits are different.  Its operator is the carat (^).
+And there is bitwise complement, which is unary, and changes
+zeros to ones and ones to zero:
+
+<pre>
+UNIX> <b>exor</b>                                                          
+Enter two integers between 0 and 255: <font color=darkred><b>1 2</b></font>
+00000001 ^ 00000010 = 00000011
+Enter two integers between 0 and 255: <font color=darkred><b>1 3</b></font>
+00000001 ^ 00000011 = 00000010
+Enter two integers between 0 and 255: <font color=darkred><b>255 0</b></font>
+11111111 ^ 00000000 = 11111111
+Enter two integers between 0 and 255: <font color=darkred><b>255 255</b></font>
+11111111 ^ 11111111 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>1 1</b></font>
+00000001 ^ 00000001 = 00000000
+Enter two integers between 0 and 255: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <b>complement</b>                                                          
+Enter an integer between 0 and 255: <font color=darkred><b>0</b></font>
+~ 00000000 = 11111111
+Enter an integer between 0 and 255: <font color=darkred><b>1</b></font>
+~ 00000001 = 11111110
+Enter an integer between 0 and 255: <font color=darkred><b>40</b></font>
+~ 00101000 = 11010111
+Enter an integer between 0 and 255: <font color=darkred><b>255</b></font>
+~ 11111111 = 00000000
+Enter an integer between 0 and 255: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> 
+</pre>
+
+
+<hr>
+<h3>Bit shifting</h3>
+
+Finally, there are the bit shift operators: left shift (<<) and
+right shift (>>).  They shift the bits a specified number of positions
+left and right respectively:
+
+<pre>
+UNIX> <b>leftshift</b>                                                          
+Enter an integer and a shift amount: <font color=darkred><b>1 0</b></font>
+00000001 <<  0 = 00000001
+Enter an integer and a shift amount: <font color=darkred><b>1 1</b></font>
+00000001 <<  1 = 00000010
+Enter an integer and a shift amount: <font color=darkred><b>1 2</b></font>
+00000001 <<  2 = 00000100
+Enter an integer and a shift amount: <font color=darkred><b>1 3</b></font>
+00000001 <<  3 = 00001000
+Enter an integer and a shift amount: <font color=darkred><b>1 4</b></font>
+00000001 <<  4 = 00010000
+Enter an integer and a shift amount: <font color=darkred><b>3 1</b></font>
+00000011 <<  1 = 00000110
+Enter an integer and a shift amount: <font color=darkred><b>3 0</b></font>
+00000011 <<  0 = 00000011
+Enter an integer and a shift amount: <font color=darkred><b>0 1</b></font>
+00000000 <<  1 = 00000000
+Enter an integer and a shift amount: <font color=darkred><b>3 8</b></font>
+00000011 <<  8 = 00000000
+Enter an integer and a shift amount: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b>rightshift</b></font>
+Enter an integer and a shift amount: <font color=darkred><b>1 0</b></font>
+00000001 >>  0 = 00000001
+Enter an integer and a shift amount: <font color=darkred><b>1 1</b></font>
+00000001 >>  1 = 00000000
+Enter an integer and a shift amount: <font color=darkred><b>8 1</b></font>
+00001000 >>  1 = 00000100
+Enter an integer and a shift amount: <font color=darkred><b>8 2</b></font>
+00001000 >>  2 = 00000010
+Enter an integer and a shift amount: <font color=darkred><b>8 3</b></font>
+00001000 >>  3 = 00000001
+Enter an integer and a shift amount: <font color=darkred><b>255 1</b></font>
+11111111 >>  1 = 01111111
+Enter an integer and a shift amount: <font color=darkred><b>255 7</b></font>
+11111111 >>  7 = 00000001
+Enter an integer and a shift amount: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> 
+</pre>
+You'll note, left shifting by 1 multiplies by 2, and right
+shifting by one divides by two.  In general, left shifting
+by <i>i</i> multiplies by 
+<i>2<sup>i</sup></i>, 
+and right shifting
+by <i>i</i> divides by 
+<i>2<sup>i</sup></i>, 
+<p>
+However, a word of caution.  Yes, left-shifting by one multiplies
+by 2 faster than doing <b>x*2</b>.  However, do not do this if
+you want to multiply by two unless your code really has to be
+optimally fast, or unless it's pretty clear what you're doing.
+Otherwise, your code becomes extremely hard to read.
+
+<p>
+Now that you know all this, implementing <b>print_bits()</b> is
+pretty simple:
+<pre>
+print_bits(unsigned char c)
+{
+  unsigned int i;
+
+  for (i = 1 << 7; i != 0; i >>= 1) {
+    if (i&c) putchar('1'); else putchar('0');
+  }
+}
+</pre>
+
+Yes, I could have done:
+<pre>
+  for (i = 1 << 7; i != 0; i >>= 1) {
+    putchar('0'+((i&c)>0));
+  }
+</pre>
+or some such garbage, but again, make your code readable.  A good
+compiler can probably make your readable code as fast as unreadable
+code.
+<p>
+<hr>
+You can do bit operations on ints, shorts, chars and longs (and long longs in C++).
+They can be signed or unsigned.  Be careful with bit-shifting and long long's.
+For example, compilers treat constants as ints, so (1 << 60) will equal zero,
+even if you assign it to a long long (or <b>uint64_t</b> in C).  
+<hr>
+<h3>bit_practice</h3>
+
+I include a program here called <b>bit_practice</b>, which lets you practice bit arithmetic.
+When you run it, it will present you with a bit arithmetic problem, which works on 
+<b>shorts</b> (16-bit numbers).  It waits for you to press <b>RETURN</b>, and it will give
+you the answer.  This is really good practice for you, especially to think about the problems
+in hexadecimal.
+
+<pre>
+UNIX> <font color=darkred><b>bit_practice</b></font>
+A is       27  0x001b  00000000 00011011
+Operation is ~
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is    65508  0xffe4  11111111 11100100
+----------------
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+A is      248  0x00f8  00000000 11111000
+Operation is >> 1
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is      124  0x007c  00000000 01111100
+----------------
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+A is        0  0x0000  00000000 00000000
+B is      124  0x007c  00000000 01111100
+Operation is &
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is        0  0x0000  00000000 00000000
+----------------
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+A is       41  0x0029  00000000 00101001
+Operation is << 4
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is      656  0x0290  00000010 10010000
+----------------
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+A is      240  0x00f0  00000000 11110000
+Operation is >> 4
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is       15  0x000f  00000000 00001111
+----------------
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+A is      138  0x008a  00000000 10001010
+Operation is >> 1
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is       69  0x0045  00000000 01000101
+----------------
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+A is      122  0x007a  00000000 01111010
+Operation is << 1
+<font color=darkred><b>&lt;RETURN&gt;</b></font>
+C is      244  0x00f4  00000000 11110100
+----------------
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
