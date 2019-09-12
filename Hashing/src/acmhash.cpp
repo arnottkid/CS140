@@ -1,7 +1,12 @@
-#include <iostream>
-using namespace std;
+/* This hash function comes from an Article in Communications of the ACM
+   in June, 1990.  It uses a permutation table to calculate the hash of
+   the next byte, from the hash of the previous byte run through this
+   permutation table.  I perform this operation on four different 
+   bytes, and then calculate a final integer from the bytes. */
 
-/* This hash table comes from a CACM paper from June, 1990 */
+#include <iostream>
+#include <string>
+using namespace std;
 
 static unsigned char perm_table[256] = {
   1, 87, 49, 12, 176, 178, 102, 166, 121, 193, 6, 84, 249, 230, 44, 163,
@@ -21,12 +26,15 @@ static unsigned char perm_table[256] = {
   140, 36, 210, 172, 41, 54, 159, 8, 185, 232, 113, 196, 231, 47, 146, 120,
   51, 65, 28, 144, 254, 221, 93, 189, 194, 139, 112, 43, 71, 109, 184, 209};
 
-unsigned int acm_hash(string &s)
+unsigned int acm_hash(const string &s)
 {
-  int i, j;
+  size_t i, j;
   unsigned int h;
-  unsigned char byte_hash[4];
+  unsigned char byte_hash[4];     /* I'm using a C-style array rather than a vector. */
   
+  /* You keep track of the four bytes in byte_hash, and
+     at character j, you operate on byte_hash[j%4]. */
+
   for (j = 0; j < 4; j++) byte_hash[j] = 0;
   j = 0;
   for (i = 0; i < s.size(); i++) {
@@ -34,12 +42,15 @@ unsigned int acm_hash(string &s)
     j++;
     if (j == 4) j = 0;
   }
+
+  /* At the end, you build the 32-bit hash value from the four bytes. */
+
   h = 0;
   for (j = 0; j < 4; j++) h = (h << 8) | byte_hash[j]; 
   return h;
 }
 
-main()
+int main()
 {
   string s;
   unsigned int h;
@@ -48,4 +59,5 @@ main()
     h = acm_hash(s);
     cout << h << endl;
   }
+  return 0;
 }

@@ -925,7 +925,7 @@ experiment.  Both the X and the O players are going to play the game randomly, w
 just one difference -- if X begins the game, he/she will choose the middle square.
 The program to do is in 
 <b><a href=src/ttt_random.cpp>src/ttt_random.cpp</a></b>. It takes two command-line arguments --
-a number of iterations (games), and a seed for the random number generators.  It then 
+a number of iterations (games), and a seed for the random number generator.  It then 
 plays games randomly, except for when X starts a game, in which case X will choose the
 middle square.
 <p>
@@ -1066,10 +1066,43 @@ Stats: X:491100 O:387998 D:120902
 UNIX> <font color=darkred><b>≈</b></font>
 </pre>
 
-You can see that X is winning over O significantly, so I think this is a pretty conclusive
-experiment!
+You can see that X is winning over O significantly and consistently across seeds, 
+so I think this is a pretty conclusive experiment!
+<p>
 
 <hr>
 <h3>Summary of the Main Points of this Lecture</h3>
 
-I'm going to write these tomorrow or wednesday.
+<OL>
+<LI> Rather than having all of your files in one directory, it is often helpful to break your
+files up into directories.  Here, I'm uisng <b>src</b> and <b>include</b> for my source and include
+files, and <b>obj</b> / <b>bin</b> for my object files and executables.  There are a few nice things about this structure.  First, when you list files in the current directory, the listing is clean.  Second, you know where to look for files.  Third, you can do "rm -rf obj/* bin/*" and you won't get
+into trouble, because all of the files in those two directories are created by the compiler.
+<p>
+<LI> It is good practice to compile your <b>.cpp</b> files into <b>.o</b> files, and then to 
+<i>link</i> the <b>.o</b> files to make an executable.  This is efficient when you have multiple
+programs making use of the same source files.  You can automate this with <b>make</b>.
+<p>
+<LI> Header files should be in an <b>include</b> directory, and they shouldn't contain code
+     (unless they are header-only implementations, like <b>MOA.hpp</b>).  
+<p>
+<LI> You should not put "using namespace std" in a header file, because that forces your users
+     to use the standard namespace.  It's fine to put "using namespace std" in your <b>.cpp</b>
+     files.
+<p>
+<LI> A classic object-oriented style is to have methods be public, but have data be protected.
+     That way, users of a data structure can't mess with the data directly -- they can only
+     mess with it through the methods.
+<p>
+<LI> If you put <b>const</b> at the end of a method, it means that the method does not modify
+     the data of a class.  The compiler will enforce this.
+<p>
+<LI> When you're implementing a class, start with dummy implementations, and then write a testing
+     program.  Typically, this testing program allows you to implement each of the class' methods
+     incrementally, and test them.
+<p>
+<LI> Duh: You should program incrementally -- don't implement the entire class at once -- do it
+     slowly and test as you go.  It will save you time.  Always.
+<p>
+<LI> A well-designed class can be used by multiple programs. 
+</UL>

@@ -1,9 +1,13 @@
+/* This is a hash function that I from http://www.cse.yorku.ca/~oz/hash.html.  
+   The author claims that it works well, but doesn't know why! */
+
 #include <iostream>
+#include <string>
 using namespace std;
 
-unsigned int djb_hash(string &s)
+unsigned int djb_hash(const string &s)
 {
-  int i;
+  size_t i;
   unsigned int h;
   
   h = 5381;
@@ -14,7 +18,7 @@ unsigned int djb_hash(string &s)
   return h;
 }
 
-main()
+int main()
 {
   string s;
   unsigned int h;
@@ -23,4 +27,5 @@ main()
     h = djb_hash(s);
     cout << h << endl;
   }
+  return 0;
 }
