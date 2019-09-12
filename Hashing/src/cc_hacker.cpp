@@ -7,17 +7,19 @@
 #include <cstdlib>
 using namespace std;
 
+/* A person is composed of a name and a credit card number. */
+
 class Person {
   public:
     string name;
     string cc;
 };
 
-typedef vector <Person> PVec;
+/* This is our djb hash function, copied from the lecture notes. */
 
-unsigned int djb_hash(string &s)
+unsigned int djb_hash(const string &s)
 {
-  int i;
+  size_t i;
   unsigned int h;
   
   h = 5381;
@@ -28,35 +30,47 @@ unsigned int djb_hash(string &s)
   return h;
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  int ts, i, index, counter, j;
+  vector < vector <Person> > table;     // The hash table
+  size_t table_size;                    // The table's size
+
+  size_t i, index;                      // Helpers
   string s;
   istringstream ss;
-  vector <PVec> table;
   Person p;
   ifstream f;
 
-  if (argc != 3) {
-    cerr << "usage: cc_hacker table_size file\n";
-    exit(1);
-  }
- 
-  ts = atoi(argv[1]);
-  f.open(argv[2]);
-  if (f.fail()) { perror(argv[2]); exit(1); }
-  if (ts <= 0) { cerr << "usage: cc_hacker table_size file\n"; exit(1); }
+  /* Process the command line. */
 
-  table.resize(ts);
+  try {
+    if (argc != 3) throw ((string) "usage: cc_hacker table_size file");
  
-  counter = 0;
+    ss.clear();
+    ss.str(argv[1]);
+    if (!(ss >> table_size || table_size == 0)) throw((string) "Bad table size"); 
+
+     f.open(argv[2]);
+     if (f.fail()) throw ((string) "couldn't open the file.");
+   } catch (string s) {
+     cerr << s << endl;
+     exit(1);
+   }
+
+  table.resize(table_size);
+ 
+  /* - Read in each name and credit card, error checking, and create a person p.
+     - Hash the name.
+     - Insert p into the hash table. 
+   */
+
   while (getline(f, s)) {
-    counter++;
     ss.clear();
     ss.str(s);
     if (!(ss >> p.cc)) { cerr << "Bad line\n"; exit(1); }
     if (p.cc.size() != 16 || p.cc.find_first_not_of("0123456789") != string::npos) { 
-      cerr << "Bad credit card\n"; exit(1); 
+      cerr << "Bad credit card\n"; 
+      return 1;
     }
     if (!(ss >> p.name)) { cerr << "Bad name\n"; exit(1); }
     while (ss >> s) { p.name += " "; p.name += s; }
@@ -65,6 +79,12 @@ main(int argc, char **argv)
     table[index].push_back(p);
   }
 
+  /* Process standard input:
+       - Get a name.
+       - Look it up in the hash table, and print out the name/cc if it's there.
+       - If it's not there, print that it's not found, and print the table entry.
+   */
+     
   while(1) {
     printf("Enter a name> "); 
     if (!getline(cin, s)) exit(1);
@@ -72,12 +92,13 @@ main(int argc, char **argv)
     for (i = 0; i < table[index].size(); i++) {
       if (table[index][i].name == s) {
         p = table[index][i];
-        printf("Found it: Table entry %d: %s %s\n", index, p.name.c_str(), p.cc.c_str());
+        printf("Found it: Table entry %lu: %s %s\n", index, p.name.c_str(), p.cc.c_str());
         i = table[index].size();
       }
     }
     if (i == table[index].size()) {
-      printf("Not found.  Table entry %d\n", index);
+      printf("Not found.  Table entry %lu\n", index);
     }
   }
+  return 0;
 }
