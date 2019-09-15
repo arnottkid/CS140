@@ -827,6 +827,263 @@ You can fix the problem in a few ways.  The easiest, as with
 quadratic probing, is to make sure that the table size is a prime number.  There are 
 other fixes, but I won't go into them (maybe in class).
 
+<h2>Cryptographic Hash Functions</h2>
+
+There are several well-known algorithms that compute hash functions
+of arbitrarily-sized data.  One example is the <a
+href=http://en.wikipedia.org/wiki/MD5>MD5</a> function that produces
+a 128-bit hash function from any sized data.  Another example is <a
+href=http://en.wikipedia.org/wiki/SHA-1>SHA-1</a>, which produces a
+160-bit hash.  Both functions attempt to generate uniformly
+distributed hashes from arbitrary data that are secure, in that you
+can't get any information about the data from the hash.  I won't go 
+into a discussion beyond that, except that SHA-1 does a better job,
+but is more computationally expensive.  For our purposes, we will assume that
+the functions produce hashes from data that look like random streams
+of bits.
+<p>
+The <b>openssl</b> command generates hashes from files using either
+technique.  For example:
+
+<pre>
+UNIX> <font color=darkred><b>cat files/input-1.txt</b></font>
+Rosalita, jump a little lighter.
+Senorita come sit by my fire.
+UNIX> <font color=darkred><b>cat files/input-2.txt</b></font>
+Sosalita, jump a little lighter.
+Senorita come sit by my fire.
+UNIX> <font color=darkred><b>openssl md5 files/input-1.txt files/input-2.txt</b></font>
+MD5(files/input-1.txt)= b9937df3fefbe66d8fcdda363730bf14
+MD5(files/input-2.txt)= 3a752ef1b9bfd1db6ba6a701b6772065
+UNIX> <font color=darkred><b>openssl sha1 files/input-1.txt files/input-2.txt</b></font>
+SHA1(files/input-1.txt)= 9a2c3d93445fa844094eb213a17fc5996895c925
+SHA1(files/input-2.txt)= 8886b6ef4671093b15c2dba387c3eb169e9db5d2
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The representation of the hashes is a long stream of hexadecimal.  You can 
+read each hex digit as four bits.  Thus the first eight bits of b9937df3fefbe66d8fcdda363730bf14
+are 10111001 (b9).  The hexadecimal string is 32 characters long -- hence the hash is 128 bits.
+<p>
+The ASCII value of 'R' is 82 (binary 1010010) and the value of 'S' is 83 (binary 1010011).
+That means that <b>files/input-1.txt</b> and <b>files/input-2.txt</b> differ by exactly one bit.
+However, look how different the hashes of both values are.  That's a great thing about
+both functions. (Look up <a href=http://en.wikipedia.org/wiki/Avalanche_effect>avalanche
+effect</a> if you want to learn more about that property).
+<p>
+Hashes like MD5 and SHA-1 are often used to represent large files.  For example, 
+suppose I have a photo in my library that is 4 MB long, and has an MD5 hash of
+6282f7860277242c80b69d3a20e0b40e.  Suppose I have burned a CD that should have the photo on
+it and I want to make sure that the CD is not corrupted.  I can calculate the hash
+of the photo on the CD, and if it doesn't equal 6282f7860277242c80b69d3a20e0b40e, then
+I know it's corrupted.  If it does equal 6282f7860277242c80b69d3a20e0b40e, I can assume
+with probability 1/2<sup>128</sup> that it is not corrupted.
+<p>
+
+<hr>
+<h2>Load Factors, Collision Resolution and Performance</h2>
+
+In your lab, you'll be writing a program that accepts commands to insert and find
+keys in a hash table.  You'll be implementing linear probing and double-hashing
+as collision resolution strategies.  Let's not worry about the details of the
+hash functions yet -- you'll deal with that with your lab.  However, I want to 
+demonstrate how double-hashing is superior to linear probing, but that you want
+the table size to be a prime number.  Your lab program, <b>bin/hash_tester</b> (this
+is in the lab directory, not here), is called as follows:
+
+<pre>
+UNIX> <font color=darkred><b>bin/hash_tester</b></font>
+usage: hash_tester table-size fxn(Last7|XOR) collision(Linear|Double) [prompt]
+UNIX> <font color=darkred><b>echo '?' | bin/hash_tester 417 Last7 Linear</b></font>
+A key val      Add the given key/val pair to the hash table.
+F key          Find the given key in the hash table.
+P              Print the hash table.
+TP             Print the total probes for finding all keys.
+Q              Quit.
+?              Print comands.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Again, don't worry about the hash function -- we'll call it with "Last7".  
+The keys accepted by this program are any stream of hex digits (so that it can 
+work on things like MD5 and SHA1 hashes).  
+We are going to evaluate this program on the file 
+<b><a href=files/Pictures-SHA1.txt>files/Pictures-SHA1.txt</a></b>, which contains
+SHA-1 hashes of 417 of my pictures.  In the file, each line starts with "A", so that
+we can use it as input to <b>bin/hash_tester</b>:
+
+<pre>
+UNIX> <font color=darkred><b>head -n 3 files/Pictures-SHA1.txt </b></font>
+A ec9d7382dede0a361ceed9f5933ab682a46b9981 Data/019950.JPG
+A fdc4f5f5519546c84d77c15b4df2a33beb1129af Data/019951.JPG
+A c6b6843d938f8d338d1e59308ced316d6941c1a0 Data/019952.JPG
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Let's see how many probes it takes when we insert it into a hash table with 417 entries.
+In other words, the load factor is 1.0:
+
+<pre>
+UNIX> <font color=darkred><b>( cat files/Pictures-SHA1.txt ; echo "TP" ) | bin/hash_tester 417 Last7 Linear</b></font>
+4896
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Man, that's terrible!  Of course, that's what the theory says.  Let's double the size of the
+hash table, as theory recommends:
+
+<pre>
+UNIX> <font color=darkred><b>( cat files/Pictures-SHA1.txt ; echo "TP" ) | bin/hash_tester 834 Last7 Linear</b></font>
+211
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+That's much better.  Let's try double-hashing, with a load factor of 1 (your program will implement
+two hash functions, called "Last7" and "XOR" -- we use "XOR" as the second hash function in
+double-hashing):
+
+<pre>
+UNIX> <font color=darkred><b>( cat files/Pictures-SHA1.txt ; echo "TP" ) | bin/hash_tester 417 Last7 Double</b></font>
+A 0722c16fb69be89210669336d65a76132d2cc8d2 Modified/020103.JPG
+Cannot insert key
+A c07e8c9463217238bce4183a37bf4479b36d3a38 Originals/020099.JPG
+Cannot insert key
+1402
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Well, it's better than linear probing, but 1402 probes is still pretty bad.  Moreover,
+two entries could not be put into the hash table at all!
+Why?  Well, 417 is not a prime number.  It is equal to 3 * 139.  So if there
+is a collision, and the second hash value is 139, then you only have three places to look
+before giving up.  If we try 419 (the smallest prime number &ge; 417), there are still 
+a lot of probes, but at least you can get everything into the hash table:
+
+<pre>
+UNIX> <font color=darkred><b>( cat files/Pictures-SHA1.txt ; echo "TP" ) | bin/hash_tester 419 Last7 Double</b></font>
+1641
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Take a look at the shell script in the file
+<b><a href=scripts/evaluate.sh>scripts/evaluate.sh</a></b> (again this is in the lab
+directory, not this directory):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#!/bin/sh
+
+for collision in Linear Double ; do
+  for table_size in \
+      419 421 431 433 439 443 449 457 461 463 467 479 487 491 499 \
+      503 509 521 523 541 547 557 563 569 571 577 587 593 599 \
+      601 607 613 617 619 631 641 643 647 653 659 661 673 677 683 691 \
+      701 709 719 727 733 739 743 751 757 761 769 773 787 797 \
+      809 811 821 823 827 829 839 ; do
+    echo $collision $table_size \
+    `( cat files/Pictures-SHA1.txt ; echo TP ) | bin/hash_tester $table_size Last7 $collision`
+ done
+done
+</pre></td></table></center><p>
+
+This tests linear probing and double-hashing on 
+every prime table size from 419 (roughly a load factor of one) to 839
+(roughly a factor of two).  Running it gives us a line for each test, as follows:
+
+<pre>
+UNIX> <font color=darkred><b>sh scripts/evaluate.sh | head -n 3</b></font>
+Linear 419 4808
+Linear 421 8588
+Linear 431 1722
+UNIX> <font color=darkred><b>sh scripts/evaluate.sh | grep Double | head -n 3</b></font>
+Double 419 1641
+Double 421 1466
+Double 431 1073
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You can take the output of this and put it into your favorite graphing package
+(I use 
+<a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs494/494/notes/Jgraph/lecture.html>jgraph</a>, because it works really will with a Unix-based workflow), to see how these collision 
+resolution techniques fare:
+
+<p><center><table border=3><td><a href=jpg/probing.jpg><img src=jpg/probing.jpg width=600></a></td></table></center><p>
+
+As you can see, the graph lines are not smooth, but that is because this is just
+one set of examples, and the exact number of probes can depend on the luck of the draw.  We
+could smooth this by running lots of different examples, but I'm not going to do that.
+Were I to write a paper on this, I'd have to do that so that my graphs are more
+cogent.
+
+<hr>
+<h2>One way that I use hashes</h2>
+
+I use MD5 hashes to help me manage pictures.  In particular, I've made a bunch of 
+"photoframes" for my family.  What I do is find a used computer display on Craig's list,
+typically for $10-$20.  Then I buy a Raspberry Pi (all of the components there are around
+$60-$70 -- it would be cheaper if I bought a Pi 0, but I haven't done that yet).  And
+then I use <b>git</b> and the program <b>feh</b> to set it up so that I can simply upload
+photos to my git repo when I want to add them to the photoframe.  The Pi's pull the repo
+every ten minutes, and then if something has been updated, they do some organization, and
+relauch <b>feh</b> with the new photos.
+
+<p>To detect which photos have changed from one iteration to another, I use MD5 hashes of the
+photos' contents.  That's a lot faster than trying to do anything with the photos' contents,
+since each photo is typically between 2 and 15 megabytes.
+
+<p>In addition to 
+<b><a href=files/Pictures-SHA1.txt>files/Pictures-SHA1.txt</a></b>, I have made the 
+file 
+<b><a href=files/Pictures-MD5.txt>files/Pictures-MD5.txt</a></b>, which contains the MD5
+hashes of the 
+<b><a href=files/Pictures-SHA1.txt>files/Pictures-SHA1.txt</a></b>, they
+contain MD5 and SHA1 hashes of 417 pictures in one of my directories, and I've put
+an "A" at the beginning of each line:
+
+<pre>
+UNIX> <font color=darkred><b>head -n 2 files/Pictures*</b></font>
+==> files/Pictures-MD5.txt <==
+A 3b75a83ce0572009efb263d190ad0f0d Data/019950.JPG
+A 1d2926b2775ee72071775160a4bdb740 Data/019951.JPG
+
+==> files/Pictures-SHA1.txt <==
+A ec9d7382dede0a361ceed9f5933ab682a46b9981 Data/019950.JPG
+A fdc4f5f5519546c84d77c15b4df2a33beb1129af Data/019951.JPG
+UNIX> <font color=darkred><b>wc files/Pictures*</b></font>
+     417    1251   22228 files/Pictures-MD5.txt
+     417    1251   25564 files/Pictures-SHA1.txt
+     834    2502   47792 total
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Now, suppose that my photoframe has a bunch of pictures, and it has
+stored their MD5 hashes in a file like <b><a href=files/Pictures-MD5.txt>files/Pictures-MD5.txt</a></b>, and it wants to see
+what's changed after it pulled it git repo. 
+It can load the file into a hash table, and then for each picture, it can
+calculate each picture's MD5 hash, and then find it in the hash table.  
+
+First, suppose we have two pictures whose MD5 hashes are
+<tt>"239b0e9c17b5950eb9700ef1d76534bb"</tt> and  
+<tt>"6143a5ddcf738eda4a9ad1d54d3fcc07"</tt>.
+Here's how we can look to see if they are in our collection of pictures, using the
+program <b>hash_tester</b> that you'll be writing in lab:
+
+<pre>
+UNIX> <font color=darkred><b>( cat files/Pictures-MD5.txt ; \</b></font>
+? <font color=darkred><b>   echo F 239b0e9c17b5950eb9700ef1d76534bb ; \</b></font>
+? <font color=darkred><b>   echo F 6143a5ddcf738eda4a9ad1d54d3fcc07 ) | \</b></font>
+? <font color=darkred><b>   bin/hash_tester 834 Last7 Linear</b></font>
+Found: 019960.JPG
+Not found.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+As you can see, the first picture is in the collection, and the second picture is not.
+Hash tables are nice, because once I insert all of the pictures from my file into the
+hash table, each <b>Find()</b> command is really fast -- simply hash the key, and your
+only overhead is the number of probes that it takes to find the file (or an empty slot
+in the table, which means that your key is not there).
+
+
 <hr>
 <h2>Summary</h2>
 
