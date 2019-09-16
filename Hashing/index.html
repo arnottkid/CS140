@@ -710,6 +710,10 @@ If we try to find the key "Baby-Daisy", we first find its hash value using <b>dj
 2768631242.  We'll have to check indices 2, 3, 4 and 5 before we find that index 6 is
 empty and we can conclude that "Baby-Daisy" is not in the table.
 
+<p>
+One problem with linear probing is that you end up with clusters of filled hash table entries,
+which can be bad for performance.  That fact motivates the next two collision resolution
+strategies.
 
 <h3>Quadratic Probing</h3>
 
@@ -826,6 +830,12 @@ and the <b>ACM</b> hash value is 1400397935.  Do you see why that's problematic:
 You can fix the problem in a few ways.  The easiest, as with
 quadratic probing, is to make sure that the table size is a prime number.  There are 
 other fixes, but I won't go into them (maybe in class).
+
+<h3>Deletion</h3>
+
+You should be able to see pretty clearly that you can't delete entries simply when you
+are using open addressing.  We will not discuss that further in this class, but you should
+be aware of it.
 
 <h2>Cryptographic Hash Functions</h2>
 
@@ -1057,10 +1067,11 @@ UNIX> <font color=darkred><b></b></font>
 
 Now, suppose that my photoframe has a bunch of pictures, and it has
 stored their MD5 hashes in a file like <b><a href=files/Pictures-MD5.txt>files/Pictures-MD5.txt</a></b>, and it wants to see
-what's changed after it pulled it git repo. 
+what's changed after it pulled the git repo. 
 It can load the file into a hash table, and then for each picture, it can
 calculate each picture's MD5 hash, and then find it in the hash table.  
 
+<p>
 First, suppose we have two pictures whose MD5 hashes are
 <tt>"239b0e9c17b5950eb9700ef1d76534bb"</tt> and  
 <tt>"6143a5ddcf738eda4a9ad1d54d3fcc07"</tt>.

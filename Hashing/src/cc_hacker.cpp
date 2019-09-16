@@ -82,7 +82,7 @@ int main(int argc, char **argv)
   /* Process standard input:
        - Get a name.
        - Look it up in the hash table, and print out the name/cc if it's there.
-       - If it's not there, print that it's not found, and print the table entry.
+       - If it's not there, print that it's not found, and print the index into the table.
    */
      
   while(1) {
