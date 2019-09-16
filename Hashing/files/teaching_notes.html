@@ -1,0 +1,79 @@
+<pre>
+Overview:
+
+   - Hash table
+   - Hash function
+   - Collision resolution strategy.
+
+Simple example with these and a 10-entry hash table.  Do "cat files/hashes-1.txt"
+
+   - Luther          3249384281
+   - Rosalita        2627953124
+   - Binky            216319842
+   - Dontonio        2797174031
+
+This highlights collision resolution.
+
+Define Load Factor.
+State what makes a good hash function.
+
+Hash functions for strings:
+
+   - badhash.cpp -- Show a and Aa
+   - djbhash.cpp -- Show a aA aAA aAAA
+   - acmhash.cpp -- show a, aaaa, aaaaa
+
+Evaluating how good the hash functions are:
+
+    files/names_10000.txt -- pipe through the hash functions, print mod 200000 | head
+    then through sort -u | wc.
+
+Separate Chaining.  Talk about.  Hack up -- start with src/cc_skeleton.cpp
+
+    Walk through cc_names_10.txt example 
+    Then using files/cc_names_100K.txt and files/cc_just_names_100K.txt, increasing the
+         table size.
+
+Open Addressing
+
+          hi = H(key) + F(i, key), modulo the table size
+          Linear Probing: F(i, key) = i
+
+          Do cat files/hashes-1.txt and add Frenchy 561643892
+          Do the same example, and then try to find "Baby-Daisy" = 2768631242
+
+          Quadratic Probing: F(i, key) = c_1 i + c_2 i^2 -- we just use i^2
+  
+          Do the same example.
+
+          Pathelogical example -- suppose entries 0, 1, 4, 5, 6 and 9 are filled, and
+            we try to find "Peach".  Toast.
+
+          Double Hashing - F(i, key) = H2(key)*i
+
+           Do the same example, and then try to insert "Ryan".  Ooops.
+     
+          Deletion.
+
+Cryptographic Hash Functions
+
+   - MD5 (128-bit) and SHA1 (160-bit).  Talk about avalanche effect and demonstrate it
+     with files/input-1.txt and files/input-2.txt -- talk about how you can use a hash
+     to detect corruption.
+
+Performance 
+
+   - files/Pictures-SHA1.txt.  Lab.  
+     ( cat files/Pictures-SHA1.txt ; echo "TP" ) | bin/hash_tester 417 Last7 Linear
+   - s/417/834/
+   - back 417 and Double
+   - up to 419
+   - Shell script & graph.
+
+One way that I use hashes -- making a photo frame.
+
+UNIX> ( cat files/Pictures-MD5.txt ; \
+?    echo F 239b0e9c17b5950eb9700ef1d76534bb ; \
+?    echo F 6143a5ddcf738eda4a9ad1d54d3fcc07 ) | \
+?    bin/hash_tester 834 Last7 Linear
+
