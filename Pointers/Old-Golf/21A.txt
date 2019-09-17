@@ -1,0 +1,160 @@
+The PGA Championship
+
+1 3     [XX]Martin Kaymer -11 F -2 72 68 67 70 277
+2 9     [XX]Bubba Watson   -11 F -4 68 71 70 68 277
+T3 4     [XX]Zach Johnson   -10 F -2 69 70 69 70 278
+T3 1     [XX]Rory McIlroy   -10 F E 71 68 67 72 278
+T5 2     [XX]Jason Dufner   -9 F -1 73 66 69 71 279
+T5 2     [XX]Steve Elkington   -9 F -1 71 70 67 71 279
+T5 3     [XX]Dustin Johnson -9 F +1 71 68 67 73 279
+T8 11     [XX]Camilo Villegas   -8 F -4 71 71 70 68 280
+T8 4     [XX]Wen-chong Liang   -8 F +1 72 71 64 73 280
+T10 1     [XX]Matt Kuchar -7 F E 67 69 73 72 281
+T10 6     [XX]Jason Day -7 F +2 69 72 66 74 281
+T12 36     [XX]Phil Mickelson -6 F -5 73 69 73 67 282
+T12 19     [XX]Paul Casey -6 F -3 72 71 70 69 282
+T12 2     [XX]Simon Dyson -6 F E 71 71 68 72 282
+T12 1     [XX]Bryce Molder   -6 F +1 72 67 70 73 282
+T16 15     [XX]Robert Karlsson   -5 F -2 71 71 71 70 283
+T16 3     [XX]D.A. Points   -5 F -1 70 72 70 71 283
+T18 23     [XX]Charl Schwartzel -4 F -2 73 69 72 70 284
+T18 1     [XX]Stephen Gallacher   -4 F E 71 69 72 72 284
+T18 1     [XX]Steve Stricker   -4 F E 72 72 68 72 284
+T18 2     [XX]Stewart Cink -4 F +1 77 68 66 73 284
+T18 2     [XX]Ernie Els -4 F +1 68 74 69 73 284
+T18 17     [XX]Nick Watney   -4 F +9 69 68 66 81 284
+T24 24     [XX]J.B. Holmes   -3 F -2 72 66 77 70 285
+T24 5     [XX]Carl Pettersson -3 F +1 71 70 71 73 285
+T24 10     [XX]Simon Khan -3 F +3 69 70 71 75 285
+T24 17     [XX]Jim Furyk -3 F +5 70 68 70 77 285
+T28 13     [XX]Troy Matteson   -2 F E 72 72 70 72 286
+T28 3     [XX]Tiger Woods -2 F +1 71 70 72 73 286
+T28 9     [XX]Bo Van Pelt   -2 F +2 73 67 72 74 286
+T28 9     [XX]David Horsey   -2 F +2 72 71 69 74 286
+T28 12     [XX]Seung Yul Noh   -2 F +3 68 71 72 75 286
+T33 20     [XX]Gonzalo Fernandez-Castano -1 F -1 70 73 73 71 287
+T33 8     [XX]Ryan Palmer   -1 F +1 71 68 75 73 287
+T33 2     [XX]Heath Slocum   -1 F +2 73 72 68 74 287
+T33 2     [XX]Edoardo Molinari -1 F +2 71 72 70 74 287
+T33 14     [XX]David Toms   -1 F +3 74 71 67 75 287
+T33 14     [XX]Francesco Molinari -1 F +3 68 73 71 75 287
+T39 14     [XX]Adam Scott   E F E 72 73 71 72 288
+T39 9     [XX]Justin Leonard E F +1 73 69 73 73 288
+T39 2     [XX]Ben Crane   E F +2 73 68 73 74 288
+T39 2     [XX]K.J. Choi   E F +2 74 69 71 74 288
+T39 8     [XX]Hunter Mahan   E F +3 74 71 68 75 288
+T39 8     [XX]Tim Clark E F +3 72 71 70 75 288
+T39 20     [XX]Vijay Singh E F +4 73 66 73 76 288
+T39 20     [XX]Brandt Snedeker E F +4 75 70 67 76 288
+T39 20     [XX]Brian Davis E F +4 71 72 69 76 288
+T48 16     [XX]Shaun Micheel +1 F -1 73 69 76 71 289
+T48 5     [XX]Darren Clarke +1 F +1 74 70 72 73 289
+T48 5     [XX]Marc Leishman   +1 F +1 71 73 72 73 289
+T48 5     [XX]Martin Laird   +1 F +1 70 74 72 73 289
+T48 --     [XX]Charles Howell III +1 F +2 69 74 72 74 289
+T48 7     [XX]Brendon de Jonge   +1 F +3 74 66 74 75 289
+T48 17     [XX]Kyung-tae Kim   +1 F +4 70 72 71 76 289
+T55 9     [XX]Retief Goosen +2 F E 76 68 74 72 290
+T55 5     [XX]Tom Lehman   +2 F +1 74 70 73 73 290
+T55 5     [XX]Davis Love III   +2 F +1 73 72 72 73 290
+T58 5     [XX]Kevin Na   +3 F +3 74 71 71 75 291
+T58 10     [XX]Gregory Bourdy   +3 F +4 70 70 75 76 291
+T58 17     [XX]Rickie Fowler   +3 F +5 73 71 70 77 291
+T58 27     [XX]Peter Hanson +3 F +6 71 71 71 78 291
+T62 7     [XX]Fredrik Andersson Hed   +4 F +1 74 71 74 73 292
+T62 2     [XX]Chad Campbell   +4 F +2 70 70 78 74 292
+T62 2     [XX]Rhys Davies   +4 F +3 71 71 75 75 292
+T65 5     [XX]Ryan Moore +5 F +4 69 76 72 76 293
+T65 34     [XX]Brian Gay   +5 F +8 72 70 71 80 293
+67 2     [XX]D.J. Trahan   +6 F +3 72 73 74 75 294
+T68 4     [XX]Stuart Appleby +7 F +5 72 73 73 77 295
+T68 4     [XX]Rob Labritz (CP) +7 F +5 73 71 74 77 295
+70 17     [XX]Ross McGowan +9 F +9 73 72 71 81 297
+71 2     [XX]Jeff Overton   +10 F +7 74 71 74 79 298
+Missed Cut -- lowest 70 scores and ties
+T72 --     [XX]Matt Bettencourt +2 -- -- 72 74 -- -- 146
+T72 --     [XX]Padraig Harrington   +2 -- -- 75 71 -- -- 146
+T72 --     [XX]Yuta Ikeda +2 -- -- 71 75 -- -- 146
+T72 --     [XX]Fredrik Jacobson +2 -- -- 76 70 -- -- 146
+T72 --     [XX]Raphael Jacquelin +2 -- -- 78 68 -- -- 146
+T72 --     [XX]Jerry Kelly   +2 -- -- 75 71 -- -- 146
+T72 --     [XX]Soren Kjeldsen +2 -- -- 73 73 -- -- 146
+T72 --     [XX]John Merrick   +2 -- -- 70 76 -- -- 146
+T72 --     [XX]Louis Oosthuizen   +2 -- -- 71 75 -- -- 146
+T72 --     [XX]Kenny Perry   +2 -- -- 73 73 -- -- 146
+T72 --     [XX]Michael Sim   +2 -- -- 70 76 -- -- 146
+T72 --     [XX]Kevin Stadler +2 -- -- 74 72 -- -- 146
+T72 --     [XX]Tim Thelen (CP) +2 -- -- 71 75 -- -- 146
+T72 --     [XX]Boo Weekley +2 -- -- 76 70 -- -- 146
+T72 --     [XX]Chris Wood   +2 -- -- 78 68 -- -- 146
+T72 --     [XX]Sergio Garcia +3 -- -- 78 69 -- -- 147
+T72 --     [XX]Lucas Glover +3 -- -- 74 73 -- -- 147
+T72 --     [XX]Bill Haas   +3 -- -- 73 74 -- -- 147
+T72 --     [XX]Anders Hansen +3 -- -- 76 71 -- -- 147
+T72 --     [XX]Thongchai Jaidee +3 -- -- 70 77 -- -- 147
+T72 --     [XX]Graeme McDowell +3 -- -- 76 71 -- -- 147
+T72 --     [XX]Troy Pare (CP) +3 -- -- 73 74 -- -- 147
+T72 --     [XX]Rory Sabbatini +3 -- -- 76 71 -- -- 147
+T72 --     [XX]John Senden   +3 -- -- 77 70 -- -- 147
+T72 --     [XX]Vaughn Taylor   +3 -- -- 73 74 -- -- 147
+T72 --     [XX]Scott Verplank   +3 -- -- 74 73 -- -- 147
+T72 --     [XX]Stephen Ames +4 -- -- 71 77 -- -- 148
+T72 --     [XX]Ben Curtis   +4 -- -- 73 75 -- -- 148
+T72 --     [XX]Miguel Angel Jimenez +4 -- -- 75 73 -- -- 148
+T72 --     [XX]Mitch Lowe (CP) +4 -- -- 71 77 -- -- 148
+T72 --     [XX]Alvaro Quiros +4 -- -- 74 74 -- -- 148
+T72 --     [XX]Justin Rose +4 -- -- 74 74 -- -- 148
+T72 --     [XX]Jimmy Walker   +4 -- -- 71 77 -- -- 148
+T72 --     [XX]Mike Weir   +4 -- -- 74 74 -- -- 148
+T72 --     [XX]Danny Willett   +4 -- -- 74 74 -- -- 148
+T72 --     [XX]Y.E. Yang +4 -- -- 72 76 -- -- 148
+T72 --     [XX]Ricky Barnes +5 -- -- 75 74 -- -- 149
+T72 --     [XX]Jason Bohn   +5 -- -- 77 72 -- -- 149
+T72 --     [XX]Angel Cabrera   +5 -- -- 72 77 -- -- 149
+T72 --     [XX]Luke Donald   +5 -- -- 72 77 -- -- 149
+T72 --     [XX]Hiroyuki Fujita   +5 -- -- 74 75 -- -- 149
+T72 --     [XX]Anthony Kim +5 -- -- 74 75 -- -- 149
+T72 --     [XX]Derek Lamely +5 -- -- 77 72 -- -- 149
+T72 --     [XX]Geoff Ogilvy   +5 -- -- 74 75 -- -- 149
+T72 --     [XX]Kevin Sutherland   +5 -- -- 74 75 -- -- 149
+T72 --     [XX]Charlie Wi   +5 -- -- 74 75 -- -- 149
+T72 --     [XX]Soren Hansen   +6 -- -- 77 73 -- -- 150
+T72 --     [XX]Trevor Immelman +6 -- -- 74 76 -- -- 150
+T72 --     [XX]Ryo Ishikawa +6 -- -- 76 74 -- -- 150
+T72 --     [XX]Shane Lowry +6 -- -- 71 79 -- -- 150
+T72 --     [XX]Bill Lunde   +6 -- -- 76 74 -- -- 150
+T72 --     [XX]George McNeill +6 -- -- 75 75 -- -- 150
+T72 --     [XX]Sean O'Hair +6 -- -- 75 75 -- -- 150
+T72 --     [XX]Scott Hebert (CP) +7 -- -- 75 76 -- -- 151
+T72 --     [XX]Tetsuji Hiratsuka +7 -- -- 74 77 -- -- 151
+T72 --     [XX]Matt Jones   +7 -- -- 74 77 -- -- 151
+T72 --     [XX]Sonny Skinner (CP) +7 -- -- 73 78 -- -- 151
+T72 --     [XX]Oliver Wilson +7 -- -- 76 75 -- -- 151
+T72 --     [XX]Danny Balin (CP) +8 -- -- 75 77 -- -- 152
+T72 --     [XX]Ross Fisher   +8 -- -- 78 74 -- -- 152
+T72 --     [XX]Stu Ingraham (CP) +8 -- -- 77 75 -- -- 152
+T72 --     [XX]Koumei Oda +8 -- -- 78 74 -- -- 152
+T72 --     [XX]Mike Small (CP) +8 -- -- 78 74 -- -- 152
+T72 --     [XX]Ryan Benzel (CP) +9 -- -- 79 74 -- -- 153
+T72 --     [XX]Kris Blanks   +9 -- -- 73 80 -- -- 153
+T72 --     [XX]Paul Goydos   +9 -- -- 80 73 -- -- 153
+T72 --     [XX]Tim Petrovic +9 -- -- 75 78 -- -- 153
+T72 --     [XX]Cameron Beckman +10 -- -- 79 75 -- -- 154
+T72 --     [XX]Kyle Flinton (CP) +10 -- -- 76 78 -- -- 154
+T72 --     [XX]Mark Brooks +11 -- -- 80 75 -- -- 155
+T72 --     [XX]David Hutsell (CP) +11 -- -- 75 80 -- -- 155
+T72 --     [XX]Rob Moss   +11 -- -- 78 77 -- -- 155
+T72 --     [XX]Rich Steinmetz (CP) +11 -- -- 75 80 -- -- 155
+T72 --     [XX]Henrik Stenson   +11 -- -- 80 75 -- -- 155
+T72 --     [XX]Steve Marino   +12 -- -- 74 82 -- -- 156
+T72 --     [XX]Robert McClellan (CP) +12 -- -- 75 81 -- -- 156
+T72 --     [XX]Jason Schmuhl (CP) +12 -- -- 82 74 -- -- 156
+T72 --     [XX]Bruce Smith (CP) +12 -- -- 81 75 -- -- 156
+T72 --     [XX]Chip Sullivan (CP) +14 -- -- 83 75 -- -- 158
+T72 --     [XX]Keith Ohr (CP) +15 -- -- 78 81 -- -- 159
+T72 --     [XX]Corey Pavin   +15 -- -- 79 80 -- -- 159
+T72 --     [XX]Mark Sheftic (CP) +17 -- -- 82 79 -- -- 161
+T72 --     [XX]Colin Montgomerie   +18 -- -- 79 83 -- -- 162
+T72 --     [XX]Ian Poulter -- -- -- -- -- -- -- -
+T72 --     [XX]John Daly -- -- -- -- -- -- -- -
+

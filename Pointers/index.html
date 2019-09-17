@@ -1,0 +1,964 @@
+<title>CS140 Lecture notes -- Pointers</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Pointers</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>~jplank/cs140/notes/Pointers</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Pointers>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Pointers</b></a>
+<LI> Last modification date: <i>
+Wed Feb  5 22:45:15 EST 2014
+</i>
+<hr>
+
+<h1>Pointers, new and delete</h1>
+
+Pointers are typically confusing to students when they first learn them.
+For better or worse, the standard template library in C++ lets you write
+some very powerful programs without having to even acknowledge that 
+that pointers exist.  However, pointers are fundamental and important.
+The main reason is that often you want to have a piece of data that is
+stored by multiple data structures.  And you want the data structures
+to reference the same piece of data instead of each data structure
+having its own copy.  This is why pointers are important.
+<p>
+You declare that a variable is a pointer to a data type with the asterisk.
+For example, if I want the variable <b>ip</b> to point to an integer, I
+declare it as:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+int *ip;
+</pre></td></table></center><p>
+
+The pointer itself is a four or eight byte piece of data.  For now, think
+of that data as being an arrow that points to other data.  In the above
+code, it points to an integer.
+<p>
+You can set a pointer's value by having it point to a piece of 
+data that already exists.  You do that using the ampersand.  
+When you want to reference what a pointer points to, you use
+the asterisk.  For
+example, the program
+<b><a href=pointer_mess_1.cpp>pointer_mess_1.cpp</a></b>
+has the pointer <b>ip</b> point to the integer <b>i</b>, and
+then does some setting and printing of that integer:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+#include &lt;cctype&gt;
+using namespace std;
+
+main()
+{
+  int i;
+  int *ip1;
+
+  ip1 = &i;
+
+  i = 5;
+  printf("i: %2d    *ip1: %2d\n", i, *ip1);
+
+  *ip1 = 10;
+  printf("i: %2d    *ip1: %2d\n", i, *ip1);
+
+  i = 15;
+  printf("i: %2d    *ip1: %2d\n", i, *ip1);
+}
+</pre></td></table></center><p>
+
+When we run it, we see the following output:
+
+<pre>
+UNIX> <font color=darkred><b>pointer_mess_1</b></font>
+i:  5    *ip1:  5
+i: 10    *ip1: 10
+i: 15    *ip1: 15
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+I'll try to illustrate this with pictures below.  When you first declare <b>i</b>
+and <b>ip</b>, that allocates space for them.  Setting <b>ip</b> to be <b>&amp;i</b>
+has <b>ip</b> "point" to <b>i</b>.  Then, when you set <b>i</b> or <b>*ip</b>, it
+sets the integer stored in <b>i</b>.  For that reason, printing <b>i</b> or <b>*ip</b>
+prints the same value:
+
+<p><center><table border=3><td><img src=pm1.jpg width=450></td></table></center><p>
+
+The program 
+<b><a href=pointer_mess_2.cpp>pointer_mess_2.cpp</a></b>
+is a little more complex:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+main()
+{
+  int i;
+  int *ip1, *ip2;
+
+  ip1 = &i;
+  i = 5;
+  printf("i: %2d    *ip1: %2d\n", i, *ip1);
+
+  ip1 = new int;
+  *ip1 = 10;
+  printf("i: %2d    *ip1: %2d\n", i, *ip1);
+
+  ip1 = new int;
+  *ip1 = 15;
+  printf("i: %2d    *ip1: %2d\n", i, *ip1);
+
+  ip2 = ip1;
+  *ip2 = 20;
+  printf("i: %2d    *ip1: %2d     *ip2: %2d\n", i, *ip1, *ip2);
+
+  ip1 = new int;
+  *ip1 = 25;
+  printf("i: %2d    *ip1: %2d     *ip2: %2d\n", i, *ip1, *ip2);
+
+  delete ip1;
+  printf("i: %2d    *ip1: %2d     *ip2: %2d\n", i, *ip1, *ip2);
+}
+</pre></td></table></center><p>
+
+This program has two pointers, <b>ip1</b> and <b>ip2</b>.  
+The first statements are the same as the previous program -- <b>ip</b>
+is set to be <b>&amp;i</b> and then <b>i</b> is set to five:
+
+<p><center><table border=3><td><img src=pm2a.jpg width=450></td></table></center><p>
+
+In the next set of statements, we call <b>new</b>.  This creates a new integer
+and has <b>ip1</b> point to it.  This is called "allocating memory."  
+This memory is guaranteed to exist until either the program ends, or 
+you explicitly call <b>delete</b> on the pointer.  That makes it different
+from local variables or procedure parameters which are created when a procedure
+starts running and is reclaimed when the procedure ends.
+Here's a picture -- you should see why the <b>printf()</b> statement prints out
+<b>i</b> as 5, 
+and 
+<b>*ip1</b> as 10.
+
+<p><center><table border=3><td><img src=pm2b.jpg width=450></td></table></center><p>
+
+In the next set of statements, we call <b>new</b> again and get the following picture:
+
+<p><center><table border=3><td><img src=pm2c.jpg width=450></td></table></center><p>
+
+Printing out <b>i</b> and <b>*ip1</b> yields 5 and 15.  However, you'll note that
+the integer that holds 10 has nothing pointing to it.  This is called a <i>memory 
+leak</i>, because that memory will not be deallocated until the program ends,
+and no part of the program can access it.  Memory leaks are things that you want
+to avoid, especially when you're writing programs that will run for a long 
+time (like a web browser or editor).  
+
+<p>
+
+The next statements have <b>ip2</b> equal <b>ip1</b>.  In other words, they
+point to the same integer.  Thus, when you change <b>*ip2</b> to 20, then
+both <b>*ip2</b> and <b>*ip1</b> equal 20:
+
+<p><center><table border=3><td><img src=pm2d.jpg width=450></td></table></center><p>
+
+Now we call <b>new</b> again, so that <b>ip1</b> and <b>ip2</b> point to different
+integers.  This is not a memory leak, because we can still access <b>ip2</b>.
+Printing <b>i</b>, <b>*ip1</b> and <b>*ip2</b> all print different values.
+
+<p><center><table border=3><td><img src=pm2e.jpg width=450></td></table></center><p>
+
+Finally, I call <b>delete ip1</b>.  This releases the integer so that the memory
+can be reused by subsequent <b>new</b> calls.  You'll note that I still print out
+<b>*ip1</b> -- the results of this may differ from machine to machine.  It
+might print out the old value because the memory hasn't been reused, or
+something else might happen.  This is a source of bugs that are extremely difficult
+to track, and the compiler usually won't helpful.  This is another reason why
+students hate pointers -- they can get you into trouble.  Regardless, you 
+need to learn and understand them.
+
+<p><center><table border=3><td><img src=pm2f.jpg width=450></td></table></center><p>
+
+Here's the output:
+
+<pre>
+UNIX> <font color=darkred><b>pointer_mess_2</b></font>
+i:  5    *ip1:  5
+i:  5    *ip1: 10
+i:  5    *ip1: 15
+i:  5    *ip1: 20     *ip2: 20
+i:  5    *ip1: 25     *ip2: 20
+i:  5    *ip1: 25     *ip2: 20
+UNIX> 
+</pre>
+
+<hr>
+<h2>You can point to vectors</h2>
+
+The program
+<b><a href=pointer_mess_3.cpp>pointer_mess_3.cpp</a></b>
+is more complex.  Instead of having pointers to integers, this one deals
+with pointers to vectors.  
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+typedef vector &lt;int&gt; IVec;
+
+class VP {
+  public:
+    IVec iv;
+};
+
+main()
+{
+  IVec iv;
+  IVec *ivp;
+  vector &lt;IVec *&gt; *ivpp;
+  int i, j;
+  VP *vp;
+
+  for (i = 0; i &lt; 10; i++) iv.push_back(lrand48()%100);
+
+  for (i = 0; i &lt; iv.size(); i++) printf("%2d ", iv[i]); printf("\n");
+
+  ivp = &iv;
+  for (i = 0; i &lt; ivp-&gt;size(); i++) printf("%2d ",ivp-&gt;at(i)); printf("\n");
+
+  ivp-&gt;resize(4);
+  for (i = 0; i &lt; iv.size(); i++) printf("%2d ", iv[i]); printf("\n");
+
+  ivpp = new vector &lt;IVec *&gt;;
+  ivpp-&gt;push_back(ivp);
+  ivpp-&gt;push_back(ivp);
+
+  for (i = 0; i &lt; ivpp-&gt;size(); i++) {
+    printf("Element %d of ivpp points to the vector:", i);
+    ivp = ivpp-&gt;at(i);
+    for (j = 0; j &lt; ivp-&gt;size(); j++) printf(" %2d", ivp-&gt;at(j)); printf("\n");
+  }
+
+  iv[0] = -50;
+  for (i = 0; i &lt; ivpp-&gt;size(); i++) {
+    printf("Element %d of ivpp points to the vector:", i);
+    ivp = ivpp-&gt;at(i);
+    for (j = 0; j &lt; ivp-&gt;size(); j++) printf(" %2d", ivp-&gt;at(j)); printf("\n");
+  }
+
+  vp = new VP;
+  for (i = 0; i &lt; 10; i++) vp-&gt;iv.push_back(lrand48()%100);
+  for (i = 0; i &lt; vp-&gt;iv.size(); i++) printf("%2d ", vp-&gt;iv[i]); printf("\n");
+}
+</pre></td></table></center><p>
+
+I'll illustrate again.  First, we set <b>iv</b> to be a vector of 10 random
+integers.  Then we set <b>ivp</b> to point to <b>iv</b> and we print it out.
+I use the <b>at()</b> method instead of square brackets just because it looks
+better.  Instead of <b>ivp->at(i)</b>, I could have done <b>(*ip)[i]</b>, but
+I don't like how that looks.  
+<p>
+In case you've forgotten from CS102/ECE206, doing <b>ivp->at()</b> is equivalent
+to <b>(*ivp).at()</b>.  It looks nicer.
+
+<p><center><table border=3><td><img src=pm3a.jpg width=450></td></table></center><p>
+
+Next, I call <b>ivp->resize(4)</b>.  As you can see, that resizes the vector
+to which <b>ivp</b> points, which ends up resizing <b>iv</b>:
+
+<p><center><table border=3><td><img src=pm3b.jpg width=260></td></table></center><p>
+
+The next part of the code will probably confuse you at first, but work through it.
+<b>Ivpp</b> is a pointer to a vector.  The elements of the vector are pointers to 
+integer vectors.  The <b>new</b> statement and two <b>push_back()</b> statements
+create a new vector, which has two elements.  Each of them point to <b>iv</b>:
+
+<p><center><table border=3><td><img src=pm3c.jpg width=266></td></table></center><p>
+
+After printing <b>ivpp</b> we set <b>iv[0]</b> to -50.  Thus, when we print out
+<b>ivpp</b> as before, both lines start with -50, since they point to the
+same thing:
+
+<p><center><table border=3><td><img src=pm3d.jpg width=266></td></table></center><p>
+
+The final piece of code involving <b>vp</b> shows how I like to handle pointers
+to vectors.  I usually like to bundle them up in a <b>class</b> or <b>struct</b>,
+so that I don't have to use <b>at()</b> and it still looks nice.
+<p>
+Here's the output.  As with the previous program, make sure you understand
+<i>every line of output</i> and why it happens.
+
+<pre>
+UNIX> <font color=darkred><b>pointer_mess_3</b></font>
+18 87 91 23 17 65 14 97 19 66 
+18 87 91 23 17 65 14 97 19 66 
+18 87 91 23 
+Element 0 of ivpp points to the vector: 18 87 91 23
+Element 1 of ivpp points to the vector: 18 87 91 23
+Element 0 of ivpp points to the vector: -50 87 91 23
+Element 1 of ivpp points to the vector: -50 87 91 23
+92 54  8 54 50 56 68 19 61 39 
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h2>Sorting using the STL</h2>
+
+The standard template library supports sorting of a vector.  You need
+to include &lt;algorithm&gt;.
+Then, to sort <b>v</b>, just call <b>sort(v.begin(), v.end())</b>,
+as in <b><a href=sortlines1.cpp>sortlines1.cpp</a></b>.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+main()
+{
+  vector &lt;string&gt; lines;
+  string s;
+  int i;
+
+  while (getline(cin, s)) lines.push_back(s);
+
+  sort(lines.begin(), lines.end());
+
+  for (i = 0; i &lt; lines.size(); i++) cout &lt;&lt; lines[i] &lt;&lt; endl;
+}
+</pre></td></table></center><p>
+
+By default, strings are sorted lexicographically and numbers numerically (duh):
+
+<pre>
+UNIX> <font color=darkred><b>cat input.txt</b></font>
+Sydney Ingratiate
+Arianna Exonerate
+Sarah Charcoal
+Alexis Kaitlyn Inferential
+Cole Hunter Ourselves
+Joseph Dilatory
+Julian Fluvial
+Mia Leah Skied
+Oliver Celebrate
+Liam Trisyllable
+UNIX> <font color=darkred><b>sortlines1 < input.txt</b></font>
+Alexis Kaitlyn Inferential
+Arianna Exonerate
+Cole Hunter Ourselves
+Joseph Dilatory
+Julian Fluvial
+Liam Trisyllable
+Mia Leah Skied
+Oliver Celebrate
+Sarah Charcoal
+Sydney Ingratiate
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+If you want to sort, but you don't want to use the default sorting mechanism,
+you can provide your own comparison function.  It should take two parameters
+of the same type as the vector and return a <b>bool</b>
+(true or false). It should return <b>true</b> if the first parameter is
+less than the second, and false otherwise.  Therefore, the
+following program 
+(<b><a href=sortlines2.cpp>sortlines2.cpp</a></b>)
+sorts standard input by the value of the second character 
+in each line:
+
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+bool string_compare(string s1, string s2)
+{
+  if (s1[1] &lt; s2[1]) return true;
+  return false;
+}
+
+main()
+{
+  vector &lt;string&gt; lines;
+  string s;
+  int i;
+
+  while (getline(cin, s)) lines.push_back(s);
+
+  sort(lines.begin(), lines.end(), string_compare);
+
+  for (i = 0; i &lt; lines.size(); i++) cout &lt;&lt; lines[i] &lt;&lt; endl;
+}
+</pre></td></table></center><p>
+
+I've highlighted the second characters in blue so that you can see that
+they are indeed sorted:
+
+<pre>
+UNIX> <font color=darkred><b>sortlines2 < input.txt</b></font>
+S<font color=blue><b>a</b></font>rah Charcoal
+M<font color=blue><b>i</b></font>a Leah Skied
+L<font color=blue><b>i</b></font>am Trisyllable
+A<font color=blue><b>l</b></font>exis Kaitlyn Inferential
+O<font color=blue><b>l</b></font>iver Celebrate
+C<font color=blue><b>o</b></font>le Hunter Ourselves
+J<font color=blue><b>o</b></font>seph Dilatory
+A<font color=blue><b>r</b></font>ianna Exonerate
+J<font color=blue><b>u</b></font>lian Fluvial
+S<font color=blue><b>y</b></font>dney Ingratiate
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h2>Data Structures that Share Data using Pointers</h2>
+
+Your friend Zark Muckerberg comes to you, saying he's got an idea for an app that
+will replace Facebook.  It's called ``Bacefook'', and 
+it's going to be a huge hit and he's going to make a ton of money with it
+and he's going to buy a great car and expensive clothes with the money and he'll
+start making friends with movie stars and pro athletes and his life will be AWESOME!!!!
+You're going to get some of that money too, 
+because you're going to help him write the app.
+<p>
+The way that many apps work is diagrammed below:
+<p><center><table border=3><td><img src=Server-Pic.jpg></td></table></center><p>
+The app runs on people's phones, and then each app talks with a central server across
+the Internet (or via a cellular network) using a networking mechanism like TCP/IP 
+sockets.  You'll learn how to do that in CS360.
+The server contains all of the data that gets shared among the apps.  When one app 
+updates information, it is updated at the server so that the other apps may have 
+access to it.  It's a nice and simple way of getting everything to work.
+<p>
+The apps are written on the platform of the phone (e.g. IOS or Android).  The server, 
+though, is often a C++ program running on a Unix platform.  Now, Zark is going to 
+write the apps, and he wants you to write the server.
+<p>
+To start with, Bacefook is going to manage people, who have just four attributes:
+<OL>
+<LI> A name, which can be composed of any number of words.
+<LI> A mood, which can also be composed of any number of words.  If a person's mood is unspecified,
+  then it is "Neutral."
+<LI> Another person with whom they are in a relationship.  This attribute doesn't have to 
+     be set, and it doesn't have be reciprocated.
+<LI> A list of friends.  
+</OL>
+I don't think Bacefook looks much different than a really low budget Facebook, but what do
+I know?
+<p>
+You'd be surprised at how unsexy a server is -- very often, they read lines of text from
+their sockets, and write lines of text back to the sockets.  And they store data in 
+data structures that you'll learn about in this class.
+<p>
+What we're going to do is write a very primitive server for Zark's app.  Instead of using
+TCP/IP sockets, it's going to read from standard input and write to standard output.
+We're just going to pretend that standard input comes from cell phones, and standard output
+goes to cell phones.  Again, you'd be surprised at how close to reality this can be.
+<p>
+Our server is going to read lines of text.  It will read a "key," and then more information 
+in subsequent lines.  Here are the keys that it processes:
+
+<UL>
+<LI> "NEW-PERSON" -- This must be followed by a line that contains the person's name.
+The name can have any number of words.
+This adds the new person to our server's database.
+If that is successful, it will print "SUCCESSFUL" on standard output.  If unsuccessful
+(the person is in the database already), then it will print "UNSUCCESSFUL".
+<p>
+<LI> "MOOD" -- This is followed by two lines.  The first contains a person's name, and
+the second contains their mood.  The server finds the person and updates his or her mood.
+The server responds either "SUCCESSFUL" or "UNSUCCESSFUL".
+
+<p>
+<LI> "IN-RELATIONSHIP" -- This is followed by two lines, which are the names of two people
+in the database.  It registers the fact that the first person is in a relationship with the
+second person.
+Again, it will return "SUCCESSFUL" or "UNSUCCESSFUL".
+
+<p>
+<LI> "ADD-FRIEND" -- This is identical to "IN-RELATIONSHIP," except it adds the second person
+to the first person's friend list.
+
+<p>
+<LI> "QUERY" -- This is followed by a line of text, which is the name of a person.
+The output will be either "UNSUCCESSUL", or the following lines of text:
+<p>
+<UL>
+<LI> "QUERY SUCCESSFUL"
+<LI> "NAME <i>Name-or-person</i>"
+<LI> "MOOD <i>Mood</i>"
+<LI> "IN-RELATIONSHIP <i>Name</i> : <i>Mood</i>".  It only prints this line if the person
+ is in a relationship.  The mood is the mood of the other person.
+<LI> "FRIEND <i>Name</i> : <i>Mood</i>"  -- there is one of these for each friend.
+<LI> "END" - This makes it easy for Zark's program to know when the list of friends is over.
+</UL>
+</UL>
+
+
+<hr>
+<h2>bacefook_server.cpp</h2>
+Let's write this one together.
+The code is in <b><a href=bacefook_server.cpp>bacefook_server.cpp</a></b>, and it's
+pretty straightforward.  I've even commented it!
+The parts that I want you to pay attention to are the pointers.
+<h3>The two main data structures: A person, and the hash table</h3>
+<p>
+Each person is represented with an instance of the <b>Person</b> class, defined below:
+<p><center><table border=3 cellpadding=3><td><pre>
+class Person {
+  public:
+    string Name;
+    string Mood;
+    Person *InRelationship;
+    vector &lt;Person *&gt; Friends;
+};
+</pre></td></table></center><p>
+
+You'll note that <b>InRelationship</b> is a pointer to a person, and 
+<b>Friends</b> is a vector of pointers to people.  That allows you to access each person's
+data directly, and when it changes, you'll see the changes.
+<p>
+In reality, our "database" is a 
+hash table that is accessed by names.  We'll use <b>djbhash</b>
+as the hash function, and separate chaining to resolve collisions.  Each vector in the hash table
+will hold a pointer to an instance of a <b>Person</b> class.  When we first insert that person
+into the hash table, that's when we create the instance using <b>new</b>.
+<p>
+Take a look at the function <b>find_person()</b>.  It takes a name and a hash table,
+and finds the person with that name in the hash table.  If the person is there, it returns
+a pointer to the person.  If the person is not there, then it looks at the <b>add</b>
+parameter.  If that parameter is true, it creates a new person (with <b>new</b>), and inserts
+it into the hash table.  The person's <b>Mood</b> is "Neutral", and its <b>InRelationship</b>
+pointer is set to <b>NULL</b>.  That is a special pointer value that points to "nothing."
+If you try to dereference <b>NULL</b>, you'll get a segmentation violation.
+The person's friend list is empty automatically.  The person is returned.
+<p>
+If <b>add</b> is false, then <b>find_person()</b> simply returns <b>NULL</b>.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+typedef vector &lt;Person *&gt; PVec;
+
+Person *find_person(string &name, vector &lt;PVec&gt; &HT, int add)
+{
+  int h;
+  int i;
+  Person *p;
+
+  h = djb_hash(name) % HT.size();
+  for (i = 0; i &lt; HT[h].size(); i++) {
+    if (HT[h][i]-&gt;Name == name) return HT[h][i];
+  }
+  if (add) {
+    p = new Person;
+    p-&gt;Name = name;
+    p-&gt;Mood = "Neutral";
+    p-&gt;InRelationship = NULL;
+    HT[h].push_back(p);
+    return p;
+  } else {   
+    return NULL;
+  }
+}
+</pre></td></table></center><p>
+
+<h3>The basics of main()</h3>
+
+The <b>main()</b> routine takes the size of the hash table on the command line.  
+Then it sets up the hash table, and goes into an infinite loop reading lines of 
+text from standard input:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+main(int argc, char **argv)
+{
+  istringstream iss;         // For processing argv[1]
+  string n1, n2, mood;       // For reading in names and moods
+  Person *p, *p2;            // Pointers to people, that we manipulate or print.
+
+  int Table_Size;            // The table size is read from the command line.
+  vector &lt;PVec&gt; Hash_Table;  // The hash table.  
+                             // Entries are vectors because we use separate chaining
+
+  int i;                     // Temporary variable
+  string s;                  // Temporary variable
+
+  // --------------------------------------------------
+  // Process the command line and create the hash table.
+
+  if (argc != 2) {
+    cerr &lt;&lt; "usage: bacefook_server table-size\n";
+    exit(1);
+  }
+
+  iss.clear();
+  iss.str(argv[1]);
+  if (!(iss &gt;&gt; Table_Size) || Table_Size &lt;= 0) {
+    cerr &lt;&lt; "usage: bacefook_server table-size\n";
+    cerr &lt;&lt; "bad table-size\n";
+    exit(1);
+  }
+ 
+  Hash_Table.resize(Table_Size);
+
+  // --------------------------------------------------
+  // Process the input from standard input.
+
+  while (getline(cin, s)) {
+</pre></td></table></center><p>
+
+Now we process standard input.  Let's start with "NEW-PERSON".  You'll note, when
+standard input ends, we simply exit the program.  When we read the person's name,
+we call <b>find_person()</b> to look the person up in the hash table.  We set 
+<b>add</b> to zero, so that if the person is not there, <b>find_person()</b> 
+returns <b>NULL</b>, and we can print "UNSUCCESSFUL."  Otherwise, we call
+<b>find_person()</b> with <b>add</b> set to one to create the person 
+and put him/her into the table:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    if (s == "NEW-PERSON") {
+      if (!getline(cin, n1)) exit(1);
+      p = find_person(n1, Hash_Table, 0);
+      if (p != NULL) {
+        printf("UNSUCCESSFUL\n");
+      } else {
+        p = find_person(n1, Hash_Table, 1);
+        printf("SUCCESSFUL\n");
+      }
+</pre></td></table></center><p>
+
+Let's test what we've done so far.  At the very least, we should be able to add people
+to the hash table, and if we try to add the same person twice, we'll be unsuccessful.
+
+<pre>
+UNIX> <font color=darkred><b>bacefook_server 100</b></font>
+<font color=darkred><b>NEW-PERSON</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+<font color=darkred><b>NEW-PERSON</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+SUCCESSFUL
+<font color=darkred><b>NEW-PERSON</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+UNSUCCESSFUL
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> 
+</pre>
+
+Let's set moods.  This is straightforward.  To test it, let's write the part 
+of "QUERY" that prints out the name and mood:
+
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    } else if (s == "MOOD") {
+      if (!getline(cin, n1)) exit(1);
+      if (!getline(cin, mood)) exit(1);
+      p = find_person(n1, Hash_Table, 0);
+      if (p == NULL) {
+        printf("UNSUCCESSFUL\n");
+      } else {
+        p-&gt;Mood = mood;
+        printf("SUCCESSFUL\n");
+      }
+
+    } else if (s == "QUERY") {
+      if (!getline(cin, n1)) exit(1);
+      p = find_person(n1, Hash_Table, 0);
+      if (p == NULL) {
+        printf("UNSUCCESSFUL\n");
+      } else {
+        printf("SUCCESSFUL\n");
+        printf("NAME %s\n", p-&gt;Name.c_str());
+        printf("MOOD %s\n", p-&gt;Mood.c_str());
+        printf("END\n");
+      }
+</pre></td></table></center><p>
+
+Here we'll change Scarlett's mood:
+
+<pre>
+UNIX> <font color=darkred><b>bacefook_server 100</b></font>
+<font color=darkred><b>NEW-PERSON</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+NAME Scarlett O'Hara
+MOOD Neutral
+END
+<font color=darkred><b>MOOD</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+<font color=darkred><b>Impetuous</b></font>
+SUCCESSFUL
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+NAME Scarlett O'Hara
+MOOD Impetuous
+END
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+Alright -- time for "IN-RELATIONSHIP".  Here, we get pointers to the two people,
+and we set <b>p->InRelationship</b> to <b>p2</b>.  This is where it is important to have 
+a pointer.  If we didn't use pointers in the hash table, and if <b>p->InRelationship</b>
+were a <b>Person</b> instead of a pointer to a <b>Person</b>, then setting <b>p->InRelationship</b>
+would make a <i>copy</i> of whatever is in the hash table.  
+<p>
+Here's the code.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    } else if (s == "IN-RELATIONSHIP") {
+      if (!getline(cin, n1)) exit(1);
+      if (!getline(cin, n2)) exit(1);
+      p = find_person(n1, Hash_Table, 0);
+      p2 = find_person(n2, Hash_Table, 0);
+      if (p == NULL || p2 == NULL) {
+        printf("UNSUCCESSFUL\n");
+      } else {
+        p-&gt;InRelationship = p2;
+        printf("SUCCESSFUL\n");
+      }
+</pre></td></table></center><p>
+
+And here's the relevant line of "QUERY" -- note how we test 
+<b>p->InRelationship</b> to make sure that we only print out the relationship
+when it has been explicitly set:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+        if (p-&gt;InRelationship != NULL) {
+          printf("IN-RELATIONSHIP %s : %s\n", p-&gt;InRelationship-&gt;Name.c_str(),
+                    p-&gt;InRelationship-&gt;Mood.c_str());
+        }
+</pre></td></table></center><p>
+To test this, let's change Scarlett's mood after Rhett has set his <b>InRelationship</b>.
+Because we are using pointers, you see the mood change when you query Rhett:
+
+<pre>
+UNIX> <font color=darkred><b>bacefook_server 100</b></font>
+<font color=darkred><b>NEW-PERSON</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+<font color=darkred><b>NEW-PERSON</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+SUCCESSFUL
+<font color=darkred><b>IN-RELATIONSHIP</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+SUCCESSFUL
+NAME Rhett Butler
+MOOD Neutral
+IN-RELATIONSHIP Scarlett O'Hara : Neutral
+END
+<font color=darkred><b>MOOD</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+<font color=darkred><b>Impetuous</b></font>
+SUCCESSFUL
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+SUCCESSFUL
+NAME Rhett Butler
+MOOD Neutral
+IN-RELATIONSHIP Scarlett O'Hara : Impetuous
+END
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX>
+</pre>
+
+Finally, let's add friends.  The code for this is very similar to "IN-RELATIONSHIP":
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    } else if (s == "ADD-FRIEND") {
+      if (!getline(cin, n1)) exit(1);
+      if (!getline(cin, n2)) exit(1);
+      p = find_person(n1, Hash_Table, 0);
+      p2 = find_person(n2, Hash_Table, 0);
+      if (p == NULL || p2 == NULL) {
+        printf("UNSUCCESSFUL\n");
+      } else {
+        p-&gt;Friends.push_back(p2);
+        printf("SUCCESSFUL\n");
+      }
+</pre></td></table></center><p>
+
+And here's the code to print out friends in "QUERY":
+
+<p><center><table border=3 cellpadding=3><td><pre>
+        for (i = 0; i &lt; p-&gt;Friends.size(); i++) {
+          printf("FRIEND %s : %s\n", p-&gt;Friends[i]-&gt;Name.c_str(),
+                    p-&gt;Friends[i]-&gt;Mood.c_str());
+</pre></td></table></center><p>
+
+Let's test this.  I'm going to do a moderate-sized example 
+of Margaret Mitchell's famous love triangle from <i>Gone With The Wind</i>.
+Afterwards, we're going to take a very detailed look at how memory and the various data structures
+are laid out.  I'm using a small hash table, because I want to be able to look at everything in 
+my pictures.
+<p>
+Go ahead and cut-and-paste the following into <b>bacefook_server 10</b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+NEW-PERSON
+Scarlett O'Hara
+NEW-PERSON
+Rhett Butler
+NEW-PERSON
+Ashley Wilkes
+NEW-PERSON
+Melanie Hamilton</pre></td><td valign=top><pre>
+ADD-FRIEND
+Scarlett O'Hara
+Melanie Hamilton
+ADD-FRIEND
+Scarlett O'Hara
+Ashley Wilkes
+ADD-FRIEND
+Melanie Hamilton
+Scarlett O'Hara</pre></td><td valign=top><pre>
+IN-RELATIONSHIP
+Rhett Butler
+Scarlett O'Hara
+IN-RELATIONSHIP
+Scarlett O'Hara
+Rhett Butler
+IN-RELATIONSHIP
+Ashley Wilkes
+Melanie Hamilton
+IN-RELATIONSHIP
+Melanie Hamilton
+Ashley Wilkes</pre></td><td valign=top><pre>
+MOOD
+Rhett Butler
+Amorous
+MOOD
+Scarlett O'Hara
+Petulant, Angry
+MOOD
+Ashley Wilkes
+Limpid and Wimpy
+MOOD
+Melanie Hamilton
+Pious
+
+</pre></td></table></center><p>
+
+If we do some queries on this state, we see all of those inter-relationships:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+SUCCESSFUL
+NAME Scarlett O'Hara
+MOOD Petulant, Angry
+IN-RELATIONSHIP Rhett Butler : Amorous
+FRIEND Melanie Hamilton : Pious
+FRIEND Ashley Wilkes : Limpid and Wimpy
+END
+
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+SUCCESSFUL
+NAME Rhett Butler
+MOOD Amorous
+IN-RELATIONSHIP Scarlett O'Hara : Petulant, Angry
+END
+
+<font color=darkred><b>QUERY </b></font>
+<font color=darkred><b>Ashley Wilkes</b></font>
+SUCCESSFUL
+NAME Ashley Wilkes
+MOOD Limpid and Wimpy
+IN-RELATIONSHIP Melanie Hamilton : Pious
+END
+
+<font color=darkred><b>QUERY</b></font>
+<font color=darkred><b>Melanie Hamilton</b></font>
+SUCCESSFUL
+NAME Melanie Hamilton
+MOOD Pious
+IN-RELATIONSHIP Ashley Wilkes : Limpid and Wimpy
+FRIEND Scarlett O'Hara : Petulant, Angry
+END
+</pre></td></table></center><p>
+
+Now, suppose we want to see what all of these structures look in memory.  
+First, open another window and run <b>djbhash</b> from the
+hashing lecture notes:
+
+<pre>
+UNIX> <font color=darkred><b>djbhash</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+1585424537
+<font color=darkred><b>Rhett Butler</b></font>
+3831887322
+<font color=darkred><b>Ashley Wilkes</b></font>
+2242265818
+<font color=darkred><b>Melanie Hamilton</b></font>
+1839425308
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX>
+</pre>
+
+That means that "Scarlett O'Hara" goes into hash table entry 7, 
+"Rhett Butler" goes into hash table entry 2, and both 
+"Ashley Wilkes" and "Melanie Hamilton" go into hash table entry 8.  
+Armed with that knowledge, take a look at the hash table, the four <b>Person</b>
+class instances, and all of their pointers.  There are three places where
+pointers are used:
+<p>
+<OL>
+<LI> From the hash table
+<LI> From <b>InRelationship</b>
+<LI> From the <b>Friends</b> vectors
+</OL>
+Each of these are colored with a different colored vector.   You should be able
+to account for every pointer in the picture.
+<p>
+<p><center><table border=3><td><img src=GWTW-1.jpg></td></table></center><p>
+
+Now, let's go back to the <b>bacefook_server</b> program, and change some things.
+We'll reflect what happens at the end of "Gone with the Wind" -- Melanie dies, 
+Scarlett professes her love to Ashley, Ashley dissolves into a weepy mess while
+he pronounces his everlasting love Melanie, and Rhett gets pissed:
+
+<pre>
+<font color=darkred><b>MOOD</b></font>
+<font color=darkred><b>Melanie Hamilton</b></font>
+<font color=darkred><b>Dead</b></font>
+SUCCESSFUL
+<font color=darkred><b>IN-RELATIONSHIP</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+<font color=darkred><b>Ashley Wilkes</b></font>
+SUCCESSFUL
+<font color=darkred><b>MOOD</b></font>
+<font color=darkred><b>Ashley Wilkes</b></font>
+<font color=darkred><b>Weepy and still loving Melanie</b></font>
+SUCCESSFUL
+<font color=darkred><b>MOOD </b></font>
+<font color=darkred><b>Rhett Butler</b></font>
+<font color=darkred><b>Pissed</b></font>
+SUCCESSFUL
+<font color=darkred><b>MOOD</b></font>
+<font color=darkred><b>Scarlett O'Hara</b></font>
+<font color=darkred><b>Jilted and angry</b></font>
+SUCCESSFUL
+</pre>
+
+If you query them, you'll see all of those changes reflected.  Here's what the 
+data structures look like now.  Again, you should double-check them.
+
+<p><center><table border=3><td><img src=GWTW-2.jpg></td></table></center><p>
+

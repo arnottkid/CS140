@@ -1,0 +1,562 @@
+   Wyndham Championship
+   Monday Aug 15 - Sunday Aug 21, 2011
+   Sedgefield Country Club · Greensboro, NC
+   [tourn_logo.gif]
+     * Purse: $5.1 million
+     * Winning Share: $918,000
+     * FedExCup Points: 500
+     * [30]http://www.wyndhamchampionship.com/
+
+   2010 LEADERBOARD
+   [31][CDW_88x31.gif]
+   Round 4
+   [32]Arjun Atwal  Today -3 To Par -20
+   Stats            Avg   Rank
+   Driving Distance 300.4 14
+   Greens in Reg    76.4  T44
+   Putts Per GIR    1.636 T3
+   Last Updated: August 24, 2010 - 1:00 AM[33]Customize the Leaderboard
+
+   Conditions: Fair·Temperature: 41F
+
+   [34]Presented by Telvent/DTN
+
+   Last Updated: August 24, 2010 - 1:00 AM
+   FC  Pos. Start Player                         Today Thru To Par R1 R2 R3 R4 Total
+    -   1     1   [35]Arjun Atwal (SF)            -3    F    -20   61 67 65 67  260
+   98   2    T5   [36]David Toms (SF)             -6    F    -19   64 68 65 64  261
+   163  T3   T19  [37]John Mallinger (SF)         -8    F    -18   65 67 68 62  262
+   102  T3   T19  [38]Michael Sim (SF)            -8    F    -18   66 68 66 62  262
+   79   T3   T5   [39]John Rollins (SF)           -5    F    -18   64 65 68 65  262
+   109  T3   T5   [40]Justin Leonard (SF)         -5    F    -18   68 63 66 65  262
+   54   7    T2   [41]Lucas Glover (SF)           -3    F    -17   64 65 67 67  263
+   116  T8   T29  [42]Webb Simpson (SF)           -7    F    -16   66 64 71 63  264
+   105  T8   T19  [43]Chris Riley (SF)            -6    F    -16   67 69 64 64  264
+   45   T8   T5   [44]Brandt Snedeker (SF)        -3    F    -16   63 65 69 67  264
+   140  T8   T2   [45]Scott Piercy (SF)           -2    F    -16   66 66 64 68  264
+   41  T12   T48  [46]Fredrik Jacobson (SF)       -8    F    -15   67 67 69 62  265
+   153 T12   T29  [47]Joe Durant (SF)             -6    F    -15   68 67 66 64  265
+   85  T12   T19  [48]Tim Petrovic (SF)           -5    F    -15   66 68 66 65  265
+   162 T12   T5   [49]Will MacKenzie (SF)         -2    F    -15   68 64 65 68  265
+   93  T12   T5   [50]Garrett Willis (SF)         -2    F    -15   66 66 65 68  265
+   142 T12   T2   [51]Scott McCarron (SF)         -1    F    -15   65 68 63 69  265
+   49  T18   T42  [52]Marc Leishman (SF)          -6    F    -14   66 66 70 64  266
+   125 T18   T29  [53]Michael Letzig (SF)         -5    F    -14   66 68 67 65  266
+   96  T18   T29  [54]Josh Teater (SF)            -5    F    -14   66 68 67 65  266
+   138 T18   T29  [55]Aron Price (SF)             -5    F    -14   67 69 65 65  266
+   174 T18   T19  [56]Tim Herron (SF)             -4    F    -14   67 64 69 66  266
+   166 T18   T19  [57]Jeev Milkha Singh (SF)      -4    F    -14   64 68 68 66  266
+   78  T18   T19  [58]Tom Gillis (SF)             -4    F    -14   69 67 64 66  266
+   114 T18   T15  [59]Kevin Streelman (SF)        -3    F    -14   64 65 70 67  266
+   149 T18   T11  [60]Richard S. Johnson (SF)     -2    F    -14   67 66 65 68  266
+   42  T18   T11  [61]Kevin Na (SF)               -2    F    -14   66 71 61 68  266
+   176 T28   T60  [62]Kirk Triplett (SF)          -7    F    -13   69 68 67 63  267
+   87  T28   T42  [63]Chad Collins (SF)           -5    F    -13   68 67 67 65  267
+   141 T28   T29  [64]James Driscoll (SF)         -4    F    -13   67 67 67 66  267
+   120 T28   T29  [65]Bob Estes (SF)              -4    F    -13   66 70 65 66  267
+   28  T28   T15  [66]Bill Haas (SF)              -2    F    -13   69 65 65 68  267
+   123 T28   T11  [67]Andres Romero (SF)          -1    F    -13   66 67 65 69  267
+   160 T34   T60  [68]Brett Wetterich (SF)        -6    F    -12   70 66 68 64  268
+   64  T34   T60  [69]J.J. Henry (SF)             -6    F    -12   71 66 67 64  268
+   62  T34   T48  [70]Jason Dufner (SF)           -5    F    -12   66 69 68 65  268
+   121 T34   T19  [71]Jonathan Byrd (SF)          -2    F    -12   66 66 68 68  268
+   127 T34   T19  [72]Jeff Quinney (SF)           -2    F    -12   66 70 64 68  268
+   94  T34   T15  [73]Jerry Kelly (SF)            -1    F    -12   66 67 66 69  268
+   101 T34   T11  [74]Martin Laird (SF)            E    F    -12   67 65 66 70  268
+   205 T41   T68  [75]John Daly (SF)              -6    F    -11   68 68 69 64  269
+   210 T41   T60  [76]Jason Gore (SF)             -5    F    -11   65 69 70 65  269
+   69  T41   T48  [77]D.J. Trahan (SF)            -4    F    -11   69 68 66 66  269
+   134 T41   T42  [78]Mark Wilson (SF)            -3    F    -11   68 67 67 67  269
+   168 T41   T29  [79]Brian Stuard (SF)           -2    F    -11   69 66 66 68  269
+   184 T41   T29  [80]Garth Mulroy (SF)           -2    F    -11   68 68 65 68  269
+    -  T41   T29  [81]Drew Weaver (SF)            -2    F    -11   67 70 64 68  269
+   80  T41   T19  [82]Alex Prugh (SF)             -1    F    -11   69 64 67 69  269
+    -  T49   T48  [83]Jerry Richardson, Jr. (SF)  -3    F    -10   70 66 67 67  270
+   137 T49   T48  [84]Troy Merritt (SF)           -3    F    -10   67 70 66 67  270
+   104 T49   T42  [85]Briny Baird (SF)            -2    F    -10   66 68 68 68  270
+   186 T49   T15  [86]Glen Day (SF)                1    F    -10   67 67 65 71  270
+   190 T53   T68  [87]Kent Jones (SF)             -4    F     -9   66 70 69 66  271
+   211 T53   T68  [88]Frank Lickliter II (SF)     -4    F     -9   70 67 68 66  271
+   182 T53   T60  [89]Rocco Mediate (SF)          -3    F     -9   70 67 67 67  271
+   57  T53   T48  [90]Spencer Levin (SF)          -2    F     -9   65 67 71 68  271
+   145 T53   T48  [91]Paul Stankowski (SF)        -2    F     -9   67 67 69 68  271
+   89  T53   T48  [92]Aaron Baddeley (SF)         -2    F     -9   66 69 68 68  271
+   113 T53   T48  [93]Troy Matteson (SF)          -2    F     -9   68 67 68 68  271
+   76  T53   T42  [94]Boo Weekley (SF)            -1    F     -9   64 67 71 69  271
+   154 T53   T48  [95]Trevor Immelman (SF)        -2    F     -9   68 69 66 68  271
+   112 T53   T29  [96]Cameron Beckman (SF)         E    F     -9   67 69 65 70  271
+   175 T53   T29  [97]Greg Owen (SF)               E    F     -9   69 67 65 70  271
+   131  64   T29  [98]James Nitties (SF)           1    F     -8   67 68 66 71  272
+   170 T65   T68  [99]Mathias Gronberg (SF)       -2    F     -7   67 68 70 68  273
+   77  T65   T68  [100]Blake Adams (SF)           -2    F     -7   65 71 69 68  273
+   188 T65   T68  [101]Charles Warren (SF)        -2    F     -7   67 69 69 68  273
+   171 T65   T60  [102]Omar Uresti (SF)           -1    F     -7   69 66 69 69  273
+   99  T65   T60  [103]John Merrick (SF)          -1    F     -7   68 67 69 69  273
+   177 T65   T60  [104]Skip Kendall (SF)          -1    F     -7   66 70 68 69  273
+   56  T71   T77  [105]Steve Marino (SF)          -4    F     -6   69 65 74 66  274
+   143 T71   T48  [106]Chris DiMarco (SF)          1    F     -6   67 68 68 71  274
+   83  T71   T42  [107]Derek Lamely (SF)           2    F     -6   70 66 66 72  274
+   136  74   T48  [108]Michael Connell (SF)        2    F     -5   66 69 68 72  275
+   122 T75   T74  [109]Robert Garrigus (SF)        E    F     -4   69 66 71 70  276
+   68  T75   T74  [110]Kris Blanks (SF)            E    F     -4   69 68 69 70  276
+   181  77   T77  [111]Daniel Chopra (SF)         -1    F     -3   70 65 73 69  277
+   147  78   76   [112]Jay Williamson (SF)         3    F     E    65 70 72 73  280
+   The following players failed to make the Cut: -3
+   FC  Pos. Start Player                  Today Thru To Par R1 R2 R3 R4 Total
+   91   -    T79  [113]Jeff Maggert        --    --         68 70 -- --  138
+   130  -    T79  [114]Tom Pernice, Jr.    --    --         68 70 -- --  138
+   118  -    T79  [115]Woody Austin        --    --         68 70 -- --  138
+   129  -    T79  [116]Brett Quigley       --    --         71 67 -- --  138
+   48   -    T79  [117]Brian Gay           --    --         69 69 -- --  138
+   20   -    T79  [118]Carl Pettersson     --    --         69 69 -- --  138
+   35   -    T79  [119]Ryan Moore          --    --         68 70 -- --  138
+   146  -    T79  [120]Lee Janzen          --    --         70 68 -- --  138
+   65   -    T79  [121]Greg Chalmers       --    --         71 67 -- --  138
+   159  -    T79  [122]Roger Tambellini    --    --         71 67 -- --  138
+    -   -    T79  [123]Brian Duncan        --    --         68 70 -- --  138
+   126  -    T79  [124]Mike Weir           --    --         67 71 -- --  138
+   100  -    T79  [125]Ryuji Imada         --    --         69 69 -- --  138
+   115  -    T79  [126]David Duval         --    --         70 68 -- --  138
+   169  -    T79  [127]Johnson Wagner      --    --         73 65 -- --  138
+   219  -    T79  [128]Brad Faxon          --    --         68 70 -- --  138
+   217  -    T79  [129]Brent Delahoussaye  --    --         70 68 -- --  138
+   165  -    T79  [130]Cameron Percy       --    --         68 70 -- --  138
+   84   -    T97  [131]Davis Love III      --    --         68 71 -- --  139
+   135  -    T97  [132]Billy Mayfair       --    --         68 71 -- --  139
+   227  -    T97  [133]Andrew McLardy      --    --         71 68 -- --  139
+    -   -    T97  [134]Brendan Gielow      --    --         70 69 -- --  139
+   172  -    T97  [135]Henrik Bjornstad    --    --         72 67 -- --  139
+   161  -    T97  [136]Steve Wheatcroft    --    --         69 70 -- --  139
+   245  -    T97  [137]Patrick Moore       --    --         70 69 -- --  139
+   207  -    T97  [138]Todd Hamilton       --    --         70 69 -- --  139
+   67   -    T97  [139]Jimmy Walker        --    --         73 66 -- --  139
+   105  -    T97  [140]Dean Wilson         --    --         70 69 -- --  139
+   180  -    T97  [141]Roland Thatcher     --    --         68 71 -- --  139
+   200  -    T97  [142]Marco Dawson        --    --         68 71 -- --  139
+   90   -    T97  [143]John Senden         --    --         68 71 -- --  139
+   158  -    T97  [144]Jarrod Lyle         --    --         71 68 -- --  139
+   151  -    T97  [145]Chris Tidland       --    --         66 73 -- --  139
+   103  -   T112  [146]J.P. Hayes          --    --         69 71 -- --  140
+   144  -   T112  [147]Nicholas Thompson   --    --         70 70 -- --  140
+   224  -   T112  [148]Chris Smith         --    --         69 71 -- --  140
+   88   -   T112  [149]Chris Couch         --    --         66 74 -- --  140
+   111  -   T112  [150]Nathan Green        --    --         69 71 -- --  140
+   183  -   T112  [151]Martin Flores       --    --         71 69 -- --  140
+    -   -   T112  [152]Brian Harman        --    --         68 72 -- --  140
+   192  -   T112  [153]Craig Barlow        --    --         66 74 -- --  140
+   139  -   T112  [154]Michael Bradley     --    --         71 69 -- --  140
+   203  -   T112  [155]Jeff Gove           --    --         71 69 -- --  140
+   223  -   T112  [156]Mark Brooks         --    --         72 68 -- --  140
+    -   -   T112  [157]Matt Hill           --    --         69 71 -- --  140
+   156  -   T124  [158]Ted Purdy           --    --         72 69 -- --  141
+   152  -   T124  [159]Mathew Goggin       --    --         72 69 -- --  141
+   191  -   T124  [160]David Lutterus      --    --         73 68 -- --  141
+   204  -   T124  [161]Vance Veazey        --    --         72 69 -- --  141
+   119  -   T124  [162]Graham DeLaet       --    --         67 74 -- --  141
+   202  -   T124  [163]Craig Bowden        --    --         72 69 -- --  141
+   197  -   T130  [164]Brenden Pappas      --    --         74 68 -- --  142
+   95   -   T130  [165]Joe Ogilvie         --    --         74 68 -- --  142
+    -   -   T130  [166]Seung-yul Noh       --    --         69 73 -- --  142
+   208  -   T130  [167]Chris Wilson        --    --         68 74 -- --  142
+   213  -   T130  [168]Kevin Johnson       --    --         68 74 -- --  142
+   82   -   T130  [169]Alex Cejka          --    --         72 70 -- --  142
+   195  -   T130  [170]Cliff Kresge        --    --         74 68 -- --  142
+   215  -   T130  [171]Robert Gamez        --    --         72 70 -- --  142
+   14   -   T130  [172]Anthony Kim         --    --         70 72 -- --  142
+   164  -   T130  [173]Fred Couples        --    --         72 70 -- --  142
+   179  -   T130  [174]Mark Hensby         --    --         70 72 -- --  142
+   189  -   T130  [175]Cameron Tringale    --    --         69 73 -- --  142
+   206  -   T142  [176]Steve Lowery        --    --         69 74 -- --  143
+   193  -   T142  [177]Carlos Franco       --    --         72 71 -- --  143
+   148  -   T142  [178]Rod Pampling        --    --         73 70 -- --  143
+   124  -   T145  [179]Chris Stroud        --    --         68 76 -- --  144
+   133  -   T145  [180]Henrik Stenson      --    --         69 75 -- --  144
+   150  -   T145  [181]Steve Flesch        --    --         73 71 -- --  144
+   128  -   T148  [182]George McNeill      --    --         69 76 -- --  145
+    -   -   T148  [183]Curt Sanders        --    --         70 75 -- --  145
+   117  -   T150  [184]Kevin Stadler       --    --         70 76 -- --  146
+   173  -   T150  [185]Rich Barcelo        --    --         76 70 -- --  146
+    -   -   T150  [186]Tanner Kesterson    --    --         72 74 -- --  146
+    -   -    153  [187]Eric Shriver        --    --         75 73 -- --  148
+   233  -    154  [188]Greg Kraft          --    --         74 75 -- --  149
+   209  WD  T153  [189]Jerod Turner        --    --         75 -- -- --  75
+   86   WD   --   [190]Matt Bettencourt    --    --         -- -- -- --  --
+
+   (#) When rounds are being played simultaneously, players who are still playing the previous round will have a # sign next to their names.
+
+   ACCEPTANCE OF TERMS
+
+   By loading this page and continuing to use PGATOUR.COM you agree to comply with the Terms of Service governing PGATOUR.com, as such may be revised from time to time. The current version of the Terms of Service governing PGATOUR.com is available at [191]http://www.pgatour.com/company/tos.html.
+
+   Tournament Overview
+     * [192]Main
+     * [193]Full Leaderboard
+     * [194]Tee Times
+     * [195]Field
+
+     * [196]Live Video
+     * [197]Course
+     * [198]Schedule
+     * [199]Full Tournament News
+
+   KEY TOURNAMENT STATS
+   SCORING AVERAGE (ACTUAL)
+   Arjun Atwal
+
+   65
+   Field Avg
+
+   68.18
+   DRIVING DISTANCE
+   Robert Garrigus
+
+   314.6
+   Field Avg
+
+   291.1
+   DRIVING ACCURACY
+   Richard S. Johnson
+
+   83.93%
+   Field Avg
+
+   64.27%
+   GREENS IN REGULATION
+   Joe Durant
+
+   88.89%
+   Field Avg
+
+   75.71%
+   SCRAMBLING
+   Brian Stuard
+
+   88.24%
+   Field Avg
+
+   61.58%
+   PUTTS PER ROUND
+   Arjun Atwal
+
+   27.25
+   Field Avg
+
+   30.06
+   TOUGHEST HOLE:
+   14
+   EASIEST HOLE:
+   5
+
+   SHOP.PGATOUR.COM
+   [200][TOUR_C16Wedges_SHOP_298x87_021511.jpg]
+
+   Shop your favorite brand name golf equipment and accessories at SHOP.PGATOUR.COM
+     * [201]shop now
+
+   FANTASY
+
+   [202]click here
+     * [203]click here
+
+   PGA TOUR Corporate
+     * [204]About PGA TOUR
+     * [205]Commissioner's Office
+     * [206]PGA TOUR Entertainment
+     * [207]Tournament Players Clubs
+     * [208]Tournament Tickets
+     * [209]Online Staff
+     * [210]TOUR Charities
+     * [211]Volunteer
+     * [212]Career Opportunities
+     * [213]Internships
+     * [214]Employment Policies
+     * [215]Contact Us
+     * [216]Mobile Device Policy
+
+   PGATOUR.COM
+     * [217]Press Room
+     * [218]Terms of Service
+     * [219]Privacy Policy
+     * [220]Feedback
+     * [221]Contact Us
+
+   Media Room
+     * [222]Press Releases
+     * [223]PGA TOUR Network on SIRIUS-XM
+     * [224]TV Times
+     * [225]Wireless
+     * [226]Newsletters
+     * [227]Podcasts
+     * [228]Media Guides
+
+   Sales and Marketing
+     * [229]Online Advertising and Promotion
+     * [230]Title Sponsors
+     * [231]Official Marketing Partners
+     * [232]Corporate Partners
+     * [233]Licensees
+     * [234]Retail Licensing
+
+   Partners
+     * [235]World Golf Hall of Fame
+     * [236]The First Tee
+     * [237]Birdies for the Brave
+     * [238]PGA TOUR Wives
+     * [239]Omega Mission Hills World Cup
+     * [240]World Golf Foundation
+     * [241]China: Official Site
+     * [242]China: Partner Site
+     * [243]Japan: Official Site
+     * [244]Japan: Official Mobile Site
+     * [245]South Korea: Official Site
+
+   © 1995-2011 PGA TOUR, Inc. | Turner Sports Interactive, Inc. All Rights Reserved. PGA TOUR, Champions Tour, Nationwide Tour and the swinging golfer logo are registered trademarks.
+   Turner PGATOUR.com is part of Turner - SI Digital, part of the Turner Sports & Entertainment Digital Network
+
+References
+
+   1. http://www.pgatour.com/s/
+   2. http://www.pgatour.com/s/
+   3. http://www.pgatour.com/s/leaderboard/
+   4. http://www.pgatour.com/s/schedule/
+   5. http://www.pgatour.com/charlesschwabcup/
+   6. http://www.pgatour.com/h/
+   7. http://www.pgatour.com/h/
+   8. http://www.pgatour.com/h/leaderboard/
+   9. http://www.pgatour.com/h/schedule/
+  10. http://www.pgatour.com/h/stats/info/?109
+  11. http://www.pgatour.com/theplayers/
+  12. http://www.pgatour.com/tourlife/instruction/
+  13. http://www.pgatour.com/tourlife/travel/
+  14. http://www.pgatour.com/multimedia/wireless/
+  15. http://www.pgatour.com/tpc/
+  16. http://www.pga.com/
+  17. http://www.pgatour.com/
+  18. http://www.pgatour.com/
+  19. http://together.pgatour.com/
+  20. http://www.pgatour.com/r/leaderboard/
+  21. http://www.pgatour.com/shottracker/
+  22. http://www.pgatour.com/r/schedule/
+  23. http://www.pgatour.com/r/players/
+  24. http://www.pgatour.com/fedexcup/
+  25. http://www.pgatour.com/video/
+  26. http://www.pgatour.com/story/archive/r/?q=all
+  27. http://www.pgatour.com/r/stats/
+  28. http://www.pgatour.com/fantasy/
+  29. http://shop.pgatour.com/
+  30. http://www.wyndhamchampionship.com/
+  31. http://ad.doubleclick.net/clk;215288162;37419057;k?http://www.cdw.com/?cm_mmc=PGA%20Brand-_-PGATour.com-_-88x31%20Logo-_-Logo
+  32. http://www.pgatour.com/players/02/14/07/scorecards/2010/r013.html
+  33. javascript:customizeOnClick()
+  34. http://pgatour.dtn.com/
+  35. http://www.pgatour.com/players/02/14/07/scorecards/2010/r013.html
+  36. http://www.pgatour.com/players/00/22/06/scorecards/2010/r013.html
+  37. http://www.pgatour.com/players/02/70/60/scorecards/2010/r013.html
+  38. http://www.pgatour.com/players/02/68/82/scorecards/2010/r013.html
+  39. http://www.pgatour.com/players/02/29/13/scorecards/2010/r013.html
+  40. http://www.pgatour.com/players/01/08/60/scorecards/2010/r013.html
+  41. http://www.pgatour.com/players/02/59/00/scorecards/2010/r013.html
+  42. http://www.pgatour.com/players/02/92/21/scorecards/2010/r013.html
+  43. http://www.pgatour.com/players/02/01/27/scorecards/2010/r013.html
+  44. http://www.pgatour.com/players/02/76/49/scorecards/2010/r013.html
+  45. http://www.pgatour.com/players/02/58/18/scorecards/2010/r013.html
+  46. http://www.pgatour.com/players/02/17/31/scorecards/2010/r013.html
+  47. http://www.pgatour.com/players/00/66/21/scorecards/2010/r013.html
+  48. http://www.pgatour.com/players/00/19/48/scorecards/2010/r013.html
+  49. http://www.pgatour.com/players/02/49/12/scorecards/2010/r013.html
+  50. http://www.pgatour.com/players/02/04/36/scorecards/2010/r013.html
+  51. http://www.pgatour.com/players/01/05/85/scorecards/2010/r013.html
+  52. http://www.pgatour.com/players/02/68/51/scorecards/2010/r013.html
+  53. http://www.pgatour.com/players/02/66/95/scorecards/2010/r013.html
+  54. http://www.pgatour.com/players/02/73/30/scorecards/2010/r013.html
+  55. http://www.pgatour.com/players/02/86/20/scorecards/2010/r013.html
+  56. http://www.pgatour.com/players/01/27/82/scorecards/2010/r013.html
+  57. http://www.pgatour.com/players/02/06/86/scorecards/2010/r013.html
+  58. http://www.pgatour.com/players/00/87/25/scorecards/2010/r013.html
+  59. http://www.pgatour.com/players/02/72/14/scorecards/2010/r013.html
+  60. http://www.pgatour.com/players/02/64/20/scorecards/2010/r013.html
+  61. http://www.pgatour.com/players/02/53/96/scorecards/2010/r013.html
+  62. http://www.pgatour.com/players/00/22/14/scorecards/2010/r013.html
+  63. http://www.pgatour.com/players/02/57/20/scorecards/2010/r013.html
+  64. http://www.pgatour.com/players/02/34/09/scorecards/2010/r013.html
+  65. http://www.pgatour.com/players/00/13/20/scorecards/2010/r013.html
+  66. http://www.pgatour.com/players/02/49/24/scorecards/2010/r013.html
+  67. http://www.pgatour.com/players/02/55/62/scorecards/2010/r013.html
+  68. http://www.pgatour.com/players/02/33/22/scorecards/2010/r013.html
+  69. http://www.pgatour.com/players/02/33/53/scorecards/2010/r013.html
+  70. http://www.pgatour.com/players/02/56/86/scorecards/2010/r013.html
+  71. http://www.pgatour.com/players/02/49/25/scorecards/2010/r013.html
+  72. http://www.pgatour.com/players/02/51/90/scorecards/2010/r013.html
+  73. http://www.pgatour.com/players/00/80/75/scorecards/2010/r013.html
+  74. http://www.pgatour.com/players/02/79/36/scorecards/2010/r013.html
+  75. http://www.pgatour.com/players/00/12/49/scorecards/2010/r013.html
+  76. http://www.pgatour.com/players/02/28/92/scorecards/2010/r013.html
+  77. http://www.pgatour.com/players/02/37/88/scorecards/2010/r013.html
+  78. http://www.pgatour.com/players/02/18/78/scorecards/2010/r013.html
+  79. http://www.pgatour.com/players/03/15/60/scorecards/2010/r013.html
+  80. http://www.pgatour.com/players/02/73/02/scorecards/2010/r013.html
+  81. http://www.pgatour.com/players/03/11/14/scorecards/2010/r013.html
+  82. http://www.pgatour.com/players/03/09/46/scorecards/2010/r013.html
+  83. http://www.pgatour.com/players/03/44/78/scorecards/2010/r013.html
+  84. http://www.pgatour.com/players/03/26/40/scorecards/2010/r013.html
+  85. http://www.pgatour.com/players/02/04/98/scorecards/2010/r013.html
+  86. http://www.pgatour.com/players/00/89/31/scorecards/2010/r013.html
+  87. http://www.pgatour.com/players/01/07/33/scorecards/2010/r013.html
+  88. http://www.pgatour.com/players/01/10/32/scorecards/2010/r013.html
+  89. http://www.pgatour.com/players/00/17/97/scorecards/2010/r013.html
+  90. http://www.pgatour.com/players/02/74/66/scorecards/2010/r013.html
+  91. http://www.pgatour.com/players/00/83/75/scorecards/2010/r013.html
+  92. http://www.pgatour.com/players/02/23/71/scorecards/2010/r013.html
+  93. http://www.pgatour.com/players/02/71/20/scorecards/2010/r013.html
+  94. http://www.pgatour.com/players/02/62/89/scorecards/2010/r013.html
+  95. http://www.pgatour.com/players/02/23/78/scorecards/2010/r013.html
+  96. http://www.pgatour.com/players/01/26/52/scorecards/2010/r013.html
+  97. http://www.pgatour.com/players/02/06/91/scorecards/2010/r013.html
+  98. http://www.pgatour.com/players/02/63/01/scorecards/2010/r013.html
+  99. http://www.pgatour.com/players/02/03/78/scorecards/2010/r013.html
+ 100. http://www.pgatour.com/players/02/99/10/scorecards/2010/r013.html
+ 101. http://www.pgatour.com/players/02/33/49/scorecards/2010/r013.html
+ 102. http://www.pgatour.com/players/00/83/85/scorecards/2010/r013.html
+ 103. http://www.pgatour.com/players/02/79/33/scorecards/2010/r013.html
+ 104. http://www.pgatour.com/players/00/16/19/scorecards/2010/r013.html
+ 105. http://www.pgatour.com/players/02/81/58/scorecards/2010/r013.html
+ 106. http://www.pgatour.com/players/00/62/51/scorecards/2010/r013.html
+ 107. http://www.pgatour.com/players/02/77/97/scorecards/2010/r013.html
+ 108. http://www.pgatour.com/players/02/36/73/scorecards/2010/r013.html
+ 109. http://www.pgatour.com/players/02/43/58/scorecards/2010/r013.html
+ 110. http://www.pgatour.com/players/02/80/87/scorecards/2010/r013.html
+ 111. http://www.pgatour.com/players/02/08/50/scorecards/2010/r013.html
+ 112. http://www.pgatour.com/players/01/04/25/scorecards/2010/r013.html
+ 113. http://www.pgatour.com/players/00/17/24/scorecards/2010/r013.html
+ 114. http://www.pgatour.com/players/00/19/41/scorecards/2010/r013.html
+ 115. http://www.pgatour.com/players/00/78/67/scorecards/2010/r013.html
+ 116. http://www.pgatour.com/players/00/77/49/scorecards/2010/r013.html
+ 117. http://www.pgatour.com/players/01/98/46/scorecards/2010/r013.html
+ 118. http://www.pgatour.com/players/02/53/45/scorecards/2010/r013.html
+ 119. http://www.pgatour.com/players/02/65/96/scorecards/2010/r013.html
+ 120. http://www.pgatour.com/players/00/15/77/scorecards/2010/r013.html
+ 121. http://www.pgatour.com/players/02/05/93/scorecards/2010/r013.html
+ 122. http://www.pgatour.com/players/02/33/07/scorecards/2010/r013.html
+ 123. http://www.pgatour.com/players/03/28/71/scorecards/2010/r013.html
+ 124. http://www.pgatour.com/players/01/04/23/scorecards/2010/r013.html
+ 125. http://www.pgatour.com/players/02/13/50/scorecards/2010/r013.html
+ 126. http://www.pgatour.com/players/00/90/11/scorecards/2010/r013.html
+ 127. http://www.pgatour.com/players/02/69/51/scorecards/2010/r013.html
+ 128. http://www.pgatour.com/players/00/13/29/scorecards/2010/r013.html
+ 129. http://www.pgatour.com/players/02/92/85/scorecards/2010/r013.html
+ 130. http://www.pgatour.com/players/02/20/56/scorecards/2010/r013.html
+ 131. http://www.pgatour.com/players/00/17/06/scorecards/2010/r013.html
+ 132. http://www.pgatour.com/players/00/17/66/scorecards/2010/r013.html
+ 133. http://www.pgatour.com/players/02/21/22/scorecards/2010/r013.html
+ 134. http://www.pgatour.com/players/03/44/48/scorecards/2010/r013.html
+ 135. http://www.pgatour.com/players/02/29/46/scorecards/2010/r013.html
+ 136. http://www.pgatour.com/players/02/58/92/scorecards/2010/r013.html
+ 137. http://www.pgatour.com/players/02/06/76/scorecards/2010/r013.html
+ 138. http://www.pgatour.com/players/00/14/73/scorecards/2010/r013.html
+ 139. http://www.pgatour.com/players/02/56/32/scorecards/2010/r013.html
+ 140. http://www.pgatour.com/players/01/26/02/scorecards/2010/r013.html
+ 141. http://www.pgatour.com/players/02/62/87/scorecards/2010/r013.html
+ 142. http://www.pgatour.com/players/00/60/34/scorecards/2010/r013.html
+ 143. http://www.pgatour.com/players/02/06/45/scorecards/2010/r013.html
+ 144. http://www.pgatour.com/players/02/68/81/scorecards/2010/r013.html
+ 145. http://www.pgatour.com/players/01/27/14/scorecards/2010/r013.html
+ 146. http://www.pgatour.com/players/00/85/37/scorecards/2010/r013.html
+ 147. http://www.pgatour.com/players/02/87/80/scorecards/2010/r013.html
+ 148. http://www.pgatour.com/players/00/21/06/scorecards/2010/r013.html
+ 149. http://www.pgatour.com/players/01/11/23/scorecards/2010/r013.html
+ 150. http://www.pgatour.com/players/02/37/18/scorecards/2010/r013.html
+ 151. http://www.pgatour.com/players/02/85/00/scorecards/2010/r013.html
+ 152. http://www.pgatour.com/players/02/76/44/scorecards/2010/r013.html
+ 153. http://www.pgatour.com/players/01/98/24/scorecards/2010/r013.html
+ 154. http://www.pgatour.com/players/00/11/16/scorecards/2010/r013.html
+ 155. http://www.pgatour.com/players/02/01/05/scorecards/2010/r013.html
+ 156. http://www.pgatour.com/players/00/11/32/scorecards/2010/r013.html
+ 157. http://www.pgatour.com/players/03/34/51/scorecards/2010/r013.html
+ 158. http://www.pgatour.com/players/02/19/59/scorecards/2010/r013.html
+ 159. http://www.pgatour.com/players/02/05/74/scorecards/2010/r013.html
+ 160. http://www.pgatour.com/players/02/76/13/scorecards/2010/r013.html
+ 161. http://www.pgatour.com/players/01/27/55/scorecards/2010/r013.html
+ 162. http://www.pgatour.com/players/02/74/36/scorecards/2010/r013.html
+ 163. http://www.pgatour.com/players/00/73/63/scorecards/2010/r013.html
+ 164. http://www.pgatour.com/players/02/06/63/scorecards/2010/r013.html
+ 165. http://www.pgatour.com/players/02/19/49/scorecards/2010/r013.html
+ 166. http://www.pgatour.com/players/02/92/89/scorecards/2010/r013.html
+ 167. http://www.pgatour.com/players/02/63/92/scorecards/2010/r013.html
+ 168. http://www.pgatour.com/players/00/65/14/scorecards/2010/r013.html
+ 169. http://www.pgatour.com/players/02/04/72/scorecards/2010/r013.html
+ 170. http://www.pgatour.com/players/01/27/05/scorecards/2010/r013.html
+ 171. http://www.pgatour.com/players/00/13/88/scorecards/2010/r013.html
+ 172. http://www.pgatour.com/players/02/97/18/scorecards/2010/r013.html
+ 173. http://www.pgatour.com/players/00/12/26/scorecards/2010/r013.html
+ 174. http://www.pgatour.com/players/02/04/33/scorecards/2010/r013.html
+ 175. http://www.pgatour.com/players/03/34/19/scorecards/2010/r013.html
+ 176. http://www.pgatour.com/players/00/17/07/scorecards/2010/r013.html
+ 177. http://www.pgatour.com/players/01/28/23/scorecards/2010/r013.html
+ 178. http://www.pgatour.com/players/02/05/72/scorecards/2010/r013.html
+ 179. http://www.pgatour.com/players/02/79/63/scorecards/2010/r013.html
+ 180. http://www.pgatour.com/players/02/15/28/scorecards/2010/r013.html
+ 181. http://www.pgatour.com/players/00/74/57/scorecards/2010/r013.html
+ 182. http://www.pgatour.com/players/02/44/90/scorecards/2010/r013.html
+ 183. http://www.pgatour.com/players/02/49/30/scorecards/2010/r013.html
+ 184. http://www.pgatour.com/players/02/66/79/scorecards/2010/r013.html
+ 185. http://www.pgatour.com/players/02/36/13/scorecards/2010/r013.html
+ 186. http://www.pgatour.com/players/03/43/83/scorecards/2010/r013.html
+ 187. http://www.pgatour.com/players/03/44/79/scorecards/2010/r013.html
+ 188. http://www.pgatour.com/players/00/60/12/scorecards/2010/r013.html
+ 189. http://www.pgatour.com/players/03/26/17/scorecards/2010/r013.html
+ 190. http://www.pgatour.com/players/02/00/70/scorecards/2010/r013.html
+ 191. http://www.pgatour.com/company/tos.html
+ 192. http://www.pgatour.com/tournaments/r013/
+ 193. http://www.pgatour.com/leaderboards/current/r013/
+ 194. http://www.pgatour.com/tournaments/r013/tee-times.html
+ 195. http://www.pgatour.com/tournaments/r013/field.html
+ 196. http://www.pgatour.com/livegolf/
+ 197. http://www.pgatour.com/tournaments/r013/course.html
+ 198. http://www.pgatour.com/tournaments/r013/schedule.html
+ 199. http://www.pgatour.com/tournaments/r013/news/
+ 200. http://shop.pgatour.com/promotions/cleveland/c_oid-259.aspx?utm_source=banner-shopbox&utm_campaign=banner&utm_term=cleveland-ultralite-cg16-298x87&utm_medium=banner
+ 201. http://shop.pgatour.com/promotions/cleveland/c_oid-259.aspx?utm_source=banner-shopbox&utm_campaign=banner&utm_term=cleveland-ultralite-cg16-298x87&utm_medium=banner
+ 202. http://www.pgatour.com/fantasy/
+ 203. http://www.pgatour.com/fantasy/
+ 204. http://www.pgatour.com/company/about_us.html
+ 205. http://www.pgatour.com/company/executive_bios.html
+ 206. http://pgatourentertainment.com/
+ 207. http://www.tpc.com/
+ 208. http://www.pgatour.com/tournaments/tickets/
+ 209. http://www.pgatour.com/company/online_staff.html
+ 210. http://www.pgatour.com/company/giving.html
+ 211. http://www.pgatour.com/company/benevolent.html
+ 212. https://tbe.taleo.net/NA6/ats/careers/jobSearch.jsp?org=PGATOUR&cws=1
+ 213. http://www.pgatour.com/company/internships.html
+ 214. http://www.pgatour.com/company/employment_policy.html
+ 215. http://www.pgatour.com/company/contactus.html
+ 216. http://www.pgatour.com/2011/company/02/15/cellphone-policy/
+ 217. http://www.pgatour.com/company/
+ 218. http://www.pgatour.com/company/tos.html
+ 219. http://www.pgatour.com/company/privacy.html
+ 220. http://www.pgatour.com/member_services/feedback.html
+ 221. http://www.pgatour.com/company/contactus.html
+ 222. http://www.pgatour.com/company/
+ 223. http://www.pgatour.com/multimedia/audio/pgatournetwork/
+ 224. http://www.pgatour.com/tv-times/
+ 225. http://www.pgatour.com/multimedia/wireless/
+ 226. http://www.pgatour.com/member_services/newsletter.html
+ 227. http://www.pgatour.com/multimedia/podcasts/
+ 228. http://www.pgatour.com/services/guide/guide.html?q=all
+ 229. http://tsed.turner.com/pga-tour
+ 230. http://www.pgatour.com/company/marketing_title_sponsor.html
+ 231. http://www.pgatour.com/company/marketing_official_marketing_partnership.html
+ 232. http://www.pgatour.com/company/partners.html
+ 233. http://www.pgatour.com/company/retail-licensees/index.html
+ 234. http://www.pgatour.com/company/licensees.html
+ 235. http://www.wgv.com/
+ 236. http://www.thefirsttee.org/Club/Scripts/Home/home.asp
+ 237. http://www.pgatour.com/birdiesforthebrave/
+ 238. http://www.pgatourwives.org/
+ 239. http://www.pgatour.com/tournaments/r169/
+ 240. http://www.worldgolffoundation.org/
+ 241. http://golf.sina.com.cn/
+ 242. http://www.golfbox.cn/
+ 243. http://www.golfdigest.co.jp/pgatour/default.asp
+ 244. http://www.pgatourm.jp/
+ 245. http://pgatour.sbsgolf.com/

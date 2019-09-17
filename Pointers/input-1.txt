@@ -1,0 +1,40 @@
+NEW-PERSON
+Scarlett O'Hara
+NEW-PERSON
+Rhett Butler
+NEW-PERSON
+Ashley Wilkes
+NEW-PERSON
+Melanie Hamilton
+ADD-Friend
+Bad Command ADD-Friend
+ADD-FRIEND
+Scarlett O'Hara
+Melanie Hamilton
+ADD-FRIEND
+Melanie Hamilton
+Scarlett O'Hara
+IN-RELATIONSHIP
+Rhett Butler
+Scarlett O'Hara
+IN-RELATIONSHIP
+Scarlett O'Hara
+Rhett Butler
+IN-RELATIONSHIP
+Ashley Wilkes
+Melanie Hamilton
+IN-RELATIONSHIP
+Melanie Hamilton
+Ashley Wilkes
+MOOD
+Rhett Butler
+Amorous
+MOOD
+Scarlett O'Hara
+Petulant, Angry, Impetuous, and a Little Mean
+MOOD
+Ashley Wilkes
+Limpid and Wimpy
+MOOD
+Melanie Hamilton
+Pious
