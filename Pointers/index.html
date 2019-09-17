@@ -7,7 +7,7 @@
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Pointers>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Pointers</b></a>
 <LI> Last modification date: <i>
-Wed Feb  5 22:45:15 EST 2014
+Tue Sep 17 17:26:54 EDT 2019
 </i>
 <hr>
 
@@ -39,40 +39,47 @@ data that already exists.  You do that using the ampersand.
 When you want to reference what a pointer points to, you use
 the asterisk.  For
 example, the program
-<b><a href=pointer_mess_1.cpp>pointer_mess_1.cpp</a></b>
+<b><a href=src/pointer_mess_1.cpp>src/pointer_mess_1.cpp</a></b>
 has the pointer <b>ip</b> point to the integer <b>i</b>, and
 then does some setting and printing of that integer:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;vector&gt;
-#include &lt;string&gt;
+<font color=blue>/* A program to demonstrate single pointer that points to an integer. */</font>
+
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
-#include &lt;cctype&gt;
 using namespace std;
 
-main()
+int main()
 {
-  int i;
-  int *ip1;
+  int i;                     <font color=blue>// Declare an integer i</font>
+  int *ip1;                  <font color=blue>// and a pointer to an integer, named ip1.</font>
 
-  ip1 = &i;
+  ip1 = &i;                  <font color=blue>// Set ip1 to point to i.</font>
+
+  <font color=blue>/* When we change i, we can access that change either from i itself,
+     or by "dereferencing" ip1 using the asterisk. */</font>
 
   i = 5;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
 
+  <font color=blue>/* When we change *ip1, you see the change reflected in both i and *ip1. */</font>
+
   *ip1 = 10;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
 
+  <font color=blue>/* This is like the first statement - changine i is reflected in both i and *ip1. */</font>
+
   i = 15;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
+  return 0;
 }
 </pre></td></table></center><p>
-
 When we run it, we see the following output:
 
 <pre>
-UNIX> <font color=darkred><b>pointer_mess_1</b></font>
+UNIX> <font color=darkred><b>make bin/pointer_mess_1</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/pointer_mess_1 src/pointer_mess_1.cpp
+UNIX> <font color=darkred><b>bin/pointer_mess_1</b></font>
 i:  5    *ip1:  5
 i: 10    *ip1: 10
 i: 15    *ip1: 15
@@ -85,52 +92,75 @@ has <b>ip</b> "point" to <b>i</b>.  Then, when you set <b>i</b> or <b>*ip</b>, i
 sets the integer stored in <b>i</b>.  For that reason, printing <b>i</b> or <b>*ip</b>
 prints the same value:
 
-<p><center><table border=3><td><img src=pm1.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm1.jpg width=450></td></table></center><p>
 
 The program 
-<b><a href=pointer_mess_2.cpp>pointer_mess_2.cpp</a></b>
+<b><a href=src/pointer_mess_2.cpp>src/pointer_mess_2.cpp</a></b>
 is a little more complex:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 using namespace std;
 
-main()
+int main()
 {
   int i;
   int *ip1, *ip2;
+
+  <font color=blue>/* This is like the previous program -- we set ip1 to point to i, and then after we
+     set i's value to 5, you see that reflected in both i, and *ip1. */</font>
 
   ip1 = &i;
   i = 5;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
 
+  <font color=blue>/* By saying "new int", we have allocated new memory for ip1.  It now points to 
+     this new memory, and no longer to i.  For this reason, i's value remains 5, while
+     *ip1 has been set to ten. */</font>
+
   ip1 = new int;
   *ip1 = 10;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
+
+  <font color=blue>/* We have allocated another integer and set ip1 to point to it.  We have "lost"
+     the memory from the first "new" statement, because we don't have any pointer
+     to it.  This is known as a "memory leak." */</font>
 
   ip1 = new int;
   *ip1 = 15;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
 
+  <font color=blue>/* We set ip2 equal to ip1.  That means they both point to the same integer, so when
+     you set *ip2 to 20, that will be reflected in both *ip1 and *ip2.  You'll note that
+     all this time, i has been unaffected, with its value remaining as 5. */</font>
+
   ip2 = ip1;
   *ip2 = 20;
   printf("i: %2d    *ip1: %2d     *ip2: %2d\n", i, *ip1, *ip2);
+
+  <font color=blue>/* We allocate still another integer for ip1.  Since ip2 points to where ip1 was, this
+     is not a memory leak.  At this point, i, *ip1 and *ip2 are all different values. */</font>
 
   ip1 = new int;
   *ip1 = 25;
   printf("i: %2d    *ip1: %2d     *ip2: %2d\n", i, *ip1, *ip2);
 
+  <font color=blue>/* This deallocates the memory for ip1, so that it can be used for a new "new" call.
+     You'll note that you can still print it out (or worse yet, set it).  That's because
+     the memory doesn't go away; it is simply not allocated.  This is a memory bug, the
+     worst of all bugs to find and fix. */</font>
+
   delete ip1;
   printf("i: %2d    *ip1: %2d     *ip2: %2d\n", i, *ip1, *ip2);
+  
+  return 0;
 }
 </pre></td></table></center><p>
-
 This program has two pointers, <b>ip1</b> and <b>ip2</b>.  
 The first statements are the same as the previous program -- <b>ip</b>
 is set to be <b>&amp;i</b> and then <b>i</b> is set to five:
 
-<p><center><table border=3><td><img src=pm2a.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm2a.jpg width=450></td></table></center><p>
 
 In the next set of statements, we call <b>new</b>.  This creates a new integer
 and has <b>ip1</b> point to it.  This is called "allocating memory."  
@@ -143,11 +173,11 @@ Here's a picture -- you should see why the <b>printf()</b> statement prints out
 and 
 <b>*ip1</b> as 10.
 
-<p><center><table border=3><td><img src=pm2b.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm2b.jpg width=450></td></table></center><p>
 
 In the next set of statements, we call <b>new</b> again and get the following picture:
 
-<p><center><table border=3><td><img src=pm2c.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm2c.jpg width=450></td></table></center><p>
 
 Printing out <b>i</b> and <b>*ip1</b> yields 5 and 15.  However, you'll note that
 the integer that holds 10 has nothing pointing to it.  This is called a <i>memory 
@@ -162,29 +192,31 @@ The next statements have <b>ip2</b> equal <b>ip1</b>.  In other words, they
 point to the same integer.  Thus, when you change <b>*ip2</b> to 20, then
 both <b>*ip2</b> and <b>*ip1</b> equal 20:
 
-<p><center><table border=3><td><img src=pm2d.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm2d.jpg width=450></td></table></center><p>
 
 Now we call <b>new</b> again, so that <b>ip1</b> and <b>ip2</b> point to different
 integers.  This is not a memory leak, because we can still access <b>ip2</b>.
 Printing <b>i</b>, <b>*ip1</b> and <b>*ip2</b> all print different values.
 
-<p><center><table border=3><td><img src=pm2e.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm2e.jpg width=450></td></table></center><p>
 
 Finally, I call <b>delete ip1</b>.  This releases the integer so that the memory
 can be reused by subsequent <b>new</b> calls.  You'll note that I still print out
 <b>*ip1</b> -- the results of this may differ from machine to machine.  It
 might print out the old value because the memory hasn't been reused, or
 something else might happen.  This is a source of bugs that are extremely difficult
-to track, and the compiler usually won't helpful.  This is another reason why
+to track, and the compiler usually won't help.  This is another reason why
 students hate pointers -- they can get you into trouble.  Regardless, you 
 need to learn and understand them.
 
-<p><center><table border=3><td><img src=pm2f.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm2f.jpg width=450></td></table></center><p>
 
 Here's the output:
 
 <pre>
-UNIX> <font color=darkred><b>pointer_mess_2</b></font>
+UNIX> <font color=darkred><b>make bin/pointer_mess_2</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/pointer_mess_2 src/pointer_mess_2.cpp
+UNIX> <font color=darkred><b>bin/pointer_mess_2</b></font>
 i:  5    *ip1:  5
 i:  5    *ip1: 10
 i:  5    *ip1: 15
@@ -198,93 +230,139 @@ UNIX>
 <h2>You can point to vectors</h2>
 
 The program
-<b><a href=pointer_mess_3.cpp>pointer_mess_3.cpp</a></b>
+<b><a href=src/pointer_mess_3.cpp>src/pointer_mess_3.cpp</a></b>
 is more complex.  Instead of having pointers to integers, this one deals
-with pointers to vectors.  
+with pointers to vectors.  You can read the comments if you want, but I will
+also walk through the example with pictures after the code.
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This is a program that mixes pointers and vectors.
+   It is good practice for you to walk through this one *really* slowly. */</font>
+
 #include &lt;vector&gt;
 #include &lt;string&gt;
+#include &lt;iostream&gt;
 #include &lt;cstdio&gt;
 #include &lt;cstdlib&gt;
 using namespace std;
 
-typedef vector &lt;int&gt; IVec;
-
 class VP {
   public:
-    IVec iv;
+    vector &lt;int&gt; vec;
 };
 
-main()
+int main()
 {
-  IVec iv;
-  IVec *ivp;
-  vector &lt;IVec *&gt; *ivpp;
-  int i, j;
-  VP *vp;
+  vector &lt;int&gt; iv;                     <font color=blue>// Vector of integers</font>
+  vector &lt;int&gt; *ivp, *jvp;             <font color=blue>// Pointers to vector of integers</font>
+  vector &lt; vector &lt;int&gt; * &gt; *ivpp;     <font color=blue>// Pointer to a vector of pointers to vectors of integers</font>
+  VP *vp;                              <font color=blue>// Pointer to an instance of the VP class.</font>
+  size_t i, j;
 
-  for (i = 0; i &lt; 10; i++) iv.push_back(lrand48()%100);
+  <font color=blue>/* Set iv to be the first 10 multiples of 11, and print them out. */</font>
 
-  for (i = 0; i &lt; iv.size(); i++) printf("%2d ", iv[i]); printf("\n");
+  for (i = 0; i &lt; 10; i++) iv.push_back(11*i);
+  for (i = 0; i &lt; iv.size(); i++) printf("%2d ", iv[i]); 
+  printf("\n");
+
+  <font color=blue>/* Set ivp to point to iv -- as you can see, it prints out the same vector.
+     I like to use that at method here, because it looks nicer, I think, than (*ivp)[i]. */</font>
 
   ivp = &iv;
-  for (i = 0; i &lt; ivp-&gt;size(); i++) printf("%2d ",ivp-&gt;at(i)); printf("\n");
+  for (i = 0; i &lt; ivp-&gt;size(); i++) printf("%2d ", ivp-&gt;at(i)); 
+  printf("\n");
 
+  <font color=blue>/* Since ivp "points to" iv, when you resize *ivp, it has the effect of resizing iv. 
+     "ivp->" is equivalent to "(*ivp)." */</font>
+
+  cout &lt;&lt; endl &lt;&lt; "Resizing ivp is reflecting by iv being resized." &lt;&lt; endl &lt;&lt; endl;
   ivp-&gt;resize(4);
-  for (i = 0; i &lt; iv.size(); i++) printf("%2d ", iv[i]); printf("\n");
+  for (i = 0; i &lt; iv.size(); i++) printf("%2d ", iv[i]); 
+  printf("\n");
 
-  ivpp = new vector &lt;IVec *&gt;;
+  <font color=blue>/* I use "new" to create a new vector of pointers to vectors of integers, and then 
+     call push_back to put the same pointer, ivp, into both vector entries. */</font>
+
+  cout &lt;&lt; endl &lt;&lt; "Creating ivpp, and setting both of its elements to ivp." &lt;&lt; endl &lt;&lt; endl;
+  ivpp = new vector &lt; vector &lt;int&gt; *&gt;;
   ivpp-&gt;push_back(ivp);
   ivpp-&gt;push_back(ivp);
 
-  for (i = 0; i &lt; ivpp-&gt;size(); i++) {
-    printf("Element %d of ivpp points to the vector:", i);
-    ivp = ivpp-&gt;at(i);
-    for (j = 0; j &lt; ivp-&gt;size(); j++) printf(" %2d", ivp-&gt;at(j)); printf("\n");
-  }
+  <font color=blue>/* Here (*ivpp)[0] and (*ivpp)[1] are both pointers to the same vector.  This code prints
+     out the vectors pointed to by ivpp[0] and ivpp[1].  Since they are the same vector,
+     the two lines are the same. */</font>
 
+  printf("(*ivpp)[0]:");
+  for (i = 0; i &lt; (*ivpp)[0]-&gt;size(); i++) printf(" %2d", (*ivpp)[0]-&gt;at(i));
+  printf("\n");
+
+  printf("(*ivpp)[1]:");
+  for (i = 0; i &lt; (*ivpp)[1]-&gt;size(); i++) printf(" %2d", (*ivpp)[1]-&gt;at(i));
+  printf("\n");
+
+  <font color=blue>/* I now change iv[0] to -50.  Remember, ivp points to iv, and both ivpp[0] and
+     ivpp[1] were set to ivp, so this change will be reflected when I print out
+     (*ivpp)[0] and (*ivpp)[1]: */</font>
+
+  cout &lt;&lt; endl &lt;&lt; "Setting iv[0] to -50.  This will be reflected in both (*ivpp)[0] and (*ivpp[1])"
+       &lt;&lt; endl &lt;&lt; endl;
   iv[0] = -50;
+
+  <font color=blue>/* This code also prints out (*ivpp)[0] and (*ivpp)[1].  It does it in a different
+     way, though, by using that temporary variable jvp. */</font>
+
   for (i = 0; i &lt; ivpp-&gt;size(); i++) {
-    printf("Element %d of ivpp points to the vector:", i);
-    ivp = ivpp-&gt;at(i);
-    for (j = 0; j &lt; ivp-&gt;size(); j++) printf(" %2d", ivp-&gt;at(j)); printf("\n");
+    printf("(*ivpp)[%lu]:", i);
+    jvp = ivpp-&gt;at(i);
+    for (j = 0; j &lt; jvp-&gt;size(); j++) printf(" %2d", jvp-&gt;at(j));
+    printf("\n");
   }
 
+  <font color=blue>/* Finally, I use new to allocate an instance of the VP class.  
+     I use an arrow to get at vp's member variable.  However, since that member
+     variable is a vector, and not a pointer to a vector, you access its methods
+     with "." and its elements with "[]": */</font>
+
+  cout &lt;&lt; endl &lt;&lt; "This code demonstrates a pointer to a class whose member variable is a vector."
+       &lt;&lt; endl &lt;&lt; endl;
   vp = new VP;
-  for (i = 0; i &lt; 10; i++) vp-&gt;iv.push_back(lrand48()%100);
-  for (i = 0; i &lt; vp-&gt;iv.size(); i++) printf("%2d ", vp-&gt;iv[i]); printf("\n");
+  for (i = 0; i &lt; 10; i++) vp-&gt;vec.push_back(9*i);
+  for (i = 0; i &lt; vp-&gt;vec.size(); i++) printf("%2d ", vp-&gt;vec[i]); 
+  printf("\n");
+  return 0;
 }
 </pre></td></table></center><p>
 
-I'll illustrate again.  First, we set <b>iv</b> to be a vector of 10 random
-integers.  Then we set <b>ivp</b> to point to <b>iv</b> and we print it out.
+
+
+I'll illustrate again.  First, we set <b>iv</b> to be a vector of the first 10 multiples
+of 11.  Then we set <b>ivp</b> to point to <b>iv</b> and we print it out.
 I use the <b>at()</b> method instead of square brackets just because it looks
 better.  Instead of <b>ivp->at(i)</b>, I could have done <b>(*ip)[i]</b>, but
 I don't like how that looks.  
 <p>
-In case you've forgotten from CS102/ECE206, doing <b>ivp->at()</b> is equivalent
-to <b>(*ivp).at()</b>.  It looks nicer.
+When you have a pointer <b>p</b>, then doing <b>p->x</b> is equivalent to doing <b>(*p).x</b>.
+It's easier to read.
 
-<p><center><table border=3><td><img src=pm3a.jpg width=450></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm3a.jpg width=450></td></table></center><p>
 
 Next, I call <b>ivp->resize(4)</b>.  As you can see, that resizes the vector
 to which <b>ivp</b> points, which ends up resizing <b>iv</b>:
 
-<p><center><table border=3><td><img src=pm3b.jpg width=260></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm3b.jpg width=260></td></table></center><p>
 
 The next part of the code will probably confuse you at first, but work through it.
 <b>Ivpp</b> is a pointer to a vector.  The elements of the vector are pointers to 
 integer vectors.  The <b>new</b> statement and two <b>push_back()</b> statements
 create a new vector, which has two elements.  Each of them point to <b>iv</b>:
 
-<p><center><table border=3><td><img src=pm3c.jpg width=266></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm3c.jpg width=266></td></table></center><p>
 
 After printing <b>ivpp</b> we set <b>iv[0]</b> to -50.  Thus, when we print out
 <b>ivpp</b> as before, both lines start with -50, since they point to the
 same thing:
 
-<p><center><table border=3><td><img src=pm3d.jpg width=266></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/pm3d.jpg width=266></td></table></center><p>
 
 The final piece of code involving <b>vp</b> shows how I like to handle pointers
 to vectors.  I usually like to bundle them up in a <b>class</b> or <b>struct</b>,
@@ -294,17 +372,32 @@ Here's the output.  As with the previous program, make sure you understand
 <i>every line of output</i> and why it happens.
 
 <pre>
-UNIX> <font color=darkred><b>pointer_mess_3</b></font>
-18 87 91 23 17 65 14 97 19 66 
-18 87 91 23 17 65 14 97 19 66 
-18 87 91 23 
-Element 0 of ivpp points to the vector: 18 87 91 23
-Element 1 of ivpp points to the vector: 18 87 91 23
-Element 0 of ivpp points to the vector: -50 87 91 23
-Element 1 of ivpp points to the vector: -50 87 91 23
-92 54  8 54 50 56 68 19 61 39 
+UNIX> <font color=darkred><b>make bin/pointer_mess_3</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/pointer_mess_3 src/pointer_mess_3.cpp
+UNIX> <font color=darkred><b>bin/pointer_mess_3</b></font>
+ 0 11 22 33 44 55 66 77 88 99 
+ 0 11 22 33 44 55 66 77 88 99 
+
+Resizing ivp is reflecting by iv being resized.
+
+ 0 11 22 33 
+
+Creating ivpp, and setting both of its elements to ivp.
+
+(*ivpp)[0]:  0 11 22 33
+(*ivpp)[1]:  0 11 22 33
+
+Setting iv[0] to -50.  This will be reflected in both (*ivpp)[0] and (*ivpp[1])
+
+(*ivpp)[0]: -50 11 22 33
+(*ivpp)[1]: -50 11 22 33
+
+This code demonstrates a pointer to a class whose member variable is a vector.
+
+ 0  9 18 27 36 45 54 63 72 81 
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 <hr>
 <h2>Sorting using the STL</h2>
@@ -312,33 +405,39 @@ UNIX> <font color=darkred><b></b></font>
 The standard template library supports sorting of a vector.  You need
 to include &lt;algorithm&gt;.
 Then, to sort <b>v</b>, just call <b>sort(v.begin(), v.end())</b>,
-as in <b><a href=sortlines1.cpp>sortlines1.cpp</a></b>.
+as in <b><a href=src/sortlines1.cpp>src/sortlines1.cpp</a></b>.
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program sorts the lines of standard input using the sort() procedure from
+   the STL algorithms library. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;algorithm&gt;
 #include &lt;vector&gt;
 #include &lt;string&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;string&gt; lines;
   string s;
-  int i;
+  size_t i;
+
+  <font color=blue>/* Read lines of standard input into the vector "lines".
+     Sort the vector using the sort() procedure, and print the sorted lines. */</font>
 
   while (getline(cin, s)) lines.push_back(s);
-
   sort(lines.begin(), lines.end());
-
   for (i = 0; i &lt; lines.size(); i++) cout &lt;&lt; lines[i] &lt;&lt; endl;
-}
-</pre></td></table></center><p>
 
+  return 0;
+}
+
+</pre></td></table></center><p>
 By default, strings are sorted lexicographically and numbers numerically (duh):
 
 <pre>
-UNIX> <font color=darkred><b>cat input.txt</b></font>
+UNIX> <font color=darkred><b>cat files/input.txt</b></font>
 Sydney Ingratiate
 Arianna Exonerate
 Sarah Charcoal
@@ -349,7 +448,9 @@ Julian Fluvial
 Mia Leah Skied
 Oliver Celebrate
 Liam Trisyllable
-UNIX> <font color=darkred><b>sortlines1 < input.txt</b></font>
+UNIX> <font color=darkred><b>make bin/sortlines1</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/sortlines1 src/sortlines1.cpp
+UNIX> <font color=darkred><b>bin/sortlines1 < files/input.txt</b></font>
 Alexis Kaitlyn Inferential
 Arianna Exonerate
 Cole Hunter Ourselves
@@ -365,54 +466,61 @@ UNIX> <font color=darkred><b></b></font>
 
 If you want to sort, but you don't want to use the default sorting mechanism,
 you can provide your own comparison function.  It should take two parameters
-of the same type as the vector and return a <b>bool</b>
+of the same type as the vector (preferably const and reference) and return a <b>bool</b>
 (true or false). It should return <b>true</b> if the first parameter is
 less than the second, and false otherwise.  Therefore, the
 following program 
-(<b><a href=sortlines2.cpp>sortlines2.cpp</a></b>)
+(<b><a href=src/sortlines2.cpp>src/sortlines2.cpp</a></b>)
 sorts standard input by the value of the second character 
 in each line:
 
-
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program uses a comparison function to sort a vector of strings by the
+   strings' second letters, rather than the entire strings. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;algorithm&gt;
 #include &lt;vector&gt;
 #include &lt;string&gt;
 using namespace std;
 
-bool string_compare(string s1, string s2)
+<font color=blue>/* Your comparison function takes as arguments, two const references to 
+   the type that is in the vector (strings). */</font>
+
+bool string_compare(const string &s1, const string &s2)
 {
-  if (s1[1] &lt; s2[1]) return true;
+  if (s1[1] &lt; s2[1]) return true;         <font color=blue>/* I could have just said "return (s1[1] &lt; s2[1]);" */</font>
   return false;
 }
 
-main()
+int main()
 {
   vector &lt;string&gt; lines;
   string s;
-  int i;
+  size_t i;
+
+  <font color=blue>/* This code is the same as before, except we pass string_compare() to the sort() procedure. */</font>
 
   while (getline(cin, s)) lines.push_back(s);
-
   sort(lines.begin(), lines.end(), string_compare);
-
   for (i = 0; i &lt; lines.size(); i++) cout &lt;&lt; lines[i] &lt;&lt; endl;
-}
-</pre></td></table></center><p>
 
+  return 0;
+}
+
+</pre></td></table></center><p>
 I've highlighted the second characters in blue so that you can see that
 they are indeed sorted:
 
 <pre>
-UNIX> <font color=darkred><b>sortlines2 < input.txt</b></font>
+UNIX> <font color=darkred><b>sortlines2 < files/input.txt</b></font>
 S<font color=blue><b>a</b></font>rah Charcoal
-M<font color=blue><b>i</b></font>a Leah Skied
 L<font color=blue><b>i</b></font>am Trisyllable
-A<font color=blue><b>l</b></font>exis Kaitlyn Inferential
+M<font color=blue><b>i</b></font>a Leah Skied
 O<font color=blue><b>l</b></font>iver Celebrate
-C<font color=blue><b>o</b></font>le Hunter Ourselves
+A<font color=blue><b>l</b></font>exis Kaitlyn Inferential
 J<font color=blue><b>o</b></font>seph Dilatory
+C<font color=blue><b>o</b></font>le Hunter Ourselves
 A<font color=blue><b>r</b></font>ianna Exonerate
 J<font color=blue><b>u</b></font>lian Fluvial
 S<font color=blue><b>y</b></font>dney Ingratiate
@@ -431,7 +539,7 @@ You're going to get some of that money too,
 because you're going to help him write the app.
 <p>
 The way that many apps work is diagrammed below:
-<p><center><table border=3><td><img src=Server-Pic.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/Server-Pic.jpg></td></table></center><p>
 The app runs on people's phones, and then each app talks with a central server across
 the Internet (or via a cellular network) using a networking mechanism like TCP/IP 
 sockets.  You'll learn how to do that in CS360.
@@ -490,7 +598,7 @@ to the first person's friend list.
 
 <p>
 <LI> "QUERY" -- This is followed by a line of text, which is the name of a person.
-The output will be either "UNSUCCESSUL", or the following lines of text:
+The output will be either "UNSUCCESSFUL", or the following lines of text:
 <p>
 <UL>
 <LI> "QUERY SUCCESSFUL"
@@ -545,18 +653,26 @@ The person's friend list is empty automatically.  The person is returned.
 If <b>add</b> is false, then <b>find_person()</b> simply returns <b>NULL</b>.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-typedef vector &lt;Person *&gt; PVec;
+<font color=blue>// This is our one and only hash table function.  It finds a person with the </font>
+<font color=blue>// given name in the hash table.  If the person is found, then it returns a </font>
+<font color=blue>// pointer to the person.  Otherwise, if "add" is true, it creates the person </font>
+<font color=blue>// and adds it to the hash table.  If "add" is false, then it simpy returns NULL.</font>
 
-Person *find_person(string &name, vector &lt;PVec&gt; &HT, int add)
+Person *find_person(string &name, vector &lt; vector &lt;Person*&gt; &gt; &HT, int add)
 {
   int h;
-  int i;
+  size_t i;
   Person *p;
+
+  <font color=blue>// Look up the person in the hash table.</font>
 
   h = djb_hash(name) % HT.size();
   for (i = 0; i &lt; HT[h].size(); i++) {
     if (HT[h][i]-&gt;Name == name) return HT[h][i];
   }
+
+  <font color=blue>// If we're here in the code, we didn't find the person in the hash table.</font>
+
   if (add) {
     p = new Person;
     p-&gt;Name = name;
@@ -577,39 +693,37 @@ Then it sets up the hash table, and goes into an infinite loop reading lines of
 text from standard input:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  istringstream iss;         // For processing argv[1]
-  string n1, n2, mood;       // For reading in names and moods
-  Person *p, *p2;            // Pointers to people, that we manipulate or print.
+  istringstream iss;                       <font color=blue>// For processing argv[1]</font>
+  string n1, n2, mood;                     <font color=blue>// For reading in names and moods</font>
+  Person *p, *p2;                          <font color=blue>// Pointers to people, that we manipulate or print.</font>
 
-  int Table_Size;            // The table size is read from the command line.
-  vector &lt;PVec&gt; Hash_Table;  // The hash table.  
-                             // Entries are vectors because we use separate chaining
+  int Table_Size;                          <font color=blue>// The table size is read from the command line.</font>
+  vector &lt; vector &lt;Person*&gt; &gt; Hash_Table;  <font color=blue>// The hash table.  </font>
+                                           <font color=blue>// Entries are vectors because we use separate chaining</font>
 
-  int i;                     // Temporary variable
-  string s;                  // Temporary variable
+  size_t i;                                <font color=blue>// Temporary variable</font>
+  string s;                                <font color=blue>// Temporary variable</font>
 
-  // --------------------------------------------------
-  // Process the command line and create the hash table.
+  <font color=blue>// --------------------------------------------------</font>
+  <font color=blue>// Process the command line and create the hash table.</font>
 
-  if (argc != 2) {
-    cerr &lt;&lt; "usage: bacefook_server table-size\n";
-    exit(1);
-  }
+  try {
+    if (argc != 2) throw((string) "usage: bacefook_server table-size");
 
-  iss.clear();
-  iss.str(argv[1]);
-  if (!(iss &gt;&gt; Table_Size) || Table_Size &lt;= 0) {
-    cerr &lt;&lt; "usage: bacefook_server table-size\n";
-    cerr &lt;&lt; "bad table-size\n";
+    iss.clear();
+    iss.str(argv[1]);
+    if (!(iss &gt;&gt; Table_Size) || Table_Size &lt;= 0) throw ("bad table-size");
+  } catch (const string s) {
+    cerr &lt;&lt; s &lt;&lt; endl;
     exit(1);
   }
  
   Hash_Table.resize(Table_Size);
 
-  // --------------------------------------------------
-  // Process the input from standard input.
+  <font color=blue>// --------------------------------------------------</font>
+  <font color=blue>// Process the input from standard input.</font>
 
   while (getline(cin, s)) {
 </pre></td></table></center><p>
@@ -623,6 +737,10 @@ returns <b>NULL</b>, and we can print "UNSUCCESSFUL."  Otherwise, we call
 and put him/her into the table:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+    <font color=blue>// --------------------------------------------------------</font>
+    <font color=blue>// NEW-PERSON.  If the person is already in the hash table,</font>
+    <font color=blue>// then it is an error.  </font>
+
     if (s == "NEW-PERSON") {
       if (!getline(cin, n1)) exit(1);
       p = find_person(n1, Hash_Table, 0);
@@ -657,6 +775,9 @@ of "QUERY" that prints out the name and mood:
 
 
 <p><center><table border=3 cellpadding=3><td><pre>
+    <font color=blue>// --------------------------------------------------------</font>
+    <font color=blue>// MOOD.  Find the name and set the mood.</font>
+
     } else if (s == "MOOD") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, mood)) exit(1);
@@ -718,6 +839,10 @@ would make a <i>copy</i> of whatever is in the hash table.
 Here's the code.
 
 <p><center><table border=3 cellpadding=3><td><pre>
+    <font color=blue>// ---------------------------------------------------------------</font>
+    <font color=blue>// IN-RELATIONSHIP.  Now, you have to successfully find both</font>
+    <font color=blue>// names.  Note how we set the pointer of p-&gt;InRelationship to p2.</font>
+
     } else if (s == "IN-RELATIONSHIP") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, n2)) exit(1);
@@ -781,6 +906,11 @@ UNIX>
 Finally, let's add friends.  The code for this is very similar to "IN-RELATIONSHIP":
 
 <p><center><table border=3 cellpadding=3><td><pre>
+    <font color=blue>// ---------------------------------------------------------------</font>
+    <font color=blue>// ADD-FRIEND.  This is pretty much identical to IN-RELATIONSHIP,</font>
+    <font color=blue>// except you are adding p2 to the Friends vector, rather than just</font>
+    <font color=blue>// setting a pointer.</font>
+
     } else if (s == "ADD-FRIEND") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, n2)) exit(1);
@@ -927,12 +1057,12 @@ pointers are used:
 Each of these are colored with a different colored vector.   You should be able
 to account for every pointer in the picture.
 <p>
-<p><center><table border=3><td><img src=GWTW-1.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/GWTW-1.jpg></td></table></center><p>
 
 Now, let's go back to the <b>bacefook_server</b> program, and change some things.
 We'll reflect what happens at the end of "Gone with the Wind" -- Melanie dies, 
 Scarlett professes her love to Ashley, Ashley dissolves into a weepy mess while
-he pronounces his everlasting love Melanie, and Rhett gets pissed:
+he pronounces his everlasting love for Melanie, and Rhett gets pissed:
 
 <pre>
 <font color=darkred><b>MOOD</b></font>
@@ -960,5 +1090,39 @@ SUCCESSFUL
 If you query them, you'll see all of those changes reflected.  Here's what the 
 data structures look like now.  Again, you should double-check them.
 
-<p><center><table border=3><td><img src=GWTW-2.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/GWTW-2.jpg></td></table></center><p>
 
+
+<hr>
+<h3>Summary</h3>
+
+<UL>
+<LI> A <i>pointer</i> is a special data type which provides a level of indirection.
+It "points" to memory, which may belong to some other variables, or may be the exclusive
+purview of the pointer.
+<p>
+<LI> You can set a pointer to point to another variable by putting an ampersand in front
+of the variable.
+<p>
+<LI> You "dereference" a pointer by putting an asterisk in front of it.  That allows you to access
+or set what the pointer is pointing to.
+<p>
+<LI> If a pointer <b>p</b> is to an instance of a class, 
+then you can get at the methods and variables of
+the class with <b>"p->"</b>.  That is cleaner than doing <b>"(*p)."</b>.
+<p>
+<LI> The <b>new</b> command asks for memory, and returns a pointer that points to it.
+This memory will last until the program is over, of until <b>delete</b> is called on the pointer.
+<p>
+<LI> A "memory leak," is where you change a pointer, and don't record its old value.  If it was
+     pointing to memory allocated with <b>new</b>, and there's no record of it anywhere, then it
+     simply wastes space.  You want to avoid memory leaks.
+<p>
+<LI> When you call <b>delete</b>, the memory does not go away, but it is marked for reuse by 
+     subsequent <b>new</b> calls.  This can cause horrific bugs when you forget that a pointer
+     has been deleted.
+<p>
+<LI> One main reason why we use pointers is because we have data that we want to access in a 
+     variety of ways.  The "Bacefook" example shows how we have multiple pointers to <b>People</b>,
+     for example, in the <tt>Inrelationship</tt> pointer, and the <tt>Friends</tt> pointers.
+</UL>

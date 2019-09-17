@@ -19,7 +19,7 @@ class Person {
 
 unsigned int djb_hash(string &s)
 {
-  int i;
+  size_t i;
   unsigned int h;
   
   h = 5381;
@@ -35,18 +35,22 @@ unsigned int djb_hash(string &s)
 // pointer to the person.  Otherwise, if "add" is true, it creates the person 
 // and adds it to the hash table.  If "add" is false, then it simpy returns NULL.
 
-typedef vector <Person *> PVec;
-
-Person *find_person(string &name, vector <PVec> &HT, int add)
+Person *find_person(string &name, vector < vector <Person*> > &HT, int add)
 {
   int h;
-  int i;
+  size_t i;
   Person *p;
+
+  // Look up the person in the hash table.
+
 
   h = djb_hash(name) % HT.size();
   for (i = 0; i < HT[h].size(); i++) {
     if (HT[h][i]->Name == name) return HT[h][i];
   }
+
+  // If we're here in the code, we didn't find the person in the hash table.
+
   if (add) {
     p = new Person;
     p->Name = name;
@@ -59,32 +63,30 @@ Person *find_person(string &name, vector <PVec> &HT, int add)
   }
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  istringstream iss;         // For processing argv[1]
-  string n1, n2, mood;       // For reading in names and moods
-  Person *p, *p2;            // Pointers to people, that we manipulate or print.
+  istringstream iss;                       // For processing argv[1]
+  string n1, n2, mood;                     // For reading in names and moods
+  Person *p, *p2;                          // Pointers to people, that we manipulate or print.
 
-  int Table_Size;            // The table size is read from the command line.
-  vector <PVec> Hash_Table;  // The hash table.  
-                             // Entries are vectors because we use separate chaining
+  int Table_Size;                          // The table size is read from the command line.
+  vector < vector <Person*> > Hash_Table;  // The hash table.  
+                                           // Entries are vectors because we use separate chaining
 
-  int i;                     // Temporary variable
-  string s;                  // Temporary variable
+  size_t i;                                // Temporary variable
+  string s;                                // Temporary variable
 
   // --------------------------------------------------
   // Process the command line and create the hash table.
 
-  if (argc != 2) {
-    cerr << "usage: bacefook_server table-size\n";
-    exit(1);
-  }
+  try {
+    if (argc != 2) throw((string) "usage: bacefook_server table-size");
 
-  iss.clear();
-  iss.str(argv[1]);
-  if (!(iss >> Table_Size) || Table_Size <= 0) {
-    cerr << "usage: bacefook_server table-size\n";
-    cerr << "bad table-size\n";
+    iss.clear();
+    iss.str(argv[1]);
+    if (!(iss >> Table_Size) || Table_Size <= 0) throw ("bad table-size");
+  } catch (const string s) {
+    cerr << s << endl;
     exit(1);
   }
  
@@ -187,5 +189,5 @@ main(int argc, char **argv)
     }
 
   }
-  exit(0);
+  return 0;
 }
