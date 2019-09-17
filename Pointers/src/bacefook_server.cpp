@@ -17,7 +17,7 @@ class Person {
 
 // Here we copy the "djb_hash" function from the hashing lecture notes.
 
-unsigned int djb_hash(string &s)
+unsigned int djb_hash(const string &s)
 {
   size_t i;
   unsigned int h;
@@ -35,7 +35,7 @@ unsigned int djb_hash(string &s)
 // pointer to the person.  Otherwise, if "add" is true, it creates the person 
 // and adds it to the hash table.  If "add" is false, then it simpy returns NULL.
 
-Person *find_person(string &name, vector < vector <Person*> > &HT, int add)
+Person *find_person(const string &name, vector < vector <Person*> > &HT, bool add)
 {
   int h;
   size_t i;
@@ -103,11 +103,11 @@ int main(int argc, char **argv)
 
     if (s == "NEW-PERSON") {
       if (!getline(cin, n1)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
       if (p != NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
-        p = find_person(n1, Hash_Table, 1);
+        p = find_person(n1, Hash_Table, true);
         printf("SUCCESSFUL\n");
       }
 
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     } else if (s == "MOOD") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, mood)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
       if (p == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
@@ -132,8 +132,8 @@ int main(int argc, char **argv)
     } else if (s == "IN-RELATIONSHIP") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, n2)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
-      p2 = find_person(n2, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
+      p2 = find_person(n2, Hash_Table, false);
       if (p == NULL || p2 == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
@@ -149,8 +149,8 @@ int main(int argc, char **argv)
     } else if (s == "ADD-FRIEND") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, n2)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
-      p2 = find_person(n2, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
+      p2 = find_person(n2, Hash_Table, false);
       if (p == NULL || p2 == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 
     } else if (s == "QUERY") {
       if (!getline(cin, n1)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
       if (p == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {

@@ -658,7 +658,7 @@ If <b>add</b> is false, then <b>find_person()</b> simply returns <b>NULL</b>.
 <font color=blue>// pointer to the person.  Otherwise, if "add" is true, it creates the person </font>
 <font color=blue>// and adds it to the hash table.  If "add" is false, then it simpy returns NULL.</font>
 
-Person *find_person(string &name, vector &lt; vector &lt;Person*&gt; &gt; &HT, int add)
+Person *find_person(const string &name, vector &lt; vector &lt;Person*&gt; &gt; &HT, bool add)
 {
   int h;
   size_t i;
@@ -731,9 +731,9 @@ int main(int argc, char **argv)
 Now we process standard input.  Let's start with "NEW-PERSON".  You'll note, when
 standard input ends, we simply exit the program.  When we read the person's name,
 we call <b>find_person()</b> to look the person up in the hash table.  We set 
-<b>add</b> to zero, so that if the person is not there, <b>find_person()</b> 
+<b>add</b> to <b>false</b>, so that if the person is not there, <b>find_person()</b> 
 returns <b>NULL</b>, and we can print "UNSUCCESSFUL."  Otherwise, we call
-<b>find_person()</b> with <b>add</b> set to one to create the person 
+<b>find_person()</b> with <b>add</b> set to <b>true</b> to create the person 
 and put him/her into the table:
 
 <p><center><table border=3 cellpadding=3><td><pre>
@@ -743,11 +743,11 @@ and put him/her into the table:
 
     if (s == "NEW-PERSON") {
       if (!getline(cin, n1)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
       if (p != NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
-        p = find_person(n1, Hash_Table, 1);
+        p = find_person(n1, Hash_Table, true);
         printf("SUCCESSFUL\n");
       }
 </pre></td></table></center><p>
@@ -781,7 +781,7 @@ of "QUERY" that prints out the name and mood:
     } else if (s == "MOOD") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, mood)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
       if (p == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
@@ -791,7 +791,7 @@ of "QUERY" that prints out the name and mood:
 
     } else if (s == "QUERY") {
       if (!getline(cin, n1)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
       if (p == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
@@ -846,8 +846,8 @@ Here's the code.
     } else if (s == "IN-RELATIONSHIP") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, n2)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
-      p2 = find_person(n2, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
+      p2 = find_person(n2, Hash_Table, false);
       if (p == NULL || p2 == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
@@ -914,8 +914,8 @@ Finally, let's add friends.  The code for this is very similar to "IN-RELATIONSH
     } else if (s == "ADD-FRIEND") {
       if (!getline(cin, n1)) exit(1);
       if (!getline(cin, n2)) exit(1);
-      p = find_person(n1, Hash_Table, 0);
-      p2 = find_person(n2, Hash_Table, 0);
+      p = find_person(n1, Hash_Table, false);
+      p2 = find_person(n2, Hash_Table, false);
       if (p == NULL || p2 == NULL) {
         printf("UNSUCCESSFUL\n");
       } else {
