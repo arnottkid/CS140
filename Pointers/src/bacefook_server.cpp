@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
 using namespace std;
 
 // This is our main data structure -- the Person.
