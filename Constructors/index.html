@@ -1,0 +1,1159 @@
+<title>CS140 Lecture notes -- Constructors, Destructors and the Assignment Overload</title>
+<body bgcolor=ffffff>
+<h2>CS140 Lecture notes -- Constructors, Destructors and the Assignment Overload</h2>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>~jplank/cs140/notes/Constructors</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Constructors>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Constructors</b></a>
+<LI> Last modification date: <i>
+Mon Sep 23 15:14:17 EDT 2019
+</i>
+<hr>
+
+We've already gone over basic constructors
+in the <a href=../Classes/index.html>lecture on classes</a>.  In this lecture, I'm going to 
+give them a more complete treatment, along with destructors and the assignment overload.
+
+<hr>
+<h3>Constructors, Parameters, Exceptions</h3>
+
+The most basic constructor is one that does not take any parameters.  It is called whenever
+you call a procedure that has the class declared as 
+a local variable, and whenever you create a new instance
+of a class with <b>new</b>.  Alternatively, you can define a constructor that takes parameters.
+To call this constructor, you need to put the parameters into the declaration of the
+local variable, or when you make the <b>new</b> call.  
+<p>
+The program <b><a href=src/const1.cpp>src/const1.cpp</a></b> defines a class called <b>My_Class</b>,
+which has two constructors -- one with parameters and one without.  Both constructors print out
+the fact that they have been called.  Then both the <b>main()</b> and <b>proc()</b> procedures
+declare two instances of <b>My_Class</b>.  This means that the constructors will be called 
+as soon as the procedures are called.  They both print some statements, and <b>main()</b> also
+creates some <b>My_Class</b> instances with <b>new</b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+<font color=blue>/* I'm declaring this class to have two constructors --
+   one without parameters, and one with parameters. */</font>
+
+class My_Class {
+  public:
+    My_Class();
+    My_Class(int a, const string &s);
+};
+
+<font color=blue>/* The constructor without parameters prints the string,
+   "Constructor called without parameters. */</font>
+
+My_Class::My_Class()
+{
+  cout &lt;&lt; "Constructor called without parameters" &lt;&lt; endl;
+}
+
+<font color=blue>/* The second constructor prints out its parameters. */</font>
+
+My_Class::My_Class(int a, const string &s)
+{
+  cout &lt;&lt; "Constructor called with parameters " 
+       &lt;&lt; a &lt;&lt; " and " &lt;&lt; s &lt;&lt; endl;
+}
+
+<font color=blue>/* The procedure proc() simply declares two
+  instances of My_Class, prints a line and exits.  */</font>
+</pre></td><td valign=top><pre>
+void proc()
+{
+  My_Class c3;
+  My_Class c4(30, "Baby-Daisy");
+
+  cout &lt;&lt; endl &lt;&lt; "proc begins and ends here." &lt;&lt; endl;
+}
+
+<font color=blue>/* Main has two My_Class's declared as local
+  variables, and two pointers, where the My_Class
+  instances are created with new. */</font>
+
+int main()
+{
+  My_Class c1;
+  My_Class c2(5, "Fred");
+  My_Class *cp1, *cp2;
+
+  cout &lt;&lt; endl &lt;&lt; "Main is starting" &lt;&lt; endl;
+  cout &lt;&lt; "calling: cp1 = new My_Class;" &lt;&lt; endl;
+  cp1 = new My_Class;
+
+  cout &lt;&lt; "cp2 = new My_Class(10, \"Luther\");" &lt;&lt; endl;
+  cp2 = new My_Class(10, "Luther");
+
+  cout &lt;&lt; "Calling proc():" &lt;&lt; endl &lt;&lt; endl;
+  proc();
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we run it, it runs to expectation, but you may find it confusing -- I've annotated
+the output:
+
+<pre>
+UNIX> <font color=darkred><b>bin/const1</b></font>
+Constructor called without parameters               <font color=blue># These are when main() starts running.</font>
+Constructor called with parameters 5 and Fred
+
+Main is starting                                    <font color=blue># Here's the main body of main().</font>
+calling: cp1 = new My_Class;
+Constructor called without parameters
+cp2 = new My_Class(10, "Luther");
+Constructor called with parameters 10 and Luther
+Calling proc():
+
+Constructor called without parameters               <font color=blue># These are when proc() starts running.</font>
+Constructor called with parameters 30 and Baby-Daisy
+
+proc begins and ends here.                          <font color=blue># And here's the body of proc().</font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+To handle errors in a constructor, you need to throw an exception.  To demonstrate, take a look
+at <b><a href=src/const2_exception.cpp>src/const2_exception.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+<font color=blue>/* I've gotten rid of the first constructor, and I'm
+   making the second constructor throw an exception
+   when its parameter a is zero. */</font>
+
+class My_Class {
+  public:
+    My_Class(int a);
+};
+
+My_Class::My_Class(int a)
+{
+  printf("Constructor.  A = %d\n", a);
+  if (a == 0) throw ((string) "Throwing exception");
+}
+<font color=blue>/* Proc declares two My_Classes -- one with 
+   a value of 1 and a second one with a value 
+   of zero.  It does a try/catch, but neither 
+   will get called because c2's declaration
+   throws an exception.  */</font>
+
+</pre></td><td valign=top><pre>
+void proc()
+{
+  My_Class c1(1);
+  My_Class c2(0);
+
+  try {
+    cout &lt;&lt; "In proc -- try\n";
+  } catch (const string s) {
+    cout &lt;&lt; "In proc -- catch " &lt;&lt; s &lt;&lt; endl;
+  }
+}
+
+<font color=blue>/* Main calls proc(), and catches exceptions. */</font>
+
+int main()
+{
+  try {
+    proc();
+    cout &lt;&lt; "This line won't print" &lt;&lt; endl;
+  } catch (const string s) {
+    cout &lt;&lt; "Caught " &lt;&lt; s &lt;&lt; endl;
+  }
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we call this, the flow of control works as follows:
+
+<UL>
+<LI> <b>main()</b> calls <b>proc()</b>.
+<LI> <b>proc()</b> declares <b>c1</b>, which calls the constructor.  Since
+the parameter <b>a</b> is 1, everything is ok.
+<LI> <b>proc()</b> declares <b>c2</b>, which calls the constructor.  Since 
+the parameter <b>a</b> is 0, the constructor throws an exception.
+<LI> Although <b>proc()</b> has a "try/catch", the variable declarations
+     are not inside the "try/catch".  For that reason, the exception is
+     caught by <b>main()</b>.
+<LI> <b>main()</b> prints out "Caught Throwing exception", and exits.
+</UL>
+
+Here it is running:
+
+<pre>
+UNIX> <font color=darkred><b>bin/const2_exception </b></font>
+Constructor.  A = 1
+Constructor.  A = 0
+Caught Throwing exception
+UNIX> <font color=darkred></font>
+</pre>
+
+This may seem confusing to you.  Make sure you can trace through code like this.
+
+<hr>
+<h3>Destructors</h3>
+
+You can define a destructor for a class.  This is defined similarly to the constructor, but
+you precede the method's name with a tilde "~".  Destructors are called primarily in two
+places: 
+
+<UL>
+<LI> When the class instance is a local variable, and a procedure is returning.
+<LI> When the class instance was created with <b>new</b>, and <b>delete</b> is called on the instance.
+</UL>
+
+Let's demonstrate with
+<b><a href=src/const3_destructor.cpp>src/const3_destructor.cpp</a></b>.
+This is identical to 
+<b><a href=src/const1.cpp>src/const1.cpp</a></b>, except for the following things:
+
+<UL>
+<LI> I've added a destructor to the class definition:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+class My_Class {
+  public:
+    My_Class();
+    My_Class(int a, const string &s);
+    ~My_Class();                       <font color=blue>// This is the destructor</font>
+};
+</pre></td></table></center><p>
+
+<LI> I implement the destructor to print when it's called:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+My_Class::~My_Class()
+{
+  cout &lt;&lt; "Destructor called." &lt;&lt; endl;
+}
+</pre></td></table></center>
+
+<LI> I call <b>delete</b> on <b>cp1</b> at the end of <b>main()</b>, 
+     along with a few extra print statements:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  <font color=blue>/* Here's the new code in main() */</font>
+
+  cout &lt;&lt; endl &lt;&lt; "Calling delete on cp1" &lt;&lt; endl ;
+  delete cp1;
+
+  cout &lt;&lt; endl &lt;&lt; "Main is returning" &lt;&lt; endl ;
+  return 0;
+}
+</pre></td></table></center><p>
+</UL>
+
+When we run this -- you can see that the destructor is called five times.  I'll
+annotate:
+
+<pre>
+UNIX> <font color=darkred><b>bin/const3_destructor</b></font>
+Constructor called without parameters
+Constructor called with parameters 5 and Fred
+
+Main is starting
+calling: cp1 = new My_Class;
+Constructor called without parameters
+cp2 = new My_Class(10, "Luther");
+Constructor called with parameters 10 and Luther
+Calling proc():
+
+Constructor called without parameters
+Constructor called with parameters 30 and Baby-Daisy
+
+proc begins and ends here.
+Destructor called.                   <font color=blue># These two are for cp3 and cp4 in proc()</font>
+Destructor called.
+
+Calling delete on cp1
+Destructor called.                   <font color=blue># This is from the delete call</font>
+
+Main is returning
+Destructor called.                   <font color=blue># These two are for cp1 and cp2 in main()</font>
+Destructor called.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+You'll note that no destructor was called for <b>cp2</b>.  That's because we never called
+<b>delete</b> on it.  So we have a few important thing about destructors:
+
+<UL>
+<LI> Destructors are always called on local variables when the procedure exits.
+<LI> Destructors are only called on pointers when you call <b>delete</b>.
+<LI> If your program ends without calling <b>delete</b> on an instance of a class, then the
+destructor will never be called.  That may be ok -- the memory is cleaned up by the operating
+system.
+</UL>
+
+<hr>
+<h3>Destructors and exceptions</h3>
+
+Time to have some fun.  Behold
+<b><a href=src/const4_dest_except.cpp>src/const4_dest_except.cpp</a></b>.  Read the
+opening block comment for a description:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+<font color=blue>/* My_Class has a string, which it sets in the constructor. 
+   It also has a destructor that prints the string.  This 
+   program will make a few nested procedure calls, each of
+   which has four My_Class local variables.  In the deepest
+   nesting, I throw an exception, which I catch in main().
+   I do this to show how all of the destructors get called
+   as the exception travels back to main(). */</font>
+
+class My_Class {
+  public:
+    My_Class(const string &s);
+    ~My_Class();
+    string my_string;
+};
+
+<font color=blue>/* The constructor sets my_string, 
+   and the destructor prints it. */</font>
+   
+My_Class::My_Class(const string &s)
+{
+  my_string = s;
+}
+
+My_Class::~My_Class()
+{
+  cout &lt;&lt; "Destructor called. my_string = " 
+       &lt;&lt; my_string &lt;&lt; endl;
+}
+
+<font color=blue>/* p1, p2, p3 declare four My_Class's.  
+   p3 throws an exception. */</font>
+</pre></td><td valign=top><pre>
+void p3()
+{
+  My_Class c1("p3_c1"), c2("p3_c2"); 
+  My_Class c3("p3_c3"), c4("p3_c4");
+  throw(0);
+}
+void p2()
+{
+  My_Class c1("p2_c1"), c2("p2_c2"); 
+  My_Class c3("p2_c3"), c4("p2_c4");
+  p3();
+}
+
+void p1()
+{
+  My_Class c1("p1_c1"), c2("p1_c2"); 
+  My_Class c3("p1_c3"), c4("p1_c4");
+  p2();
+}
+
+<font color=blue>/* Finally, main() allocates one 
+   My_Class, then calls p1(), 
+   catching the exception. */</font>
+
+int main()
+{
+  My_Class c1("main_c1");
+
+  try {
+    p1();
+  } catch (int i) {
+    cout &lt;&lt; "Caught " &lt;&lt; i &lt;&lt; endl;
+  }
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we call this, you'll note:
+
+<UL>
+<LI> <b>main()</b> calls <b>p1()</b>.
+<LI> <b>p1()</b> calls <b>p2()</b>.
+<LI> <b>p2()</b> calls <b>p3()</b>.
+<LI> <b>p3()</b> throws an exception. 
+</UL>
+
+I do this to highlight the fact that when the exception is thrown, the following
+things happen:
+
+<UL>
+<LI> Since the exception cannot be caught in <b>p3()</b>, <b>p3()</b> returns, 
+     calling its four destructors.
+<LI> Now, the exception cannot be caught in <b>p2()</b>, so <b>p2()</b> returns, 
+     calling its four destructors.
+<LI> Again, the exception cannot be caught in <b>p1()</b>, so <b>p1()</b> returns, 
+     calling its four destructors.
+<LI> The exception is caught in <b>main()</b>, so it prints out that it caught the
+     exception. 
+<LI> <b>main()</b> exits, which makes the last destructor call:
+</UL>
+
+<pre>
+UNIX> <font color=darkred><b>bin/const4_dest_except</b></font>
+Destructor called. my_string = p3_c4
+Destructor called. my_string = p3_c3
+Destructor called. my_string = p3_c2
+Destructor called. my_string = p3_c1
+Destructor called. my_string = p2_c4
+Destructor called. my_string = p2_c3
+Destructor called. my_string = p2_c2
+Destructor called. my_string = p2_c1
+Destructor called. my_string = p1_c4
+Destructor called. my_string = p1_c3
+Destructor called. my_string = p1_c2
+Destructor called. my_string = p1_c1
+Caught 0
+Destructor called. my_string = main_c1
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Starting in C++ 11, you can't catch an exception thrown in a destructor.  It has to do with
+the program that you just saw -- if you need to call those destructors while catching an 
+exception, then you shouldn't be throwing a new exception.   The impact: Just don't throw
+an exception from a destructor.  
+<p>
+If you want to read typical arrogant and abusive blather on the topic, just Google "why can't i throw an exception in a destructor in C++" and read the prose on Stack Overflow...
+
+<hr>
+<h3>Vectors, Constructors and Destructors</h3>
+
+Suppose I make a vector of <b>My_Class</b> objects through resizing, and I don't specify a
+default.  Then the constructor is called on every element of the vector, and when the procedure
+exits, the destructor is called on every element as well.  I'll illustrate with
+<b><a href=src/const5_vector1.cpp>src/const5_vector1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=blue>/* We resize a vector of My_Class elements and 
+   exit, just to see what the constructors and
+   destructors do */</font>
+
+class My_Class {
+  public:
+    My_Class();
+    ~My_Class();
+};
+</pre></td><td valign=top><pre>
+My_Class::My_Class()
+{
+  cout &lt;&lt; "Constructor called." &lt;&lt; endl;
+}
+
+My_Class::~My_Class()
+{
+  cout &lt;&lt; "Destructor called." &lt;&lt; endl;
+}
+</pre></td><td valign=top><pre>
+int main()
+{
+  vector &lt;My_Class&gt; v;
+
+  v.resize(5);
+  return 0;
+}
+</pre></td></table></center><p>
+
+Here we go -- five constructor calls, and five destructor calls:
+
+<pre>
+UNIX> <font color=darkred><b>bin/const5_vector1 </b></font>
+Constructor called.
+Constructor called.
+Constructor called.
+Constructor called.
+Constructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Now, suppose we resize by giving a default value.  This is done
+in 
+<b><a href=src/const6_vector2.cpp>src/const6_vector2.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=blue>/* Now we resize with a default value. */</font>
+
+class My_Class {
+  public:
+    My_Class();
+    ~My_Class();
+};
+</pre></td><td valign=top><pre>
+My_Class::My_Class()
+{
+  cout &lt;&lt; "Constructor called." &lt;&lt; endl;
+}
+
+My_Class::~My_Class()
+{
+  cout &lt;&lt; "Destructor called." &lt;&lt; endl;
+}
+</pre></td><td valign=top><pre>
+int main()
+{
+  My_Class c;
+  vector &lt;My_Class&gt; v;
+
+  <font color=blue>// We resize with a default</font>
+  v.resize(5, c); 
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we run it, we only get one constructor call, and six destructor calls:
+
+<pre>
+UNIX> <font color=darkred><b>bin/const6_vector2</b></font>
+Constructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+What gives? Well.....
+
+<hr>
+<h3>The Copy Constructor</h3>
+
+You can define what's called a "copy constructor."  It takes a parameter, which is
+a const reference parameter to an instance of the same type.  This is what's
+called when you resize with a default.  The program 
+<b><a href=src/const7_copy.cpp>src/const7_copy.cpp</a></b>
+demonstrates:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=blue>/* This program explores the copy constructor. */</font>
+
+class My_Class {
+  public:
+    My_Class();
+    My_Class(const My_Class &mc);
+    ~My_Class();
+};
+
+<font color=blue>/* This is the copy constructor, which is called
+   when a vector is resized with a default, or 
+   when you call a procedure with an instance of
+   the class as a non-reference parameter. */</font>
+
+My_Class::My_Class(const My_Class &mc)
+{
+  (void) mc;
+  cout &lt;&lt; "Copy Constructor called." &lt;&lt; endl;
+}
+</pre></td><td valign=top><pre>
+My_Class::My_Class()
+{
+  cout &lt;&lt; "Constructor called." &lt;&lt; endl;
+}
+
+My_Class::~My_Class()
+{
+  cout &lt;&lt; "Destructor called." &lt;&lt; endl;
+}
+
+void proc1(My_Class c)
+{
+  (void) c;
+}
+
+void proc2(My_Class &c)
+{
+  (void) c;
+}
+</pre></td><td valign=top><pre>
+void proc3(const My_Class &c)
+{
+  (void) c;
+}
+
+int main()
+{
+  My_Class c;
+  vector &lt;My_Class&gt; v;
+
+  v.resize(5, c);
+  cout &lt;&lt; "vector resized" &lt;&lt; endl;
+  proc1(c);
+  proc2(c);
+  proc3(c);
+  
+  cout &lt;&lt; "returning" &lt;&lt; endl;
+  return 0;
+}
+</pre></td></table></center><p>
+
+You'll note that in addition to the copy constructor, I have three procedures:
+
+<UL>
+<LI> <b>proc1</b>, which takes a <b>My_Class</b> instance as a parameter.  It will make a copy
+of this parameter, which will call the copy constructor.
+<LI> <b>proc2</b>, which takes a reference to a <b>My_Class</b> instance as a parameter.
+Since it's a reference, there's no copy being made, so no constructor is called.
+<LI> <b>proc3</b>, which takes a const reference parameter.
+This is just like <b>proc2()</b>.  The only thing that the <b>const</b> does is have the compiler
+enforce the fact that you're not changing <b>c</b>.
+</UL>
+
+When we run it, we see that the copy constructor is called five times when we resize the 
+vector, and then once when we call <b>proc1()</b>:
+
+<pre>
+UNIX> <font color=darkred><b>bin/const7_copy</b></font>
+Constructor called.                 <font color=blue># This is for c</font>
+Copy Constructor called.            <font color=blue># These five are when we resize the vector</font>
+Copy Constructor called.
+Copy Constructor called.
+Copy Constructor called.
+Copy Constructor called.
+vector resized
+Copy Constructor called.            <font color=blue># This is when proc1() is called - we copy the argument</font>
+Destructor called.                  <font color=blue># This is when proc1() returns</font>
+returning                           <font color=blue># Main() prints this right before it returns</font>
+Destructor called.                  <font color=blue># There are six of these - 5 for the vector, and one for c</font>
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+Destructor called.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+If you don't define a copy constructor, a default is defined for you, that 
+simply copies each member variable of the 
+class.  Typically, that's what you want, so you don't define a copy constructor.  Think about that
+in our bitmatrix lab -- the only member variable is a vector <b>M</b>.  The copy constructor
+copies that vector, so it does exctly what you want.
+If your class does some weird stuff, (typically involving pointers or open files),
+you'll want to rewrite the copy constructor.
+
+<hr>
+<h3>This</h3>
+
+When you are implementing a method in C++, you can access a pointer to the instance of your
+class with <b>this</b>.  Let me give a really simple example, which is not a good example of
+program design, but at least illustrates <b>this</b>.   Here we have a class <b>Person</b>
+with member variables <b>Name</b> and <b>Age</b>.  There is also a <b>Print()</b> method.
+We have an additional procedure <b>Print_Person()</b> which takes a pointer to a <b>Person</b>,
+and prints it out with some formatting.  
+<p>
+To implement the <b>Print()</b> method, we simply call <b>Print_Person()</b> on <b>this</b>, which
+is a pointer to the class.  Take a look (in
+<b><a href=src/this.cpp>src/this.cpp</a></b>).
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* A program to demonstrate "this" */</font>
+
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+class Person {
+  public:
+    string Name;
+    int Age;
+    void Print(); 
+};
+
+<font color=blue>/* Print_Person() takes a pointer to a person, and prints out
+   the person with some formatting. */</font>
+
+void Print_Person(Person *p)
+{
+  printf("Person: %s - Age = %d\n", p-&gt;Name.c_str(), p-&gt;Age);
+}
+
+<font color=blue>/* The Print() method uses Print_Person() -- this is a pointer
+   to the instance which is calling Print(). */</font>
+
+void Person::Print()
+{
+  Print_Person(this);
+}
+
+<font color=blue>/* In main(), we read in pairs of (name,age), and then use the
+   Print() method of the Person class to print the person. */</font>
+
+int main()
+{
+  Person p;
+  
+  while (cin &gt;&gt; p.Name &gt;&gt; p.Age) p.Print();
+  return 0;
+}
+</pre></td></table></center><p>
+
+We run it by passing two pairs of names and ages to standard input -- as you can see, the
+<b>Print()</b> method calls <b>Print_Person()</b>, using <b>this</b> as a pointer to the 
+<b>Person</b> calling <b>Print()</b>:
+
+<pre>
+UNIX> <font color=darkred><b>echo Fred 5 Luther 55 | bin/this</b></font>
+Person: Fred - Age = 5
+Person: Luther - Age = 55
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Overloading the assigment operator</h3>
+
+C++ allows you to "overload" operators -- this allows you do to things like define what "+"
+means for a class.  Sometimes that's nice (like having "+" be string concatenation in the
+string class).  More often than not, it's confusing, which is why I don't teach much concerning
+operator overloading.
+<p>
+Much like the copy constructor, each class has a default assignment operator.  This is the equals
+sign.  If you say:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+a = b;
+</pre></td></table></center><p>
+
+Where <b>a</b> and <b>b</b> are instances of a class, the default action is for <b>a</b> to 
+receive a copy of each of <b>b</b>'s member variables.  More often than not, this is what
+you want.  However, there are times when it's not, and when that's the case, you can redefine it.
+Let me show you an example, which is contrived, but it demonstrates how you can redefine the 
+operator.   It's in 
+<b><a href=src/overload.cpp>src/overload.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* A program to show an assignment overload */</font>
+
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+class Crazy_Class {
+  public:
+    int value;
+    Crazy_Class& operator= (const Crazy_Class &cc);
+};
+
+<font color=blue>/* The assignment overload copies value+1 from the original class. */</font>
+
+Crazy_Class& Crazy_Class::operator= (const Crazy_Class &cc)
+{
+  value = cc.value+1;
+  return *this;
+}
+
+int main()
+{
+  Crazy_Class c1, c2;
+
+  c1.value = 5;
+  c2 = c1;                    <font color=blue>// This will call the overload, and set c2.value to 6.</font>
+  cout &lt;&lt; c2.value &lt;&lt; endl;   <font color=blue>// This prints 6.</font>
+}
+</pre></td></table></center><p>
+
+The assignment overload copies <b>value+1</b> to value.  So, when you say "c2 = c1", it calls
+the assignment overload, and sets <b>c2.value</b> to <b>(c1.value+1)</b>=6.  Again, this example
+is contrived, but there are times, again when you're using pointers or open files in a class,
+that you'll want to redefine the assignment overload.
+
+<pre>
+UNIX> <font color=darkred><b>bin/overload</b></font>
+6
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Some Opinions From Dr. Plank</h3>
+
+As you know, I'm pretty opinionated when it comes to programming.  I've been doing it forever, 
+and my experience with that, combined with developing large open-source programming projects, 
+combined with doing code review as an expert witness, have given me quite a bit of perspective.
+<p>
+I'm going to give you some opinions and recommendations now, with respect to C++ and object
+oriented programming.  You don't have to heed these, but you should take serious consideration
+of them, and think about why I make them.  I'll tell you that I am strict with respect to these,
+and I expect the students who work for me to be strict as well.  Here we go:
+
+<OL>
+<LI> <b>Variable declarations should come before code, and not be intermixed</b>.
+<p>
+In both C and C++, you can declare variables pretty much anywhere.  I declare variables at
+the top of my procedures, before any code.  That way, you know where to look for them, and
+you know that they are not undergoing any changes until the first line of real code.
+It makes the code readable, and easy to reason about.  I am sure I'm in the minority here,
+but again, I have a <i>lot</i> of experience.  When you read my code, you know where to
+find stuff.
+<p>
+It's much more convenient for the programmer to violate this.  Let's take stringstreams
+for example.  When I read a line of text and convert it to a vector of strings, I do the
+following:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+int main()
+{
+  istringstream ss;
+  vector &lt;string&gt; sv;
+  string line, word;
+
+  while (getline(cin, line)) {
+    ss.clear();
+    sv.clear();
+    ss.str(line);
+    while (ss &gt;&gt; word) sv.push_back(word());
+    ...
+</pre></td></table></center><p>
+   
+It would be more convenient for me to simply declare <b>ss</b> and <b>sv</b> inside the loop:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+int main()
+{
+  string line, word;
+
+  while (getline(cin, line)) {
+    istringstream ss;
+    vector &lt;string&gt; sv;
+    ss.str(line);
+    while (ss &gt;&gt; word) sv.push_back(word);
+    ...
+</pre></td></table></center><p>
+
+Now I don't have to call <b>clear()</b>.  I can tell you I intensely dislike code like this -- 
+again, I want declarations before code, and I don't want those declarations to be executing 
+things.  Then you know where to find stuff, and you have reasonable assurances what the state
+of the stuff is when the first line of code is executed.  
+<p>
+Let me give you a really extreme example, in 
+<b><a href=src/code_in_declarations.cpp>src/code_in_declarations.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* Here's a program where the constructor has side effects on its parameter.
+   By the time you're done declaring parameters, the value of i is 105. */</font>
+
+class My_Class {
+  public:
+    My_Class(int &i);
+};
+
+My_Class::My_Class(int &i)
+{
+  i += 50;
+}
+
+int main()
+{
+  int i = 5;
+  My_Class c1(i), c2(i);
+  
+  cout &lt;&lt; i &lt;&lt; endl;
+  return 0;
+}
+</pre></td></table></center><p>
+
+As mentioned in the comments, by the time you print <b>i</b>, the two constructors have
+changed its value to 105.  You may say that this is an extreme example, but once you start
+intermixing variable declarations, code, and complex constructor operations, anything goes,
+and you can get code like this.
+
+<LI> <b>Class declarations should have <i>no executable code</i>.  That includes constructors that define defaults</b>.
+
+This falls in with the above comments -- when class declarations don't have code, then you
+don't have surprises, and you know where to look for things.  You'll note, that includes 
+default-setting constructors, like:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+class My_Class {
+  public:
+    My_Class() : i(5) {};
+  protected:
+    int i;
+};
+</pre></td></table></center><p>
+
+<p>
+<LI> <b>You should avoid parameterizing constructors, unless you use a class exclusively with pointers</b>.
+<p>
+This can be derived from the first recommendation.  If you declare an instance of a class as 
+a local variable with parameters, you are executing code.  Often, you can't even declare it until
+you have executed some code that lets you set its parameters.  Here's an example -- recall
+from the Bitmatrix lab, that we defined a hash table of bitmatrices:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+class BM_Hash {
+  public:
+    BM_Hash(int size);
+  ...
+</pre></td></table></center><p>
+
+Now, suppose you want to create a hash table, and read the table's size from standard input.
+When you use a pointer, the code is nice and clean:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void main()
+{
+  int table_size;
+  BM_Hash *hash_table;
+
+  cin &lt;&lt; table_size;
+  hash_table = new BM_Hash(table_size);
+  ....
+</pre></td></table></center><p>
+
+If you don't want to use a pointer (and I know that y'all students don't want to use pointers),
+you are forced to declare <b>hash_table</b> in the middle of your code:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void main()
+{
+  int table_size;
+
+  cin &lt;&lt; table_size;
+  BM_Hash hash_table(table_size);
+  ....
+</pre></td></table></center><p>
+
+Convenient?  Yes.  Easy to read and reason about?  No.  I don't do it.
+
+<p>
+<LI> <b>If you are going to declare instances of a class as local variables, don't parameterize the constructor.  That way, you can declare it wherever you want, and you don't have to worry about
+errors.</b>
+<p>
+This may be inconvenient, because then you have to account for an "empty" instance of the class.
+Let's use the hash table above to exemplify.  Its constructor takes a parameter - the table size.
+For that reason, you never have an empty hash table.  On the flip side, if you are going to 
+follow my rules, you'll always use a pointer to it, and you'll always have to call <b>new</b>
+to create it.  Suppose instead that you don't have a 
+parameter to the constructor.  Then, you don't even need a constructor -- when you create an
+instance, the table will be empty.  You'll have to add a method, like <b>Set_Size()</b>, to 
+set the hash table's size, and then in your other hash table methods, you'll have to take 
+into account that the hash table may be empty, and return the appropriate errors.
+<p>
+So it's a trade-off, certainly in code complexity, but you get the ability to declare the 
+class very easily as a local variable.  You also get the ability to resize a vector of the
+class without specifying a default value.  There will be additional advantages when we get
+around to maps as well.  
+<p>
+So consider that, when you are designing your classes.
+
+<LI> <b>Remember copy constructors and assignment overloads</b>.
+<p>
+When someone else uses your class, they will very reasonably expect to be able to make copies
+of class instances, either through a procedure call, or through the assignment operator.  
+You should do the following:
+
+<p>
+<UL>
+<LI> If the default copy constructor and assignment behavior work, that's great!
+<LI> If they don't, but it makes sense to write your own copy constructor and assignment overload,
+     then do it.
+<LI> If it doesn't make sense to write your own, then <i>disable</i> them.  You can do that as
+follows:
+<p><center><table border=3 cellpadding=3><td><pre>
+class My_Class {
+  public:
+    My_Class(const MyClass &c) = delete;
+    My_Class& operator= (const My_Class &cc) = delete;
+....
+}
+</pre></td></table></center><p>
+
+Now, if a user attempts an operation that would call the copy constructor or assignment
+overlead, the compiler will emit an error.  This is <i>much</i> better than ignoring the 
+copy constructor, and then having it not work when someone calls it.
+</UL>
+<p>
+Since someone is bound to ask me about this, you can define a "move" constructor as well
+in the later versions of C++ (11 and beyond).  The point of this is to optimize performance
+when you return a large data structure from a procedure/method.  
+Move constructors are beyond the scope of this class, sorry.
+
+</UL>
+<LI> <b>With one exception, when you throw an exception, the "try/catch" code that catches
+     it should be in the same procedure in which it is thrown.  The one exception is when
+     you throw an exception from a constructor (because you can't avoid it).</b>
+<p>
+If you adhere to this rule, you will avoid a <i>ton</i> of mistakes that come from the
+odd flow-of-control when you catch exceptions in other procedures.  Think about the 
+program above that threw the exception in <b>p3()</b>, and caught it in <b>main()</b>.
+Since it calls all of those destructors on the way, the code is confusing and obtuse.
+</UL>
+
+<LI> <b>Be very careful with pointers into the internals of data structures, such as
+        strings and vectors (and later sets and maps).  This is because strings and vectors
+        move their data around as they resize, and you'll be left with a stale pointer.</b>
+        
+<p>
+I'm going to give two example programs here.  The first is in
+<b><a href=src/vector_pointer.cpp>src/vector_pointer.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* A program to demonstrate why it is dangerous to hold a pointer to
+   an element of a vector, because it may get moved. */</font>
+
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main()
+{
+  vector &lt;string&gt; v;
+  string *sp;
+  string line;
+
+  while (getline(cin, line)) {
+    v.push_back(line); 
+    if (v.size() == 1) sp = &(v[0]);          <font color=blue>// I set sp to point to the first string in v.</font>
+    cout &lt;&lt; v.size() &lt;&lt; " " &lt;&lt; *sp &lt;&lt; endl;   <font color=blue>// I then print v's size, and *sp.</font>
+  }
+  return 0;
+}
+</pre></td></table></center><p>
+
+This program reads lines from standard input, and pushes them onto v.  It sets sp to
+point to the first string in <b>v</b>, right after it is put onto v.  At the end of every
+iteration, it prints v's size and *sp.  Let's see it in action:
+
+<pre>
+UNIX> <font color=darkred><b>cat files/input.txt</b></font>
+Kaylee Hex
+Abigail Piezoelectric MD
+Charlie Waive
+Gabriel Oshkosh
+Lucas Some
+Maya Extravaganza
+Isaiah Stiletto
+Cooper Encumber
+Kayla Littleneck
+Lillian Coroutine
+UNIX> <font color=darkred><b>cat files/input.txt | bin/vector_pointer </b></font>
+1 Kaylee Hex
+2 Kaylee Hex
+Segmentation fault
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+That's not good.  What happened?  When the program called <b>v.push_back("Charlie Waive")</b>,
+the vector needed more memory, so it resized itself to a different memory location, and then
+copied the strings that were in the old location to the new location.  And then they deleted
+the old location.  Frankly, this could have happend after 
+<b>v.push_back("Abigail Piezoelectric MD")</b>, and the memory at <b>sp</b> didn't get reused
+until 
+<b>v.push_back("Charlie Waive")</b>.  Regardless, after 
+<b>v.push_back("Charlie Waive")</b>, the memory pointed to by <b>sp</b> has been changed so that
+it is no longer a string, and we are alerted to it by the segmentation violation.
+Keep that in mind.
+
+<p>
+Here's a second example, that got me when I was first using exceptions.  If you throw
+a string literal, like:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+throw("Error");
+</pre></td></table></center><p>
+
+The type of the argument is <b>(const char *)</b>, which means that to catch it, you need
+to do:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+catch (const char *s) {
+</pre></td></table></center><p>
+<p>
+Suppose that you've already written the code to throw a string literal, and then later in the
+same constructor, you want to construct a custom error message as a string and throw the
+string.  Unfortunately, you can't catch it with the statement above -- it has to catch a string.  
+So, to avoid writing a second <b>catch()</b> statement and possiblyl duplicate code,
+what I did was throw the <b>c_str()</b> method of the string.  Let me demonstrate with
+some code, in 
+<b><a href=src/exception_char_star.cpp>src/exception_char_star.cpp</a></b>.  I'll start
+with the class definition, and the constructor, which thows a string literal when <b>a</b>
+equals zero, and uses a stringstream to construct an error string when <b>a &lt; 0</b>.
+It then converts the stringstream to a string and uses the <b>c_str()</b> method so that
+it is throwing a <b>(const char *)</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+class My_Class {
+  public:
+    My_Class(int a);
+};
+
+My_Class::My_Class(int a)
+{
+  ostringstream oss;
+
+  if (a == 0) throw("Bad constructor for My_Class().  A shouldn't equal zero.");
+
+  if (a &lt; 0) {
+    oss &lt;&lt; "Bad constructor for My_Class().  A shouldn't equal " &lt;&lt; a ;
+    throw(oss.str().c_str());
+  }
+}
+</pre></td></table></center><p>
+
+In the <b>main()</b> I call <b>new</b>, first when <b>a</b> is zero, and then again 
+when <b>a</b> is negative.  
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Here, I catch (const char *)'s rather than strings. */</font>
+
+int main()
+{
+  My_Class *cp;
+
+  try {                        <font color=blue>// This one works fine, because the string literal is </font>
+    cp = new My_Class(0);      <font color=blue>// really a global variable.</font>
+  } catch (const char *s) {
+    printf("%s\n", s);
+  }
+   
+  try {                        <font color=blue>// This one doesn't work, because the oss's destructor is called, </font>
+    cp = new My_Class(-5);     <font color=blue>// and the memory pointed to by s has been freed up (and reused)</font>
+  } catch (const char *s) {
+    printf("%s\n", s);
+  }
+  return 0;
+}
+</pre></td></table></center><p>
+
+The first <b>throw()</b> gets caught fine, because that
+string literal is a global variable.  The second <b>throw</b> gets caught, but because
+the constructor has exited, the stringstream has been deallocated (actually, technically,
+the string created by the <b>str()</b> method has been deallocated).  That means that the
+pointer that was returned by <b>c_str()</b> is no longer valid.
+<p>
+When we run it, the second <b>catch()</b> prints an empty string.  To be honest with you,
+anything could happen there.  It just happens to print an empty string on my Macintosh.
+
+<pre>
+UNIX> <font color=darkred><b>bin/exception_char_star</b></font>
+Bad constructor for My_Class().  A shouldn't equal zero.
+
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The solution to this is to always throw strings.  If you have a string literal, put
+<b>(string)</b> in front of it, so that the <b>throw()</b> statement throws a string:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+throw((string) "Error");
+</pre></td></table></center><p>
+</UL>
