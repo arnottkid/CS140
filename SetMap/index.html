@@ -1,0 +1,706 @@
+<title>CS140 Lecture Notes</title>
+<h2>CS140 Lecture Notes - STL Sets and Maps</h2>
+<UL>
+<LI> James S. Plank
+<LI> Original Notes: September 3, 2009
+<LI> Last revision: <i>Wed Mar 30 11:31:51 EDT 2011</i>
+<LI> Directory: <b>/home/plank/cs140/Notes/SetMap</b>
+</UL>
+
+<hr>
+Sets and Maps are two very powerful parts of the STL.  They let you do sorting
+and searching in log time, which gives you optimal performance with two 
+extremely important functionalities (searching and sorting).
+<hr>
+<h3>Topcoder Problems to help with Sets and Maps</h3>
+<UL>
+<LI> <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Topcoder/MultiplicationTable2.html>SRM 685, D1, 250-Pointer: MultiplicationTable2</a>.  This is a straightforward <b>set</b> 
+problem.
+<LI> <a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2016/Ropestring>SRM 696, D2, 250-Pointer: Ropestring</a>.  This is a straightforward problem to let you practice multisets.
+<LI> <a href=http://web.eecs.utk.edu/~jplank/topcoder-writeups/2017/RelativeHeights/index.html>SRM 718, D2, 250-Pointer: RelativeHeights</a>.  Maps, sets and some string processing.  This is a good practice problem.
+<LI> <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Topcoder/AmebaDiv1.html>SRM 615, D1, 250-Pointer: AmebaDiv1</a>.  This is another relatively straightforward <b>set</b> 
+problem.
+<LI> <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Topcoder/StoryFromTCO.html>SRM 635, D1, 500-Pointer: StoryFromTCO</a>.  This is a straightforward <b>multiset</b> problem when you
+program it.  Figuring out the solution is harder, but in the notes, I walk you through it.
+I recommend that you do this problem, as it is a good one to make you think algorithmically,
+using the <b>multiset</b> as a tool.
+</UL>
+<hr>
+<h3>Sets</h3>
+
+A set is an ordered collection of data, such as ints or strings.  You may <i>insert</i>
+elements into the set, and then you may <i>find</i> them, or traverse the set in order.
+You do insertion just like calling <b>push_back()</b> or <b>push_front()</b> on a list.
+The difference is that the item goes into its proper place in the set, rather than
+on the back or front of a list.
+<p>
+When you traverse a set, you use an iterator, just as you do with lists.  Thus, the
+simple program 
+<b><a href=simple_set.cpp>simple_set.cpp</a></b>
+employs a set to sort the lines of standard input:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;set&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+main()
+{
+  string s;
+  set &lt;string&gt; names;
+  set &lt;string&gt;::iterator nit;
+
+  while(getline(cin, s)) names.insert(s);
+
+  for (nit = names.begin(); nit != names.end(); nit++) {
+    cout &lt;&lt; *nit &lt;&lt; endl;
+  }
+} 
+</pre></td></table></center><p>
+
+To repeat, instead of using <b>push_back()</b>, like you do with lists or vectors, 
+you use <b>insert()</b>,
+which puts the string into the right place.    The traversal is
+exactly like traversing a list.  
+<p>
+
+<pre>
+UNIX> <font color=darkred><b>cat input-1.txt</b></font>
+Jack Journey
+Mackenzie Olympia
+James Splotch
+Dylan Ache
+UNIX> <font color=darkred><b>simple_set < input-1.txt</b></font>
+Dylan Ache
+Jack Journey
+James Splotch
+Mackenzie Olympia
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The first question you should have is: "What about duplicate entries?"  For
+example, let's try 
+<b><a href=input-2.txt>input-2.txt</a></b>, which has two duplicate entries:
+
+<pre>
+UNIX> <font color=darkred><b>cat input-2.txt</b></font>
+John Bevy
+Xavier Ornately
+Nicholas Wyatt Fecund
+Max Inadvertent III
+John Bevy
+Max Inadvertent III
+UNIX> <font color=darkred><b>simple_set < input-2.txt</b></font>
+John Bevy
+Max Inadvertent III
+Nicholas Wyatt Fecund
+Xavier Ornately
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+As you can see, it does not insert duplicates.  If you want to allow duplicates,
+you use a <b>multiset</b>, as in 
+<b><a href=simple_multiset.cpp>simple_multiset.cpp</a></b>.  The only 
+difference with this program is the declaration of <b>names</b> and <b>nit</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  multiset &lt;string&gt; names;
+  multiset &lt;string&gt;::iterator nit;
+</pre></td></table></center><p>
+
+Everything else is the same, and the duplicate entries each get their own 
+entry in the multiset:
+
+<pre>
+UNIX> <font color=darkred><b>simple_multiset < input-2.txt</b></font>
+John Bevy
+John Bevy
+Max Inadvertent III
+Max Inadvertent III
+Nicholas Wyatt Fecund
+Xavier Ornately
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+We can use the <b>find()</b> method of a set or multiset to see if an element
+is in the set or multiset.  This is done in log time, which means very fast --
+much faster than traversing all elements of the set to find it.  <b>Find()</b>
+returns an iterator to the element in the set if it is found.  If it is not
+in the set, it returns an iterator that equals the <b>end()</b> method.
+<p>
+
+Here's an example in
+<b><a href=simple_set_find.cpp>simple_set_find.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;set&gt;
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+main(int argc, char **argv)
+{
+  string s;
+  ifstream f;
+  set &lt;string&gt; names;
+
+  if (argc != 2) { cerr &lt;&lt; "usage: simple_set_find file\n"; exit(1); }
+
+  f.open(argv[1]);
+  if (f.fail()) { perror(argv[1]); exit(1); }
+
+  while(getline(f, s)) names.insert(s);
+  f.close();
+
+  while (1) {
+    cout &lt;&lt; "Enter a name: ";
+    cout.flush();                    // Don't worry about this too much -- I do this
+                                     // to make sure that the string is printed to the screen.
+                                     // Sometimes, partial lines aren't printed immediately,
+                                     // and cout.flush() forces the partial line to be printed.
+    if (!getline(cin, s)) exit(0);
+    if (names.find(s) == names.end()) {
+      cout &lt;&lt; s &lt;&lt; " is not in the set.\n";
+    } else {
+      cout &lt;&lt; s &lt;&lt; " is in the set.\n";
+    }
+  }
+} 
+</pre></td></table></center><p>
+
+The program reads a file and puts each line into a set.  It then reads lines from standard input
+and prints whether the line is in the set.  For example:
+
+<pre>
+UNIX> <font color=darkred><b>cat input-3.txt</b></font>
+Madelyn Psychotic
+Joseph Halverson
+Aidan Pooh
+Bailey Cycad
+Wyatt Advantageous
+UNIX> <font color=darkred><b>simple_set_find input-3.txt</b></font>
+Enter a name: <font color=darkred><b>Aidan Pooh</b></font>
+Aidan Pooh is in the set.
+Enter a name: <font color=darkred><b>Jim Plank</b></font>
+Jim Plank is not in the set.
+Enter a name: <font color=darkred><b></b></font>
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+<hr>
+<h3>Maps</h3>
+
+Although sets are nice, they are a little limited.  Often we want to store key-value
+pairs, where we can search on the key and have data associated with a value.  For that,
+we use a <b>map</b>.  When you declare a map, you specify the type of the key and
+the value.  For example, the following declaration is for a map whose keys are strings
+and whose values are integers.  I also include the declaration for the map iterator
+as well.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+map &lt;string, int&gt; names;
+map &lt;string, int&gt;::iterator nit;
+</pre></td></table></center><p>
+
+We'll write a simple example.  This example assumes that input is as in 
+<b><a href=Roster.txt>Roster.txt</a></b>: it is composed of first and last
+names of people.  (Our example is all the NFL players in 2009 whose last names
+begin with "A", in random order).  We'll use a map as declared above, and 
+what we are going to do is keep track of the last names, and how many players
+have each last name.  The program for this is in
+<b><a href=simple_map.cpp>simple_map.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;map&gt;
+using namespace std;
+
+main()
+{
+  map &lt;string, int&gt; names;
+  map &lt;string, int&gt;::iterator nit;
+  string fn, ln;
+  
+  while (cin &gt;&gt; fn &gt;&gt; ln) {
+    nit = names.find(ln);
+    if (nit == names.end()) {
+      names.insert(make_pair(ln, 1));
+    } else {
+      nit-&gt;second++;
+    }
+  }
+
+  for (nit = names.begin(); nit != names.end(); nit++) {
+    cout &lt;&lt; "Last name: " &lt;&lt; nit-&gt;first &lt;&lt; ". Number of players: " &lt;&lt; nit-&gt;second &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+
+When you insert into a map, since you are inserting two things (a key and value),
+you must combine them into a <i>pair</i> with the <b>make_pair()</b> procedure.
+The types of the arguments must match the types specified in the declaration -- 
+in this case, they must be a string and an integer.  
+<p>
+The iterator for a map is different, too.  Instead of simply specifying it with
+pointer indirection, you can grab the key from an iterator with "<b>->first</b>"
+and the value with "<b>->second</b>".  Yes, I wish they were called <b>key</b>
+and <b>val</b>, but that is life.  When we run it on <b>Roster.txt</b>, we get:
+
+<pre>
+UNIX> <font color=darkred><b>simple_map < Roster.txt</b></font>
+Last name: Abdallah. Number of players: 1
+Last name: Abdullah. Number of players: 2
+Last name: Abiamiri. Number of players: 1
+Last name: Abraham. Number of players: 1
+Last name: Adams. Number of players: 7
+.....
+</pre>
+
+We can check for correctness with <b>grep</b>:
+
+<pre>
+UNIX> <font color=darkred><b>grep Abdallah Roster.txt</b></font>
+Nader Abdallah
+UNIX> <font color=darkred><b>grep Adams Roster.txt</b></font>
+Gaines Adams
+Jamar Adams
+Anthony Adams
+Michael Adams
+Titus Adams
+Flozell Adams
+Mike Adams
+UNIX> <font color=darkred><b>grep Adams Roster.txt | wc</b></font>
+       7      14      90
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Like sets, you traverse the maps in ascending order, and you can't insert
+duplicate keys.  Since 
+<b><a href=simple_map.cpp>simple_map.cpp</a></b>
+calls <b>find()</b> and only performs <b>insert()</b> when the
+key is not found, the limitation on duplicate keys is not a problem.  If
+you need duplicate keys, use a <b>multimap</b>.
+<p>
+<hr>
+<h3>Writing that last program with a multiset</h3>
+
+As observed in class, we could have written that last program with a multiset
+or even a vector.  Let's consider the multiset.  Suppose we insert all the 
+last names into the multiset.  We then traverse the multiset, maintaing 
+a string <b>pn</b> that holds the string in the previous element of the
+multiset, plus a count of the number of times that we have seen that 
+string.  If the current string equals the previous string, then we simply
+increment the count.  Otherwise, we print the previous string and its count,
+and then reset the count.  At the end of the traversal, we print out the
+last element.  The code is in 
+<b><a href=nnames_multiset.cpp>nnames_multiset.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdio&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;set&gt;
+using namespace std;
+
+main()
+{
+  multiset &lt;string&gt; names;
+  multiset &lt;string&gt;::iterator nit;
+  string fn, ln, pn;
+  int count;
+  
+  while (cin &gt;&gt; fn &gt;&gt; ln) names.insert(ln);
+
+  
+  for (nit = names.begin(); nit != names.end(); nit++) {
+    if (nit != names.begin()) {
+      if (*nit == pn) {
+        count++;
+      } else { 
+        printf("%-20s %d\n", pn.c_str(), count);
+        pn = *nit;
+        count = 1;
+      }
+    } else {
+      pn = *nit;
+      count = 1;
+    }
+  }
+
+  if (names.size() &gt; 0) printf("%-20s %d\n", pn.c_str(), count);
+}
+</pre></td></table></center><p>
+
+Compared to the map, that's a pretty convoluted piece of code.  However,
+make sure that you can step through it and convince yourself that it works.
+
+<pre>
+UNIX> <font color=darkred><b>head -n 10 Roster.txt</b></font>
+Russell Allen
+Gaines Adams
+Aundrae Allison
+David Anderson
+Adrian Arrington
+Hamza Abdullah
+Tim Anderson
+Devin Aromashodu
+Asher Allen
+Eric Alexander
+UNIX> <font color=darkred><b>head -n 10 Roster.txt | nnames_multiset</b></font>
+Abdullah             1
+Adams                1
+Alexander            1
+Allen                2
+Allison              1
+Anderson             2
+Aromashodu           1
+Arrington            1
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+
+<h3>Maps and Sets together</h3>
+
+The next program is a more detailed example.
+This program reads an input file like <b>Roster.txt</b> 
+and prints out the players sorted by last name. When two players have the same
+last name, they are sorted by first name.  The program is in
+<b><a href=sort_names_1.cpp>sort_names_1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+using namespace std;
+
+typedef set &lt;string&gt; fnset;
+
+main()
+{
+  map &lt;string, fnset *&gt; lnames;
+  map &lt;string, fnset *&gt;::iterator lnit;
+  fnset *fnames;
+  fnset::iterator fnit;
+  string fn, ln;
+  
+  while (cin &gt;&gt; fn &gt;&gt; ln) {
+    lnit = lnames.find(ln);
+    if (lnit == lnames.end()) {
+      fnames = new fnset;
+      lnames.insert(make_pair(ln, fnames));
+    } else {
+      fnames = lnit-&gt;second;
+    }
+    fnames-&gt;insert(fn);
+  }
+
+  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
+    fnames = lnit-&gt;second;
+    for (fnit = fnames-&gt;begin(); fnit != fnames-&gt;end(); fnit++) {
+      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+    }
+  }
+}
+</pre></td></table></center><p>
+
+The program uses a map to sort the last names.  The "second" field of the map is a pointer
+to a set, which
+sorts the first names that belong to that last name.  When you read in a name, you check the
+last name to see if it's in the map.  If so, then it sets <b>fnames</b> to be the set of
+first names with that last name.  If not, it creates a new <b>fnames</b> set and inserts it
+and the last name into the map.  Last, it inserts the first name into the set.
+<p>
+When it's done reading input, it does a nested traversal to print out all of the names.
+<p>
+Note the <b>typedef</b> statement to make the program read more easily.
+<p>
+This program will not print out duplicate names, because sets don't hold 
+duplicate entries.  If you wanted it to print out duplicate names, you would have to use
+a multiset.
+
+<pre>
+UNIX> <font color=darkred><b>sort_names_1 < Roster.txt | head</b></font>
+Nader Abdallah
+Hamza Abdullah
+Husain Abdullah
+Victor Abiamiri
+John Abraham
+Anthony Adams
+Flozell Adams
+Gaines Adams
+Jamar Adams
+Michael Adams
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>You should use pointers as the <i>val</i> part of a map</h3>
+
+The program above uses a pointer to a <b>fnset</b> rather than 
+simply using a <b>fnset</b>.  You may wonder, "Why not just use a <b>fnset</b>, so
+I don't have to mess with pointers?"  The reason is that C++'s habit of making
+copies of things makes this an inefficient and often bug-prone ordeal.  First, 
+take a look at
+<b><a href=sort_names_bad.cpp>sort_names_bad.cpp</a></b>.  This is a mapping 
+of <b>sort_names_1.cpp</b> that doesn't use the pointer. 
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+using namespace std;
+
+typedef set &lt;string&gt; fnset;
+
+main()
+{
+  map &lt;string, fnset&gt; lnames;
+  map &lt;string, fnset&gt;::iterator lnit;
+  fnset fnames;
+  fnset::iterator fnit;
+  string fn, ln;
+  
+  while (cin &gt;&gt; fn &gt;&gt; ln) {
+    lnit = lnames.find(ln);
+    if (lnit == lnames.end()) {
+      lnames.insert(make_pair(ln, fnames));
+    } else {
+      fnames = lnit-&gt;second;
+    }
+    fnames.insert(fn);
+  }
+
+  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
+    fnames = lnit-&gt;second;
+    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
+      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+    }
+  }
+}
+</pre></td></table></center><p>
+
+This program is very buggy.  Take a simple example:
+
+<pre>
+UNIX> <font color=darkred><b>head -n 2 Roster.txt</b></font>
+Adam Anderson
+Andy Alleman
+UNIX> <font color=darkred><b>head -n 2 Roster.txt | sort_names_1</b></font>
+Andy Alleman
+Adam Anderson
+UNIX> <font color=darkred><b>head -n 2 Roster.txt | sort_names_bad</b></font>
+Adam Alleman
+UNIX> 
+</pre>
+
+Yuck.  What's going on?  Well, two things.  Let's concentrate on the most egregious.
+This is the fact that you reuse <b>fnames</b> to insert a name into the set, and
+then you use that same <b>fnames</b> when you insert a last name into the map.  That's
+wrong.  Let's fix that by having two <b>fnset</b>'s: <b>fnames</b>, which we'll
+use to insert first names, and <b>fnames_empty</b>, which we use to put an empty
+set into a newly created last name map:
+(<b><a href=sort_names_bad2.cpp>sort_names_bad2.cpp</a></b>)
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+using namespace std;
+
+typedef set &lt;string&gt; fnset;
+
+main()
+{
+  map &lt;string, fnset&gt; lnames;
+  map &lt;string, fnset&gt;::iterator lnit;
+  fnset fnames, fnames_empty;
+  fnset::iterator fnit;
+  string fn, ln;
+  
+  while (cin &gt;&gt; fn &gt;&gt; ln) {
+    lnit = lnames.find(ln);
+    if (lnit == lnames.end()) {
+      lnames.insert(make_pair(ln, fnames_empty));
+      lnit = lnames.find(ln);
+    }
+    fnames = lnit-&gt;second;
+    fnames.insert(fn);
+  }
+
+  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
+    fnames = lnit-&gt;second;
+    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
+      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+    }
+  }
+}
+</pre></td></table></center><p>
+
+This one still doesn't work:
+
+<pre>
+UNIX> <font color=darkred><b>head -n 2 Roster.txt | sort_names_bad2</b></font>
+UNIX> 
+</pre>
+
+Why? The culprit lies in these two lines:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+      fnames = lnit-&gt;second;
+      fnames.insert(fn);
+</pre></td></table></center><p>
+
+The first of these lines makes a <i>copy</i> of <b>lnit-&gt;second</b>;  You insert
+the first name into the copy, which does not modifiy the <b>fnset</b> that is actually
+in <b>lnit-&gt;second</b>.  To fix this, you need to insert directly into 
+<b>lnit-&gt;second</b>.    I do this in 
+<b><a href=sort_names_bad3.cpp>sort_names_bad3.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+using namespace std;
+
+typedef set &lt;string&gt; fnset;
+
+main()
+{
+  map &lt;string, fnset&gt; lnames;
+  map &lt;string, fnset&gt;::iterator lnit;
+  fnset fnames, fnames_empty;
+  fnset::iterator fnit;
+  string fn, ln;
+  
+  while (cin &gt;&gt; fn &gt;&gt; ln) {
+    lnit = lnames.find(ln);
+    if (lnit == lnames.end()) {
+      lnames.insert(make_pair(ln, fnames_empty));
+      lnit = lnames.find(ln);
+    }
+    lnit-&gt;second.insert(fn);
+  }
+
+  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
+    fnames = lnit-&gt;second;
+    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
+      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+    }
+  }
+}
+</pre></td></table></center><p>
+
+This works as it should:
+
+<pre>
+UNIX> <font color=darkred><b>sort_names_1 < Roster.txt > out1.txt</b></font>
+UNIX> <font color=darkred><b>sort_names_bad3 < Roster.txt > out2.txt</b></font>
+UNIX> <font color=darkred><b>diff out1.txt out2.txt</b></font>
+UNIX> 
+</pre>
+
+So, now you say, "Ok, it works.  Why can't I do this?"  The answer is twofold.
+First, the fact that you can't have a variable point to 
+<b>lnit-&gt;second</b> is not only inconvenient, it makes your programs
+very hard to read.  Second, you'll find yourself setting variables to 
+<b>lnit-&gt;second</b> and making copies when you don't have to.  For example,
+look at the <b>for</b> loop that prints out the names:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
+    fnames = lnit-&gt;second;
+    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
+      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+    }
+  }
+</pre></td></table></center><p>
+
+It is making copies of <b>lnit-&gt;second</b>.  Even though it's not a bug, it's
+extremely inefficient in terms of both time and memory.  Get into the habit of
+using pointers in the <b>second</b> field of your maps.
+
+<hr>
+<h3>The return value of <i>insert()</i></h3>
+
+In class we looked at the prototype for the <b>insert()</b> method of a set
+(not a multiset):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    pair&lt;iterator, bool&gt; set::insert(const TYPE& val);
+</pre></td></table></center><p>
+
+The "(const TYPE& val)" simply means that it works with type that you specify when you 
+define the set.
+<p>
+The return value is a <i>pair</i> much like what you pass to the <b>insert()</b>
+call of a map.  Its <b>first</b> field will be an iterator for the set, and
+the second will be a boolean.  If the element is inserted, then the iterator 
+will point to the newly inserted element.  Otherwise, you tried to insert a duplicate,
+and the iterator is to the value already in the set.  The <b>second</b> field 
+reports whether the item was inserted or not.
+<p>
+To see usage, take a look at 
+<b><a href=setreturn.cpp>setreturn.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;set&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+typedef set &lt;string&gt; string_set;
+
+main()
+{
+  string s;
+  string_set names;
+  string_set::iterator nit;
+  pair &lt;string_set::iterator, bool&gt; retval;
+  
+
+  while(getline(cin, s)) {
+    retval = names.insert(s);
+    if (retval.second) {
+      cout &lt;&lt; s &lt;&lt; ": Successfully inserted.\n";
+    } else {
+      cout &lt;&lt; s &lt;&lt; ": Duplicate not inserted.\n";
+    }
+  }
+} 
+</pre></td></table></center><p>
+
+Note how it returns a <b>pair</b>, whose fields you access with dots rather than arrows.
+Why then do you use arrows in iterators on maps?  Because those iterators <i>point</i>
+to pairs -- they are not pairs themselves.
+
+<pre>
+UNIX> <font color=darkred><b>cat input-2.txt</b></font>
+John Bevy
+Xavier Ornately
+Nicholas Wyatt Fecund
+Max Inadvertent III
+John Bevy
+Max Inadvertent III
+UNIX> <font color=darkred><b>setreturn < input-2.txt</b></font>
+John Bevy: Successfully inserted.
+Xavier Ornately: Successfully inserted.
+Nicholas Wyatt Fecund: Successfully inserted.
+Max Inadvertent III: Successfully inserted.
+John Bevy: Duplicate not inserted.
+Max Inadvertent III: Duplicate not inserted.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
