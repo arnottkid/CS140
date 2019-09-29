@@ -1,7 +1,11 @@
+/* This is an implementation of DiamondHunt which uses a list rather than a string.
+   It improves the performance drastically, because it is not making those big
+   substrings, and it does not perform all of those find operations.  Please read
+   the lecture notes for an explanation of the iterators. */
+
 #include <iostream>
-#include <cstdio>
-#include <cstdlib>
 #include <list>
+#include <string>
 using namespace std;
 
 class DiamondHunt {
@@ -11,13 +15,16 @@ class DiamondHunt {
 
 int DiamondHunt::countDiamonds(string mine)
 {
-  int nd, i;
+  int num_diamonds;
+  size_t i;
   list <char> l;
-  list <char>::iterator left, right, newleft;
+  list <char>::const_iterator left, right, newleft;
+
+  /* Create the list from the string. */
 
   for (i = 0; i < mine.size(); i++) l.push_back(mine[i]);
   
-  nd = 0;
+  num_diamonds = 0;
   left = l.begin();
   while (left != l.end()) {
     if (*left == '>') {
@@ -25,12 +32,12 @@ int DiamondHunt::countDiamonds(string mine)
     } else {
       right = left;
       right++;
-      if (right == l.end()) return nd;
+      if (right == l.end()) return num_diamonds;
 
       if (*right == '<') {   // If right is not the end of a diamond, move on
         left++;
-      } else {            // Otherwise, we've found a diamond.  We need to
-        nd++;             // increment nd, and set newleft to point to the previous
+      } else {            // Otherwise, we've found a diamond.  We need to increment
+        num_diamonds++;   // num_diamonds, and set newleft to point to the previous
                           // char, or if left is at the beginning, to the next one.
 
         if (left == l.begin()) {
@@ -47,10 +54,10 @@ int DiamondHunt::countDiamonds(string mine)
       }
     }
   }
-  return nd;
+  return num_diamonds;
 }
 
-main()
+int main()
 {
   DiamondHunt d;
   string s;
@@ -58,6 +65,6 @@ main()
   while (cin >> s) {
     cout << d.countDiamonds(s) << endl;
   }
-  exit(0);
+  return 0;
 }
 

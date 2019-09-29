@@ -1,9 +1,10 @@
+/* This program creates a long string of n less-than signs followed by n greater-than signs. */
+
 #include <iostream>
-#include <cstdlib>
 #include <sstream>
 using namespace std;
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   int i, nd;
   istringstream ss;
@@ -19,5 +20,5 @@ main(int argc, char **argv)
     for (i = 0; i < nd; i++) cout << '>';
     cout << endl;
   }
-  exit(0);
+  return 0;
 }

@@ -4,7 +4,9 @@
 <LI> James S. Plank
 <LI> Directory: <b>/home/plank/cs140/Notes/Lists</b>
 <LI> Original Notes: September 1, 2009. 
-<LI> Last modification: <i>Tue Feb 26 12:09:55 EST 2013</i>
+<LI> Last modification: <i>
+Fri Sep 27 09:43:58 EDT 2019
+</i>
 </UL>
 
 <hr>
@@ -17,24 +19,30 @@ insert each string to the front of the list using the <b>push_front()</b>
 method.  
 <p>
 The code is in 
-<b><a href=reverse_1.cpp>reverse_1.cpp</a></b>:
+<b><a href=src/reverse_1.cpp>src/reverse_1.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program shows how to reverse standard input using a list.
+   We create the list with push_front(), so the list holds the 
+   lines of standard input in reverse order.  Therefore, we traverse
+   it from front to back with a const_interator. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;list&gt;
 using namespace std;
 
-main()
+int main()
 {
   list &lt;string&gt; lines;
-  list &lt;string&gt;::iterator lit;
   string s;
-
+  list &lt;string&gt;::const_iterator lit;             <font color=blue>// We use const_iterator, because the iterator</font>
+                                                 <font color=blue>// does not change its contents.</font>
   while (getline(cin, s)) lines.push_front(s);
  
   for (lit = lines.begin(); lit != lines.end(); lit++) {
     cout &lt;&lt; *lit &lt;&lt; endl;
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -44,47 +52,50 @@ vector, except we are using <b>push_front()</b> to prepend each string to the
 front of the list.  
 <p>
 To traverse the list, we use an <i>iterator</i>, which is a special type
-defined by the template library.  The <b>for</b> loop is typical -- you start
+defined by the standard template library (STL).  The <b>for</b> loop is typical -- you start
 with the first element of the list, obtained with the <b>begin()</b> method,
 and traverse until you are one element beyond the end of the list (signified
 by the <b>end()</b> method).  To go from one element to the next, you 
-increment the iterator.  I don't like this usage of overloading, but it
-wasn't up to me.
+increment the iterator.  This is operator overloading, implemented by the STL.
 <p>
-Then, to access the element in the list, you use pointer indirection (the asterisk).
+Then, to access the element in the list, you use pointer indirection (the asterisk),
+which is in fact really another overloaded method.
 When you get used to seeing this code, it reads nicely.  It does take a little
 acclimation though.  Regardless, it works:
 
 <pre>
-UNIX> <font color=darkred><b>cat input.txt</b></font>
-Born in the night
-She would run like a leopard
-That freaks at the sight
-Of a mind close beside herself
-UNIX> <font color=darkred><b>reverse_1 < input.txt</b></font>
-Of a mind close beside herself
-That freaks at the sight
-She would run like a leopard
-Born in the night
-UNIX> 
+UNIX> <font color=darkred><b>cat files/input.txt</b></font>
+1. Born in the night
+2. She would run like a leopard
+3. That freaks at the sight
+4. Of a mind close beside herself
+UNIX> <font color=darkred><b>bin/reverse_1 < files/input.txt</b></font>
+4. Of a mind close beside herself
+3. That freaks at the sight
+2. She would run like a leopard
+1. Born in the night
+UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
 <h3>Reverse Iterators</h3>
 
-Instead of creating a list in reverse order, we also could have created the list in order, and
-traversed it in reverse order.  That code is in 
-<b><a href=reverse_2.cpp>reverse_2.cpp</a></b>
+Instead of creating a list in reverse order, we also can create the list by appending
+the strings, and then traverse it in reverse order.  That code is in 
+<b><a href=src/reverse_2.cpp>src/reverse_2.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This also reverses standard input, by appending the strings to the list,
+   and then using a "reverse" iterator to traverse the list backward. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;list&gt;
 using namespace std;
 
-main()
+int main()
 {
   list &lt;string&gt; lines;
-  list &lt;string&gt;::reverse_iterator lit;
+  list &lt;string&gt;::const_reverse_iterator lit;
   string s;
 
   while (getline(cin, s)) lines.push_back(s);
@@ -92,22 +103,27 @@ main()
   for (lit = lines.rbegin(); lit != lines.rend(); lit++) {
     cout &lt;&lt; *lit &lt;&lt; endl;
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
-We've created the list with <b>push_back()</b>, and we change <b>lit</b> 
-to be a <b>reverse_iterator</b>.  The iteration proceeds from <b>rbegin()</b>,
+We create  the list with <b>push_back()</b>, and we change <b>lit</b> 
+to be a <b>const_reverse_iterator</b>.  Once again, the "const" part says that I 
+won't change what the iterator points to.  The "reverse" part says that when I
+increment the iterator, it moves backward in the list.
+<p>
+The iteration proceeds from <b>rbegin()</b>,
 which is the last element of the list, to <b>rend()</b>, which is one element
-before the first element of the list.  Note, we still increment <b>lit</b> -- is
-that natural?  You be the judge.
+before the first element of the list.  Again, increment <b>lit</b> to have it go
+backward in the list.  Is that natural?  You be the judge.
 
 <pre>
-UNIX> <font color=darkred><b>reverse_2 < input.txt</b></font>
-Of a mind close beside herself
-That freaks at the sight
-She would run like a leopard
-Born in the night
-UNIX> 
+UNIX> <font color=darkred><b>bin/reverse_2 < files/input.txt</b></font>
+4. Of a mind close beside herself
+3. That freaks at the sight
+2. She would run like a leopard
+1. Born in the night
+UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
@@ -118,37 +134,41 @@ element in front of that iterator.  Thus
 <b>lines.push_front()</b> is equivalent to <b>lines.insert(lines.begin())</b> and
 <b>lines.push_back()</b> is equivalent to <b>lines.insert(lines.end())</b>.  
 <p>
-The program <b><a href=reverse_3.cpp>reverse_3.cpp</a></b> implements reversal by 
+The program <b><a href=src/reverse_3.cpp>src/reverse_3.cpp</a></b> implements reversal by 
 inserting each element at the front and traversing the list in the forward direction:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program now creates the list in reverse order by inserting each
+   string before the first element in the list.  This is equivalent to
+   calling push_front(). */</font>
+
 #include &lt;iostream&gt;
 #include &lt;list&gt;
 using namespace std;
 
-main()
+int main()
 {
   list &lt;string&gt; lines;
-  list &lt;string&gt;::iterator lit;
+  list &lt;string&gt;::const_iterator lit;
   string s;
 
-  while (getline(cin, s)) lines.insert(lines.begin(), s);
+  while (getline(cin, s)) lines.insert(lines.begin(), s);  <font color=blue>// This is equivalent to push_front().</font>
  
   for (lit = lines.begin(); lit != lines.end(); lit++) {
     cout &lt;&lt; *lit &lt;&lt; endl;
   }
+  return 0;
 }
 </pre></td></table></center><p>
-
 It works like the others:
 
 <pre>
-UNIX> <font color=darkred><b>reverse_3 < input.txt</b></font>
-Of a mind close beside herself
-That freaks at the sight
-She would run like a leopard
-Born in the night
-UNIX> <b></b>
+UNIX> <font color=darkred><b>bin/reverse_3 < files/input.txt</b></font>
+4. Of a mind close beside herself
+3. That freaks at the sight
+2. She would run like a leopard
+1. Born in the night
+UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
@@ -158,19 +178,25 @@ You can use iterators with
 vectors, and they work just like lists.  Moreover,
 for some ill-judged reason, the implementors of the STL felt it ok to 
 implement an <b>insert()</b> operation on vectors.   This means that you 
-can change the code of <b><a href=reverse_3.cpp>reverse_3.cpp</a></b> 
+can change the code of <b><a href=src/reverse_3.cpp>src/reverse_3.cpp</a></b> 
 to use vectors instead of lists.  It is in 
-<b><a href=reverse_4.cpp>reverse_4.cpp</a></b>:
+<b><a href=src/reverse_4.cpp>src/reverse_4.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This code inserts each string at the front of a vector, instead of a list.
+   What this does is resize the vector at every insert() call, move each element
+   over one, and put the new string at element 0.  Thus, it is *really* 
+   inefficient code.  Its performance will scale quadratically with the
+   size of the input. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;vector&gt;
 using namespace std;
 
-main()
+int main()
 {
   vector &lt;string&gt; lines;
-  vector &lt;string&gt;::iterator lit;
+  vector &lt;string&gt;::const_iterator lit;
   string s;
 
   while (getline(cin, s)) lines.insert(lines.begin(), s);
@@ -178,6 +204,8 @@ main()
   for (lit = lines.begin(); lit != lines.end(); lit++) {
     cout &lt;&lt; *lit &lt;&lt; endl;
   }
+
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -185,89 +213,104 @@ I call this ill-judged because when you perform an insertion
 such as <b>v.insert(v.begin(), x)</b>, 
 the STL basically does the following:
 
-<p><center><table border=3 cellpadding=3><td><pre>
-  v.resize(v.size()+1);
-  for (i = v.size(); i &gt; 0; i--) v[i] = v[i-1];
-  v[0] = x;
+<p><center><table border=3 cellpadding=10><td><pre>
+v.resize(v.size()+1);
+for (i = v.size(); i &gt; 0; i--) v[i] = v[i-1];
+v[0] = x;
 </pre></td></table></center><p>
 
 In other words, it copies all of the elements of the vector to 
 make room for the new element at <b>v[0]</b>.  This is expensive,
-and makes <b>reverse_4.cpp</b> above run in <i>O(n<sup>2</sup>)</i>
-time.  
+and makes <b>reverse_4.cpp</b> above run in time proportional to 
+<i>n<sup>2</sup></i>, when <i>n</i> is the number of lines in standard
+input.  (Later, we'll call that <i>O(n<sup>2</sup>)</i>).
 <p>
 To illustrate,
-<b><a href=input-2.txt>input-2.txt</a></b> is an input file with
+<b><a href=files/input_2.txt>files/input_2.txt</a></b> is an files/input file with
 10,000 lines, and 
-<b><a href=input-3.txt>input-3.txt</a></b>
+<b><a href=files/input_3.txt>files/input_3.txt</a></b>
 is one with 40,000 lines.  Look at the difference in speed
-between <b>reverse_3</b> and <b>reverse_4</b>:
+between <b>bin/reverse_3</b> and <b>bin/reverse_4</b> (this was
+on my 2.2 GHz MacBook in 2019):
 
 <pre>
-UNIX> <font color=darkred><b>wc input-2.txt</b></font>
-10000 10000 80000 input-2.txt
-UNIX> <font color=darkred><b>wc input-3.txt</b></font>
- 40000  40000 320000 input-3.txt
-UNIX> <font color=darkred><b>time reverse_3 < input-2.txt > /dev/null</b></font>
-0.012u 0.000s 0:00.01 100.0%  0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time reverse_3 < input-3.txt > /dev/null</b></font>
-0.024u 0.008s 0:00.03 66.6% 0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time reverse_4 < input-2.txt > /dev/null</b></font>
-0.452u 0.000s 0:00.45 100.0%  0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time reverse_4 < input-3.txt > /dev/null</b></font>
-7.008u 0.012s 0:07.04 99.5% 0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>wc files/input_2.txt</b></font>
+   10000   10000   80000 files/input_2.txt
+UNIX> <font color=darkred><b>wc files/input_3.txt</b></font>
+   40000   40000  320000 files/input_3.txt
+0.000u 0.000s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time bin/reverse_3 < files/input_2.txt > /dev/null</b></font>
+0.017u 0.003s 0:00.02 50.0%	0+0k 0+0io 0pf+0w                 <font color=blue>#  0.02 seconds</font>
+UNIX> <font color=darkred><b>time bin/reverse_3 < files/input_3.txt > /dev/null</b></font>
+0.066u 0.013s 0:00.08 87.5%	0+0k 0+0io 0pf+0w                 <font color=blue>#  0.08 seconds</font>
+UNIX> <font color=darkred><b>time bin/reverse_4 < files/input_2.txt > /dev/null</b></font>
+0.696u 0.004s 0:00.70 98.5%	0+0k 0+0io 0pf+0w                 <font color=blue>#  0.70 seconds</font>
+UNIX> <font color=darkred><b>time bin/reverse_4 < files/input_3.txt > /dev/null</b></font>
+10.460u 0.014s 0:10.47 100.0%	0+0k 0+0io 0pf+0w                 <font color=blue># 10.47 seconds!!</font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
 
-As you can see, <b>reverse_3</b> is very fast (0.012 and 0.024 seconds on 
-one of our <b>hydra</b> machines in 2014), while <b>reverse_4</b> is painfully slow (0.45 and 7
-seconds).  This is is important, and you should take care that it
+As you can see, <b>bin/reverse_3</b> is very fast,
+while <b>bin/reverse_4</b> becomes painfully slow!!
+This is is important, and you should take care that it
 doesn't happen to you.  
 <p>
-A good rule of thumb is to use a vector as an array and not a list.
+A good rule of thumb is to use a vector as a direct-access data structure, and not a list.
 Don't use iterators -- use integer indices.  Then you're ok.
 
 <hr>
 <h3>Deques</h3>
 
-The STL defines a <b>deque</b>, which stands for "double-ended queues."  You use
+The STL defines a data structure called a <b>deque</b>, 
+which stands for "double-ended queue."  You use
 these like vectors, but with the proviso that you can insert or delete from either
 end of the deque with high efficiency.  For that reason, they have a <b>push_front()</b>
 method (which vectors do not have).  We can therefore use a <b>deque</b> to create 
 a vector in reverse order, and then traverse it forwards.  The code is in
-<b><a href=reverse_5.cpp>reverse_5.cpp</a></b>:
+<b><a href=src/reverse_5.cpp>src/reverse_5.cpp</a></b>:
+
+<b><a href=src/reverse_5.cpp>src/reverse_5.cpp</a></b>
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This code uses a deque to store standard input in reverse order.
+   We then traverse it in the forward direction, to print standard input 
+   in reverse order.  Deques are like vectors, because we can access 
+   elements with integer indices.  They differ, because you can insert
+   and delete from both the front and the back.  With vectors, you should 
+   only insert and delete from the back. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;deque&gt;
 using namespace std;
 
-main()
+int main()
 {
   deque &lt;string&gt; lines;
-  int i;
+  size_t i;
   string s;
 
   while (getline(cin, s)) lines.push_front(s);
 
   for (i = 0; i &lt; lines.size(); i++) cout &lt;&lt; lines[i] &lt;&lt; endl;
+
+  return 0;
 }
 </pre></td></table></center><p>
 
 Unlike the vector version, this one runs very fast:
 
 <pre>
-UNIX> <font color=darkred><b>reverse_5 < input.txt</b></font>
-Of a mind close beside herself
-That freaks at the sight
-She would run like a leopard
-Born in the night
-UNIX> <font color=darkred><b>time reverse_5 < input-2.txt > /dev/null</b></font>
-0.004u 0.004s 0:00.01 0.0%  0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time reverse_5 < input-3.txt > /dev/null</b></font>
-0.032u 0.000s 0:00.03 100.0%  0+0k 0+0io 0pf+0w
-UNIX>
+UNIX> <font color=darkred><b>bin/reverse_4 < files/input.txt</b></font>
+4. Of a mind close beside herself
+3. That freaks at the sight
+2. She would run like a leopard
+1. Born in the night
+UNIX> <font color=darkred><b>time bin/reverse_5 < files/input_2.txt > /dev/null</b></font>
+0.017u 0.004s 0:00.02 50.0%	0+0k 0+0io 0pf+0w               <font color=blue># 0.02 seconds</font>
+UNIX> <font color=darkred><b>time bin/reverse_5 < files/input_3.txt > /dev/null</b></font>
+0.065u 0.012s 0:00.07 100.0%	0+0k 0+0io 0pf+0w               <font color=blue># 0.07 seconds</font>
+UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
@@ -282,17 +325,21 @@ an iterator as a parameter, and erases it from the list.  Thus, we read in
 lines of text and append them to a list.  When the list grows bigger than ten
 elements, we delete the first element, which will bring it down to the last
 ten lines.  The code is straightforward, in 
-<b><a href=mytail_list.cpp>mytail_list.cpp</a></b>:
+<b><a href=src/mytail_list.cpp>src/mytail_list.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program uses lists to print the last ten lines of standard input.
+   It calls push_back to append each line to the list, and then whenever
+   the list becomes greater than 10 elements, it deletes the first element. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;list&gt;
 using namespace std;
 
-main()
+int main()
 {
   list &lt;string&gt; lines;
-  list &lt;string&gt;::iterator lit;
+  list &lt;string&gt;::const_iterator lit;
   string s;
 
   while (getline(cin, s)) {
@@ -303,62 +350,69 @@ main()
   for (lit = lines.begin(); lit != lines.end(); lit++) {
     cout &lt;&lt; *lit &lt;&lt; endl;
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
 Works fine:
 
 <pre>
-UNIX> <font color=darkred><b>mytail_list < input-2.txt</b></font>
-  9991  
-  9992  
-  9993  
-  9994  
-  9995  
-  9996  
-  9997  
-  9998  
-  9999  
- 10000  
-UNIX> <font color=darkred><b>mytail_list < input-3.txt</b></font>
- 39991  
- 39992  
- 39993  
- 39994  
- 39995  
- 39996  
- 39997  
- 39998  
- 39999  
- 40000  
+UNIX> <font color=darkred><b>bin/mytail_list < files/input_2.txt</b></font>
+  9991	
+  9992	
+  9993	
+  9994	
+  9995	
+  9996	
+  9997	
+  9998	
+  9999	
+ 10000	
+UNIX> <font color=darkred><b>bin/mytail_list < files/input_3.txt</b></font>
+ 39991	
+ 39992	
+ 39993	
+ 39994	
+ 39995	
+ 39996	
+ 39997	
+ 39998	
+ 39999	
+ 40000	
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
+
 As with the previous example, we can port the code directly to vectors and to deques,
-since they both implement an <b>erase()</b> method.  As with the other example, we
-see that the vector implemention performs worse, since it copies all of the remaining
+since they both implement an <b>erase()</b> method.  I've done that with 
+<b><a href=src/mytail_100_list.cpp>src/mytail_100_list.cpp</a></b>,
+<b><a href=src/mytail_100_deque.cpp>src/mytail_100_deque.cpp</a></b>, and
+<b><a href=src/mytail_100_vector.cpp>src/mytail_100_vector.cpp</a></b>,
+which all print the last 100 lines, rather than the last 10 (because that amplifies
+the difference when you use vectors).
+
+You can see that the vector implemention performs worse, since it copies all of the remaining
 elements upon deletion (the shell scripts make them do more work so that you can
-see the difference):  
+see the difference in their performance):  
 
 <pre>
-UNIX> <font color=darkred><b>time sh big_mytail_list.sh</b></font>
-0.411u 0.013s 0:00.42 100.0%    0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh big_mytail_deque.sh</b></font>
-0.370u 0.012s 0:00.38 100.0%    0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh big_mytail_vector.sh</b></font>
-0.507u 0.012s 0:00.52 98.0%     0+0k 0+1io 0pf+0w
-UNIX> 
+UNIX> <font color=darkred><b>time sh scripts/big_mytail_list.sh</b></font>
+0.601u 0.008s 0:00.60 100.0%	0+0k 0+0io 0pf+0w           <font color=blue># 0.60 seconds for list</font>
+UNIX> <font color=darkred><b>time sh scripts/big_mytail_deque.sh</b></font>
+0.629u 0.008s 0:00.63 98.4%	0+0k 0+0io 0pf+0w           <font color=blue># 0.63 seconds for deque</font>
+UNIX> <font color=darkred><b>time sh scripts/big_mytail_vector.sh</b></font>
+1.736u 0.010s 0:01.74 100.0%	0+0k 0+0io 0pf+0w           <font color=blue># 1.74 seconds for vector</font>
+UNIX> <font color=darkred><b></b></font>
 </pre>
 
-The difference isn't huge, but it is there.  Were we to keep the last 100 lines instead of
-the last 10, the difference would be much more pronounced (we did this in class).
 
 <hr>
 <h2>The Topcoder DiamondHunt Example</h2>
 
 This is from Topcoder SRM 346 D2, 250-pointer.  Here's their 
 <a href=http://community.topcoder.com/stat?c=problem_statement&pm=7681&rd=10670>problem description</a>.  The bottom line is that you have a string <b>s</b>, composed of 
-less-than and greater-than signs.  Your job is to look for "diamonds" which are '&lt;&gt;' 
+less-than and greater-than signs.  Your job is to look for "diamonds" which are 
+<tt>"&lt;&gt;"</tt>
 substrings.  If you find a diamond, you remove it from the string, and continue to look
 for more diamonds.  You return the number of diamonds that you find.
 <p>
@@ -377,11 +431,17 @@ They give a few examples:
 </center>
 
 I've hacked up two solutions to this problem.  The first is in 
-<b><a href=DiamondHunt1.cpp>DiamondHunt1.cpp</a></b>.  I've added a <b>main()</b> so that
+<b><a href=src/DiamondHunt1.cpp>src/DiamondHunt1.cpp</a></b>.  I've added a <b>main()</b> so that
 you can enter strings on standard input, and it will print <b>countDiamonds()</b> for each string.  
 <p>
 This implementation works directly from the problem statement, using the <b>find()</b>
-method of strings to find a diamond, and then using <b>substr()</b> to remove the diamond:
+method of strings to find a diamond, and then "removing" the diamond
+by creating two substrings:
+
+<OL>
+<LI> The substring from the beginning of the string to the beginning of the diamond.
+<LI> The substring from the end of the diamond to the end of the string.
+</OL>
 
 <p><center><table border=3 cellpadding=3><td><pre>
 #include &lt;iostream&gt;
@@ -394,20 +454,26 @@ class DiamondHunt {
     int countDiamonds(string mine);
 };
 
+<font color=blue>/* We count diamonds by searching for "&lt;&gt;" in the string.  If we find it, we "remove" it by 
+   recreating the string with the concatenation of the two substrings surrounding the "&lt;&gt;". */</font>
+
 int DiamondHunt::countDiamonds(string mine)
 {
-  int nd, i;
+  int num_diamonds;
+  size_t i;
 
-  nd = 0;
+  num_diamonds = 0;
   while (1) {
     i = mine.find("&lt;&gt;");
-    if (i == string::npos) return nd;
-    nd++;
+    if (i == string::npos) return num_diamonds;
+    num_diamonds++;
     mine = mine.substr(0, i) + mine.substr(i+2);
   }
 }
 
-main()
+<font color=blue>/* The main reads the strings from standard input and calls the method on each string. */</font>
+
+int main()
 {
   DiamondHunt d;
   string s;
@@ -415,15 +481,14 @@ main()
   while (cin &gt;&gt; s) {
     cout &lt;&lt; d.countDiamonds(s) &lt;&lt; endl;
   }
-  exit(0);
+  return 0;
 }
 </pre></td></table></center><p>
 
 When we test it out, it works fine:
 
 <pre>
-UNIX> <font color=darkred><b>g++ -o DiamondHunt1 DiamondHunt1.cpp</b></font>
-UNIX> <font color=darkred><b> DiamondHunt1</b></font>
+UNIX> <font color=darkred><b>bin/DiamondHunt1</b></font>
 <font color=darkred><b>&lt;&gt;</b></font>
 1
 <font color=darkred><b>&gt;&lt;</b></font>
@@ -436,6 +501,7 @@ UNIX> <font color=darkred><b> DiamondHunt1</b></font>
 9
 <font color=darkred><b>&gt;&lt;&lt;&gt;&lt;&gt;&lt;&lt;&gt;&gt;&gt;&gt;&lt;&lt;&gt;&gt;&lt;&lt;&gt;&lt;&lt;&gt;&gt;&lt;&lt;&lt;&gt;&gt;&gt;&gt;&gt;&gt;&lt;&lt;&lt;</b></font>
 14
+<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -446,35 +512,32 @@ then 7, etc.  In other words, if you have a string of <i>n</i> less-than signs f
 <i>n</i> greater-than signs, you will have to perform <i>n<sup>2</sup></i> scans to find
 the diamonds.  When <i>n</i> is small (25 in the topcoder constraints), that doesn't make
 a difference.  However, it can matter.  The program
-<b><a href=make_bad_diamond.cpp>make_bad_diamond.cpp</a></b> is a very simple C++ program
+<b><a href=src/make_bad_diamond.cpp>src/make_bad_diamond.cpp</a></b> is a very simple C++ program
 that takes <i>n</i> on the command line and produces a string with <i>n</i> less-than
 signs followed by <i>n</i> greater-than signs.  See what happens when we call it with
 successively larger values and time the output:
 
 <pre>
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 10 | DiamondHunt1"</b></font>
-10
-0.000u 0.000s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 100 | DiamondHunt1"</b></font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 100 | bin/DiamondHunt1"</b></font>
 100
-0.010u 0.000s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 1000 | DiamondHunt1"</b></font>
+0.003u 0.004s 0:00.00 0.0%	0+0k 0+0io 0pf+0w                      <font color=blue># 0.00 seconds for 100 diamonds</font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 1000 | bin/DiamondHunt1"</b></font>
 1000
-0.010u 0.000s 0:00.01 100.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 10000 | DiamondHunt1"</b></font>
+0.009u 0.005s 0:00.01 0.0%	0+0k 0+0io 0pf+0w                      <font color=blue># 0.01 seconds for 1000 diamonds</font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 10000 | bin/DiamondHunt1"</b></font>
 10000
-0.800u 0.000s 0:00.79 101.2%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 100000 | DiamondHunt1"</b></font>
+0.478u 0.006s 0:00.48 97.9%	0+0k 0+0io 0pf+0w                      <font color=blue># 0.48 seconds for 10000 diamonds</font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 100000 | bin/DiamondHunt1"</b></font>
 100000
-79.350u 0.010s 1:19.66 99.6%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b></b></font>
+45.692u 0.053s 0:45.75 99.9%	0+0k 0+0io 0pf+0w                      <font color=blue># 45.75 seconds for 100000 diamonds!</font>
+UNIX>
 </pre>
 
 When the input size is increased by a factor of 10, the running time is increased by a 
 factor of 100.  That's not good.
 <p>
 Instead, 
-<b><a href=DiamondHunt2.cpp>DiamondHunt2.cpp</a></b> uses a list.  It copies the elements
+<b><a href=src/DiamondHunt2.cpp>src/DiamondHunt2.cpp</a></b> uses a list.  It copies the elements
 of <b>mine</b> to a list, and then uses three iterators on the list:
 
 <UL>
@@ -493,10 +556,14 @@ node after <b>right</b>.  Otherwise, it should be the node before <b>left</b>.
 After we erase <b>left</b> and <b>right</b>, we set <b>left</b> to be <b>newleft</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This is an implementation of DiamondHunt which uses a list rather than a string.
+   It improves the performance drastically, because it is not making those big
+   substrings, and it does not perform all of those find operations.  Please read
+   the lecture notes for an explanation of the iterators. */</font>
+
 #include &lt;iostream&gt;
-#include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 #include &lt;list&gt;
+#include &lt;string&gt;
 using namespace std;
 
 class DiamondHunt {
@@ -506,27 +573,30 @@ class DiamondHunt {
 
 int DiamondHunt::countDiamonds(string mine)
 {
-  int nd, i;
+  int num_diamonds;
+  size_t i;
   list &lt;char&gt; l;
-  list &lt;char&gt;::iterator left, right, newleft;
+  list &lt;char&gt;::const_iterator left, right, newleft;
+
+  <font color=blue>/* Create the list from the string. */</font>
 
   for (i = 0; i &lt; mine.size(); i++) l.push_back(mine[i]);
   
-  nd = 0;
+  num_diamonds = 0;
   left = l.begin();
   while (left != l.end()) {
     if (*left == '&gt;') {
-      left++;             // If left is not the beginning of a diamond, move on.
+      left++;             <font color=blue>// If left is not the beginning of a diamond, move on.</font>
     } else {
       right = left;
       right++;
-      if (right == l.end()) return nd;
+      if (right == l.end()) return num_diamonds;
 
-      if (*right == '&lt;') {   // If right is not the end of a diamond, move on
+      if (*right == '&lt;') {   <font color=blue>// If right is not the end of a diamond, move on</font>
         left++;
-      } else {            // Otherwise, we've found a diamond.  We need to
-        nd++;             // increment nd, and set newleft to point to the previous
-                          // char, or if left is at the beginning, to the next one.
+      } else {            <font color=blue>// Otherwise, we've found a diamond.  We need to increment</font>
+        num_diamonds++;   <font color=blue>// num_diamonds, and set newleft to point to the previous</font>
+                          <font color=blue>// char, or if left is at the beginning, to the next one.</font>
 
         if (left == l.begin()) {
           newleft = right;
@@ -536,16 +606,16 @@ int DiamondHunt::countDiamonds(string mine)
           newleft--;
         }
 
-        l.erase(left);      // Now erase left and right, and set left to newleft.
+        l.erase(left);      <font color=blue>// Now erase left and right, and set left to newleft.</font>
         l.erase(right);
         left = newleft;
       }
     }
   }
-  return nd;
+  return num_diamonds;
 }
 
-main()
+int main()
 {
   DiamondHunt d;
   string s;
@@ -553,7 +623,7 @@ main()
   while (cin &gt;&gt; s) {
     cout &lt;&lt; d.countDiamonds(s) &lt;&lt; endl;
   }
-  exit(0);
+  return 0;
 }
 
 </pre></td></table></center><p>
@@ -561,8 +631,7 @@ main()
 It works on the examples as before:
 
 <pre>
-UNIX> <font color=darkred><b>g++ -o DiamondHunt2 DiamondHunt2.cpp</b></font>
-UNIX> <font color=darkred><b> DiamondHunt2</b></font>
+UNIX> <font color=darkred><b>bin/DiamondHunt2</b></font>
 <font color=darkred><b>&lt;&gt;</b></font>
 1
 <font color=darkred><b>&gt;&lt;</b></font>
@@ -582,18 +651,15 @@ However, it is much faster than the previous version because we don't traverse t
 on each iteration as we did with <b>m.find()</b>:
 
 <pre>
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 1000 | DiamondHunt2"</b></font>
-1000
-0.020u 0.000s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 10000 | DiamondHunt2"</b></font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 10000 | bin/DiamondHunt2"</b></font>
 10000
-0.020u 0.000s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 100000 | DiamondHunt2"</b></font>
+0.013u 0.005s 0:00.01 100.0%	0+0k 0+0io 0pf+0w       <font color=blue># 0.01 seconds for 10,000 diamonds</font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 100000 | bin/DiamondHunt2"</b></font>
 100000
-0.040u 0.010s 0:00.04 125.0%	0+0k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh -c "make_bad_diamond 1000000 | DiamondHunt2"</b></font>
+0.102u 0.008s 0:00.09 111.1%	0+0k 0+0io 0pf+0w       <font color=blue># 0.09 seconds for 100,000 diamonds</font>
+UNIX> <font color=darkred><b>time sh -c "bin/make_bad_diamond 1000000 | bin/DiamondHunt2"</b></font>
 1000000
-0.470u 0.000s 0:00.44 106.8%	0+0k 0+0io 0pf+0w
+0.967u 0.034s 0:00.82 120.7%	0+0k 0+0io 0pf+0w       <font color=blue># 0.89 seconds for 1,000,000 diamonds</font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -602,12 +668,12 @@ of ten.  That's <i>much</i> better than <b>DiamondHunt1</b>.
 
 <p>
 It's important for you to understand the code in 
-<b><a href=DiamondHunt2.cpp>DiamondHunt2.cpp</a></b>.  To help you, here's an example when 
+<b><a href=src/DiamondHunt2.cpp>src/DiamondHunt2.cpp</a></b>.  To help you, here's an example when 
 we call it on the string: "&lt;&lt;&gt;&gt;&lt;&lt;&gt;":
 I will draw every iteration of the <b>while()</b> loop.  Here are the list and the iterators
 in the first iteration:
 
-<p><center><table border=3><td><img src=DH1.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH1.jpg></td></table></center><p>
 
 I'm drawing the list with two <i>sentinel</i> nodes at each end.  Before the first node is
 a sentinel node for <b>l.rend()</b>, and after the last node is a sentinel node for <b>l.end()</b>.
@@ -615,15 +681,15 @@ We start with <b>left</b> equaling <b>l.begin()</b>, and since it points to a le
 character, we set <b>right</b> to be the next node.  Since <b>right</b> also points to a less-than
 node, there is no diamond -- we increment <b>left</b> and go to the next iteration of the <b>while()</b> loop:
 
-<p><center><table border=3><td><img src=DH1A.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH1A.jpg></td></table></center><p>
 
 Now <b>left</b> points to a less-than and <b>right</b> points to a greater-than.  So, we increment
 <b>nd</b> and then set <b>newleft</b> to be the node before <b>left</b>.  That is pictured below:
-<p><center><table border=3><td><img src=DH2.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH2.jpg></td></table></center><p>
 We then erase <b>left</b> and <b>right</b>, and set <b>left</b> to <b>newleft</b> before going back to
 the top of the <b>while()</b> loop.  Here's what happens in the next iteration:
 
-<p><center><table border=3><td><img src=DH3.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH3.jpg></td></table></center><p>
 
 The two erased nodes are gone from the picture, and <b>left</b> and <b>right</b> point to a diamond.
 Thus, <b>nd</b> is incremented, and since <b>left</b> is equal to <b>l.begin()</b>, we set
@@ -631,18 +697,18 @@ Thus, <b>nd</b> is incremented, and since <b>left</b> is equal to <b>l.begin()</
 We then erase <b>left</b> and <b>right</b>, and set <b>left</b> to <b>newleft</b> before going back to
 the top of the <b>while()</b> loop.  Here's what happens in the fourth iteration:
 
-<p><center><table border=3><td><img src=DH4.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH4.jpg></td></table></center><p>
 
 This is the same case as the first iteration -- no diamond.  We increment <b>left</b> and move on:
 
-<p><center><table border=3><td><img src=DH5.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH5.jpg></td></table></center><p>
 
 We have a diamond.  We first increment <b>nd</b>.
 Next, since <b>left</b> is not equal to <b>l.begin()</b>, we set <b>newleft</b> to point to the
 node before <b>left</b>.  That is depicted above.  We then erase, set <b>left</b> to <b>newleft</b>
 and reach the last iteration of the <b>while()</b> loop:
 
-<p><center><table border=3><td><img src=DH6.jpg></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/DH6.jpg></td></table></center><p>
 
 Since <b>right</b> equals <b>l.end()</b>, we return <b>3</b>, and we're done. 
 It's important that you step through this example until you understand it.  You may 
@@ -669,233 +735,3 @@ use a list.
 I did not go over the following material this year, because I've gone over similar material.
 However, I keep the notes here in case you want to reinforce your understanding of
 lists and pointers.
-<p>
-<h3>Nested List Traversal, and Why We Use Pointers</h3>
-
-As an example in building lists of lists, we wrote the program 
-<b><a href=list_o_list_1.cpp>list_o_list_1.cpp</a></b>, which creates
-a list of lists.  The top-level list is a list of ten lists of integers.
-These bottom-level lists contain ten integers each.  The first bottom-level
-list contains the integers from 0 to 9.  The next contains the integers 
-from 10 to 19, etc.  
-<p>
-After creating the list of lists, we traverse it an print out each bottom level
-list on one line:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;list&gt;
-using namespace std;
-
-typedef list &lt;int&gt; intlist;
-
-main()
-{
-  list &lt;intlist *&gt; numlists;
-  list &lt;intlist *&gt;::iterator nlit;
-  intlist *il;
-  intlist::iterator ilit;
-  int i, j;
-
-  for (j = 0; j &lt; 100; j += 10) {
-    il = new intlist;
-    numlists.push_back(il);
-    for (i = 0; i &lt; 10; i++) {
-      il-&gt;push_back(i+j);
-    }
-  }
-
-  for (nlit = numlists.begin(); nlit != numlists.end(); nlit++) {
-    il = *nlit;
-    for (ilit = il-&gt;begin(); ilit != il-&gt;end(); ilit++) cout &lt;&lt; *ilit &lt;&lt; " " ;
-    cout &lt;&lt; endl;
-  }
-}
-</pre></td></table></center><p>
-
-The <b>typedef</b> makes the code cleaner, so that you don't have nested list declarations.
-<p>
-This code runs nicely, and as you'd expect:
-
-<pre>
-UNIX> <font color=darkred><b>list_o_list_1</b></font>
-0 1 2 3 4 5 6 7 8 9 
-10 11 12 13 14 15 16 17 18 19 
-20 21 22 23 24 25 26 27 28 29 
-30 31 32 33 34 35 36 37 38 39 
-40 41 42 43 44 45 46 47 48 49 
-50 51 52 53 54 55 56 57 58 59 
-60 61 62 63 64 65 66 67 68 69 
-70 71 72 73 74 75 76 77 78 79 
-80 81 82 83 84 85 86 87 88 89 
-90 91 92 93 94 95 96 97 98 99 
-UNIX> 
-</pre>
-
-You have undoubtedly noticed the fact that our bottom level list is a pointer to a list,
-which we create using <b>new</b>.  Why do we do this?  The answer is that if we don't 
-use pointers, we
-expose ourselves to problems with making copies of things.  Let's see what happens if
-we try to avoid pointers.
-<p>
-A first straightforward try is in 
-<b><a href=list_o_list_2.cpp>list_o_list_2.cpp</a></b>, which just takes out the <b>new</b>
-and changes pointers to non-pointers:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;list&gt;
-using namespace std;
-
-typedef list &lt;int&gt; intlist;
-
-main()
-{
-  list &lt;intlist&gt; numlists;
-  list &lt;intlist&gt;::iterator nlit;
-  intlist il;
-  intlist::iterator ilit;
-  int i, j;
-
-  for (j = 0; j &lt; 100; j += 10) {
-    numlists.push_back(il);
-    for (i = 0; i &lt; 10; i++) {
-      il.push_back(i+j);
-    }
-  }
-
-  for (nlit = numlists.begin(); nlit != numlists.end(); nlit++) {
-    il = *nlit;
-    for (ilit = il.begin(); ilit != il.end(); ilit++) cout &lt;&lt; *ilit &lt;&lt; " " ;
-    cout &lt;&lt; endl;
-  }
-}
-</pre></td></table></center><p>
-
-When we run it, we get some icky results:
-
-<pre>
-UNIX> list_o_list_2
-
-0 1 2 3 4 5 6 7 8 9 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 
-UNIX> 
-</pre>
-
-What's going on?  Well, first, you are always inserting <b>il</b> into each top-level list.  
-When you do that, it makes a copy of <b>il</b>, and then does not insert the integers into the 
-copy, but into <b>il</b>.  This is why <b>il</b> keeps growing, and why the first line is blank --
-we are printing an empty list.
-<P>
-We can fix this by getting rid of <b>il</b> and accessing the list elements directly.  
-A solution is in
-<b><a href=list_o_list_3.cpp>list_o_list_3.cpp</a></b>:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;list&gt;
-using namespace std;
-
-typedef list &lt;int&gt; intlist;
-
-main()
-{
-  list &lt;intlist&gt; numlists;
-  list &lt;intlist&gt;::iterator nlit;
-  intlist il;
-  intlist::iterator ilit;
-  int i, j;
-
-  for (j = 0; j &lt; 100; j += 10) {
-    numlists.resize(numlists.size()+1);
-    for (i = 0; i &lt; 10; i++) {
-      numlists.back().push_back(i+j);   /* Yuck */
-    }
-  }
-
-  for (nlit = numlists.begin(); nlit != numlists.end(); nlit++) {
-    il = *nlit;
-    for (ilit = il.begin(); ilit != il.end(); ilit++) cout &lt;&lt; *ilit &lt;&lt; " " ;
-    cout &lt;&lt; endl;
-  }
-}
-</pre></td></table></center><p>
-
-That's an awful line of code, isn't it?  Spend some time reading it to make sure
-you understand it.  It seems to work fine:
-
-<pre>
-UNIX> <font color=darkred><b>list_o_list_3</b></font>
-0 1 2 3 4 5 6 7 8 9 
-10 11 12 13 14 15 16 17 18 19 
-20 21 22 23 24 25 26 27 28 29 
-30 31 32 33 34 35 36 37 38 39 
-40 41 42 43 44 45 46 47 48 49 
-50 51 52 53 54 55 56 57 58 59 
-60 61 62 63 64 65 66 67 68 69 
-70 71 72 73 74 75 76 77 78 79 
-80 81 82 83 84 85 86 87 88 89 
-90 91 92 93 94 95 96 97 98 99 
-UNIX> <b></b>
-</pre>
-
-However, there is a bug.  That is the line
-
-<p><center><table border=3 cellpadding=3><td><pre>
-    il = *nlit;
-</pre></td></table></center><p>
-
-This line makes a copy of <b>*nlit</b>, which makes a copy of the list.  As I said
-in class, it makes one pine for C, which doesn't let you make copies so wantonly.
-To fix this, remove <b>il</b> completely (<b><a href=list_o_list_4.cpp>list_o_list_4.cpp</a></b>):
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;list&gt;
-using namespace std;
-
-typedef list &lt;int&gt; intlist;
-
-main()
-{
-  list &lt;intlist&gt; numlists;
-  list &lt;intlist&gt;::iterator nlit;
-  intlist il;
-  intlist::iterator ilit;
-  int i, j;
-
-  for (j = 0; j &lt; 100; j += 10) {
-    numlists.resize(numlists.size()+1);
-    for (i = 0; i &lt; 10; i++) {
-      numlists.back().push_back(i+j);
-    }
-  }
-
-  for (nlit = numlists.begin(); nlit != numlists.end(); nlit++) {
-    for (ilit = nlit-&gt;begin(); ilit != nlit-&gt;end(); ilit++) cout &lt;&lt; *ilit &lt;&lt; " " ;
-    cout &lt;&lt; endl;
-  }
-}
-</pre></td></table></center><p>
-
-Again, I find that code unreadable -- in fact, this code is so ugly, you may as well put it all on one
-line (<b><a href=list_o_list_5.cpp>list_o_list_5.cpp</a></b>):
-
-<p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
-#include &lt;list&gt;
-using namespace std; typedef list &lt;int&gt; intlist; main() { list &lt;intlist&gt; numlists; list &lt;intlist&gt;::iterator nlit; intlist il; intlist::iterator ilit; int i, j; for (j = 0; j &lt; 100; j += 10) { numlists.resize(numlists.size()+1); for (i = 0; i &lt; 10; i++) { numlists.back().push_back(i+j); } } for (nlit = numlists.begin(); nlit != numlists.end(); nlit++) { for (ilit = nlit-&gt;begin(); ilit != nlit-&gt;end(); ilit++) cout &lt;&lt; *ilit &lt;&lt; " " ; cout &lt;&lt; endl; } }
-</pre></td></table></center><p>
-
-For the record, I don't advocate doing this -- it's just that <b><a href=list_o_list_4.cpp>list_o_list_4.cpp</a></b> is 
-so unreadable it may as well be on one line.
-
-
-
