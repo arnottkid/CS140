@@ -1,0 +1,528 @@
+
+<title>CS140 Lecture Notes</title>
+<h2>CS140 Lecture Notes - Using a Map as an Associative Array</h2>
+<UL>
+<LI> James S. Plank
+<LI> Original Notes: September 10, 2009
+<LI> Last Revision: <i>Fri Mar 25 16:01:20 EDT 2011</i>
+<LI> Directory: <b>/home/plank/cs140/Notes/Map_Assoc_Array</b>
+</UL>
+
+There's a nice manual on this topic at
+<a href=http://www.cplusplus.com/reference/stl/map/operator[]/>http://www.cplusplus.com/reference/stl/map/operator[]/</a>.
+
+<hr>
+The STL overloads the '[]' operator on its <b>map</b> data structure, which allows
+you to treat a map as an "Associative Array."  In other words, you can use the
+map as an array whose indices are elements of the "first" part of the map. 
+For example, the file 
+<b><a href=2009-Masters.txt>2009-Masters.txt</a></b> contains the scores of the
+2009 Masters golf tournament.  The format is the score followed by the golfer's name.
+<p>
+Suppose I want to write a quick and dirty program
+that prints out all the players and scores in that file, sorted by first name.  
+I can do it very easily using a map as an associative array.
+The program is in 
+<b><a href=simpgolf.cpp>simpgolf.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+using namespace std;
+
+main()
+{
+  map &lt;string, int&gt; golfer;
+  map &lt;string, int&gt;::iterator git;
+  int score;
+  string name, s;
+
+  while (cin &gt;&gt; score &gt;&gt; name) {
+    getline(cin, s);
+    golfer[name+s] = score;   <font color=darkred><b>// Here's the associative array line.</b></font>
+  }
+
+  for (git = golfer.begin(); git != golfer.end(); git++) {
+    printf("%-30s %5d\n", git-&gt;first.c_str(), git-&gt;second);
+  }
+}
+</pre></td></table></center><p>
+
+The commented line treats the map as an associative array -- indexed by a string.
+(You'll note, I construct the golfers' names by reading the first name, and then
+using <b>getline()</b> to read in the rest of the name).  
+When I insert an element into the array, it inserts it into the map.  At the end
+of the program, I traverse the map using an iterator and print out the names
+and scores:
+
+<pre>
+UNIX> <font color=darkred><b>head 2009-Masters.txt</b></font>
+276     Angel Cabrera
+276     Chad Campbell
+276     Kenny Perry
+278     Shingo Katayama
+279     Phil Mickelson
+280     John Merrick
+280     Steve Flesch
+280     Tiger Woods
+280     Steve Stricker
+281     Hunter Mahan
+UNIX> <font color=darkred><b>sed 's/\(...\)\(.*\)/\2      \1/' 2009-Masters.txt | sort | head -n 10</b></font>
+        Aaron Baddeley      284
+        Adam Scott      299
+        Alvaro Quiros      306
+        Andres Romero      297
+        Angel Cabrera      276
+        Anthony Kim      286
+        Ben Crenshaw      309
+        Ben Curtis      288
+        Bernhard Langer      303
+        Billy Mayfair      305
+UNIX> <font color=darkred><b>simpgolf < 2009-Masters.txt | head -n 10</b></font>
+Aaron Baddeley                   284
+Adam Scott                       299
+Alvaro Quiros                    306
+Andres Romero                    297
+Angel Cabrera                    276
+Anthony Kim                      286
+Ben Crenshaw                     309
+Ben Curtis                       288
+Bernhard Langer                  303
+Billy Mayfair                    305
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+That seems quite convenient, but you should ask yourself what happens if you try to
+access a map in this way, and the key isn't there?  The answer is that <i>it inserts
+the key into the map with a blank value.</i>  To illustrate, take a look at
+<b><a href=tiger_and_jack.cpp>tiger_and_jack.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+using namespace std;
+
+main()
+{
+  map &lt;string, int&gt; golfer;
+  map &lt;string, int&gt;::iterator git;
+  int score;
+  string name, s;
+
+  while (cin &gt;&gt; score &gt;&gt; name) {
+    getline(cin, s);
+    golfer[name+s] = score;
+  }
+
+  cout &lt;&lt; "Number of golfers: " &lt;&lt; golfer.size() &lt;&lt; endl;
+  cout &lt;&lt; "Tiger Woods' Score: " &lt;&lt; golfer["Tiger Woods"] &lt;&lt; endl;
+  cout &lt;&lt; "Jack Nicklaus' Score: " &lt;&lt; golfer["Jack Nicklaus"] &lt;&lt; endl;
+  cout &lt;&lt; "Number of golfers: " &lt;&lt; golfer.size() &lt;&lt; endl;
+}
+</pre></td></table></center><p>
+
+This program reads in the golfers just like 
+<b><a href=simpgolf.cpp>simpgolf.cpp</a></b>.  After reading in the golfers, it prints
+the size of the map, then it prints Tiger Woods' score and Jack Nicklaus' score.  Finally
+it prints the size of the map again.  Below we run it on 
+<b><a href=2009-Masters.txt>2009-Masters.txt</a></b>:
+
+<pre>
+UNIX> <font color=darkred><b>tiger_and_jack < 2009-Masters.txt</b></font>
+Number of golfers: 96
+Tiger Woods' Score: 280
+Jack Nicklaus' Score: 0
+Number of golfers: 97
+UNIX> 
+</pre>
+
+Since Jack Nicklaus didn't play in the 2009 Masters, he has no score.  When we try to
+look him up in the map, it creates a new entry for him with a default score of zero.
+For this reason, looking him up in the map has increased the size of the map by one.
+<p>
+Is that what you want?  It doesn't really matter -- that's what happens, and you should
+be aware of it.
+
+<hr>
+<h3>Temptation, Temptation</h3>
+
+Now that we know about this feature, we may be tempted to use it often.  For example, suppose
+I want to see how the professional golfers did in all four major tournaments of 2009.  I 
+have the info for each of these tournaments in 
+<b><a href=2009-Masters.txt>2009-Masters.txt</a></b>,
+<b><a href=2009-British_Open.txt>2009-British_Open.txt</a></b>,
+<b><a href=2009-US-Open.txt>2009-US-Open.txt</a></b>,
+and
+<b><a href=2009-PGA-Championship.txt>2009-PGA-Championship.txt</a></b>.
+<p>
+In 
+<b><a href=allmajors1.cpp>allmajors1.cpp</a></b>, I modified
+<b><a href=simpgolf.cpp>simpgolf.cpp</a></b> so that the val field of the 
+map is a vector of scores.  Then when I traverse the map, I print out
+the average scores of the golfers who played in all four tournaments:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+typedef vector &lt;int&gt; ivector;
+     
+main()
+{
+  map &lt;string, ivector&gt; golfer;
+  map &lt;string, ivector&gt;::iterator git;
+  int score, i;
+  string name, s;
+  double total;
+
+  while (cin &gt;&gt; score &gt;&gt; name) {
+    getline(cin, s);
+    golfer[name+s].push_back(score);
+  }
+
+  for (git = golfer.begin(); git != golfer.end(); git++) {
+    if (git-&gt;second.size() == 4) {
+      total = 0;
+      for (i = 0; i &lt; git-&gt;second.size(); i++) total += git-&gt;second[i];
+      printf("%-30s %10.2lf\n", git-&gt;first.c_str(), total/4.0);
+    }
+  }
+}
+</pre></td></table></center><p>
+
+When I run it, all looks good:
+
+<pre>
+UNIX> <font color=darkred><b>cat 2009* | allmajors1 | head</b></font>
+Adam Scott                         302.50
+Alvaro Quiros                      302.00
+Andres Romero                      294.50
+Angel Cabrera                      287.75
+Anthony Kim                        292.50
+Ben Curtis                         295.00
+Boo Weekley                        296.25
+Brandt Snedeker                    305.25
+Briny Baird                        304.75
+Bubba Watson                       297.00
+UNIX> <font color=darkred><b>cat 2009* | grep Snedeker | awk '{ l++; n += $1; print n/l }'</b></font>
+309
+306
+306
+305.25
+UNIX> <font color=darkred><b>cat 2009* | grep Weekly | awk '{ l++; n += $1; print n/l }'</b></font>
+282
+292
+292.333
+296.25
+UNIX> 
+</pre>
+
+However, I really want to sort by the best (lowest) scores.  To do that, I
+can use a second map keyed on doubles.  This is in:
+<b><a href=allmajors2.cpp>allmajors2.cpp</a></b>.  I add the second 
+map and iterator in the variable declarations:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  map &lt;double, string&gt; averages;
+  map &lt;double, string&gt;::iterator ait;
+</pre></td></table></center><p>
+
+And insert by treating the map as an associative array, before printing it out:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  for (git = golfer.begin(); git != golfer.end(); git++) {
+    if (git-&gt;second.size() == 4) {
+      total = 0;
+      for (i = 0; i &lt; git-&gt;second.size(); i++) total += git-&gt;second[i];
+      averages[total/4.0] = git-&gt;first;
+    }
+  }
+  for (ait = averages.begin(); ait != averages.end(); ait++) {
+    printf("%8.2lf %s\n", ait-&gt;first, ait-&gt;second.c_str());
+  }
+}
+</pre></td></table></center><p>
+
+When I run it, all appears well:
+
+<pre>
+UNIX> <font color=darkred><b>cat 2009*.txt | allmajors2 | head</b></font>
+  284.50 Ross Fisher
+  284.75 Henrik Stenson
+  285.00 Lee Westwood
+  285.25 Rory McIlroy
+  286.50 Camilo Villegas
+  287.00 Vijay Singh
+  287.25 Kenny Perry
+  287.75 Jim Furyk
+  288.75 Soren Hansen
+  289.25 Retief Goosen
+UNIX> 
+</pre>
+
+But where is Tiger Woods?  Certainly he would be in the top ten (at least in 2009,
+before his sex scandals and subsequent tanking of his golf game...):
+
+<pre>
+UNIX> <font color=darkred><b>cat 2009*.txt | allmajors1 | grep Tiger</b></font>
+Tiger Woods                        287.00
+UNIX> <font color=darkred><b>cat 2009*.txt | allmajors1 | wc</b></font>
+      50     150    2100
+UNIX> <font color=darkred><b>cat 2009*.txt | allmajors2 | wc</b></font>
+      41     123     909
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+I hope you see what has happened.  We used a <b>map</b>, which means that when we inserted
+Vijay Singh's score of 287, it replaced Tiger's score.  We need to instead use a multimap,
+and if we try to do so as in 
+<b><a href=allmajors3.cpp>allmajors3.cpp</a></b>, which simply replaces the <b>map</b>
+with a <b>multimap</b>, it will not compile, since you cannot use a <b>multimap</b> as
+an associative array:
+
+<pre>
+UNIX> <font color=darkred><b>g++ -o allmajors3 allmajors3.cpp</b></font>
+allmajors3.cpp: In function 'int main()':
+allmajors3.cpp:28: error: no match for operator[] in averages[(total / 4.0e+0)]
+UNIX> 
+</pre>
+
+Instead, you have to go back to using the <b>insert()</b> method explicitly.
+This is done in 
+<b><a href=allmajors4.cpp>allmajors4.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  for (git = golfer.begin(); git != golfer.end(); git++) {
+    if (git-&gt;second.size() == 4) {
+      total = 0;
+      for (i = 0; i &lt; git-&gt;second.size(); i++) total += git-&gt;second[i];
+      <font color=darkred><b>averages.insert(make_pair(total/4.0, git-&gt;first));</b></font>
+    }
+  }
+  for (ait = averages.begin(); ait != averages.end(); ait++) {
+    printf("%8.2lf %s\n", ait-&gt;first, ait-&gt;second.c_str());
+  }
+}
+</pre></td></table></center><p>
+
+Now when we run it, we not only see Tiger Woods, we don't lose any golfers.
+
+<pre>
+UNIX> <font color=darkred><b>cat 2009*.txt | allmajors4 | head</b></font>
+  284.50 Ross Fisher
+  284.75 Henrik Stenson
+  285.00 Lee Westwood
+  285.25 Graeme McDowell
+  285.25 Rory McIlroy
+  286.50 Camilo Villegas
+  287.00 Tiger Woods
+  287.00 Vijay Singh
+  287.25 Kenny Perry
+  287.75 Angel Cabrera
+UNIX> <font color=darkred><b>cat 2009*.txt | allmajors4 | wc</b></font>
+      50     150    1111
+UNIX> 
+</pre>
+
+<hr>
+<h3>Beware of performance</h3>
+
+A final batch of programs to illustrate a point:  
+You may be inclined to use maps instead of vectors since they are so convenient.
+In particular, you don't have to resize them or worry about empty elements.  Let's take an
+example that can easily happen if you are lazy.  Suppose I want to write a 
+histogram-like program.  It is going to take as input a bunch of data points which are doubles.
+It will then round each data point to an integer, and then keep track of how many of each rounded
+value there is.  For example, consider the following data points:
+<p>
+<center>( 6.2, 5.8, 2.3, 1.7, 2.0 )</center>
+<p>
+Our program will organize these as two data points that round to 6 and three that round to 2.
+<p>
+I'm going to write four versions of this program.  They will all assume that our data points are
+nonnegative.  The first uses a map, which it traverses like an array.
+It is in <b><a href=histomap1.cpp>histomap1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;cmath&gt;
+using namespace std;
+
+main()
+{
+  map &lt;double, int&gt; histo;
+  double i;
+  double d;
+
+  while (cin &gt;&gt; d) histo[rint(d)]++;
+
+  for (i = 0; i &lt;= histo.rbegin()-&gt;first; i++) {
+    if (histo[i] &gt; 0) cout &lt;&lt; i &lt;&lt; " " &lt;&lt; histo[i] &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+
+It runs fine on our example above:
+
+<pre>
+UNIX> <font color=darkred><b>echo 6.2 5.8 2.3 1.7 2.0 | histomap1</b></font>
+2 3
+6 2
+UNIX> 
+</pre>
+
+The second implementation 
+(<b><a href=histomap2.cpp>histomap2.cpp</a></b>)
+is identical to the first, except we use an iterator to 
+iterate through the map rather than an integer. 
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;cmath&gt;
+using namespace std;
+
+main()
+{
+  map &lt;double, int&gt; histo;
+  map &lt;double, int&gt;::iterator hit;
+  double d;
+
+  while (cin &gt;&gt; d) histo[rint(d)]++;
+
+  for (hit = histo.begin(); hit != histo.end(); hit++) {
+    cout &lt;&lt; hit-&gt;first  &lt;&lt; " " &lt;&lt; hit-&gt;second &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+
+And a third implementation 
+(<b><a href=histomap3.cpp>histomap3.cpp</a></b>)
+also traverses the map, but uses the map as an array
+to print out the values.   I'm only including the <b>for</b> loop here:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  for (hit = histo.begin(); hit != histo.end(); hit++) {
+    d = hit-&gt;first;
+    cout &lt;&lt; d &lt;&lt; " " &lt;&lt; histo[d] &lt;&lt; endl;
+  }
+</pre></td></table></center><p>
+
+Finally, a fourth implementation uses a vector instead of a map.  
+The implementation is in
+<b><a href=histovector.cpp>histovector.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;cmath&gt;
+using namespace std;
+
+main()
+{
+  vector &lt;int&gt; histo;
+  double i;
+  double d;
+
+  while (cin &gt;&gt; d) {
+    i = rint(d);
+    if (histo.size() &lt;= i) histo.resize(i+1, 0);
+    histo[i]++;
+  }
+
+  for (i = 0; i &lt;= histo.size(); i++) {
+    if (histo[i] &gt; 0) cout &lt;&lt; i &lt;&lt; " " &lt;&lt; histo[i] &lt;&lt; endl;
+  }
+}
+</pre></td></table></center><p>
+
+All the implementations produce the same output on the same input, so they are all 
+correct.  However, let's think about how they are each going to fare on different
+input files.  For tiny input files, they should all work equivalently.  For example,
+<b><a href=tinyinput>tinyinput</a></b> has the five example numbers above, and 
+all four programs perform equivalently:
+
+<pre>
+UNIX> <font color=darkred><b>time histomap1 < tinyinput > /dev/null</b></font>
+0.001u 0.002s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time histomap2 < tinyinput > /dev/null</b></font>
+0.001u 0.002s 0:00.00 0.0%      0+0k 0+1io 0pf+0w
+UNIX> <font color=darkred><b>time histomap3 < tinyinput > /dev/null</b></font>
+0.001u 0.001s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time histovector < tinyinput > /dev/null</b></font>
+0.001u 0.001s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+UNIX> 
+</pre>
+
+The inputfile 
+<b><a href=sparseinput>sparseinput</a></b>
+has four values, two of which round to two and two of which round to 1,000,000:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+4.2 1000000.1 1000000.2 3.8
+</pre></td></table></center><p>
+
+When we run our four implementations, we see that <b>histomap1</b> performs
+the worst.  Why?  Because when we traverse the map, we look at <b>histo[i]</b>
+for each value of <i>i</i> from 4 to 1,000,000.  Doing so inserts each value
+into the map, meaning our map has roughly 1,000,000 elements instead of two.
+<p>
+<b>Histomap2</b> and <b>histomap3</b> are much faster, because they only look
+at two values in the map.  <b>Histovector</b> is slower because it creates
+a vector of 1,000,000 elements.  It is faster than <b>histomap1</b>, because
+the underlying implementation of the vector is an array, and the underlying
+implementation of the map is a tree.  Thus, the creation of the map 
+is <i>O(n log(n))</i>), where <i>n=1,000,000</i>, whereas the creation of the
+vector is <i>O(n)</i>.
+
+<pre>
+UNIX> <font color=darkred><b>time histomap1 < sparseinput > /dev/null</b></font>
+1.081u 0.049s 0:01.13 99.1%     0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time histomap2 < sparseinput > /dev/null</b></font>
+0.001u 0.001s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time histomap3 < sparseinput > /dev/null</b></font>
+0.001u 0.001s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time histovector < sparseinput > /dev/null</b></font>
+0.023u 0.008s 0:00.03 66.6%     0+0k 0+0io 0pf+0w
+UNIX> 
+</pre>
+
+Finally, the program 
+<b><a href=biggen.cpp>biggen.cpp</a></b>
+generates 10,000,000 numbers uniformly distributed 
+between 0 and 1,000,000.  
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdlib&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+main()
+{
+  int i;
+
+  for (i = 0; i &lt; 10000000; i++) printf("%.2lf\n", drand48()*1000000);
+}
+</pre></td></table></center><p>
+
+When we use it as input, the vector version of the program outperforms the
+others, because its insert operations take
+less time (and memory):
+
+<pre>
+UNIX> <font color=darkred><b>time sh -c "biggen | histomap1 > /dev/null"</b></font>
+44.328u 0.839s 0:41.09 109.8%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "biggen | histomap2 > /dev/null"</b></font>
+42.677u 0.824s 0:39.44 110.2%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "biggen | histomap3 > /dev/null"</b></font>
+43.462u 0.850s 0:40.24 110.1%	0+0k 0+3io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "biggen | histovector > /dev/null"</b></font>
+26.350u 0.722s 0:22.99 117.7%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+What's the lesson?  Use the proper data structure for the job.  Sometimes
+the characteristics of the input dictate what data structure you should use.
