@@ -3,8 +3,10 @@
 <UL>
 <LI> James S. Plank
 <LI> Original Notes: September 3, 2009
-<LI> Last revision: <i>Wed Mar 30 11:31:51 EDT 2011</i>
-<LI> Directory: <b>/home/plank/cs140/Notes/SetMap</b>
+<LI> Last revision: <i>
+Tue Oct  1 15:29:09 EDT 2019
+</i>
+<LI> Directory: <b>/home/jplank/cs140/Notes/SetMap</b>
 </UL>
 
 <hr>
@@ -29,32 +31,38 @@ using the <b>multiset</b> as a tool.
 <h3>Sets</h3>
 
 A set is an ordered collection of data, such as ints or strings.  You may <i>insert</i>
-elements into the set, and then you may <i>find</i> them, or traverse the set in order.
+elements into the set, and then you may <i>find</i> them, or <i>traverse</i> the set in order.
 You do insertion just like calling <b>push_back()</b> or <b>push_front()</b> on a list.
 The difference is that the item goes into its proper place in the set, rather than
 on the back or front of a list.
 <p>
 When you traverse a set, you use an iterator, just as you do with lists.  Thus, the
 simple program 
-<b><a href=simple_set.cpp>simple_set.cpp</a></b>
+<b><a href=src/simple_set.cpp>src/simple_set.cpp</a></b>
 employs a set to sort the lines of standard input:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program reads lines from standard input, and inserts each line into a set.
+   It then traverses the set and prints the lines.  This has the effect of sorting
+   standard input (while stripping duplicates). */</font>
+
 #include &lt;set&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   set &lt;string&gt; names;
-  set &lt;string&gt;::iterator nit;
+  set &lt;string&gt;::const_iterator nit;
 
   while(getline(cin, s)) names.insert(s);
 
   for (nit = names.begin(); nit != names.end(); nit++) {
     cout &lt;&lt; *nit &lt;&lt; endl;
   }
+
+  return 0;
 } 
 </pre></td></table></center><p>
 
@@ -65,12 +73,12 @@ exactly like traversing a list.
 <p>
 
 <pre>
-UNIX> <font color=darkred><b>cat input-1.txt</b></font>
+UNIX> <font color=darkred><b>cat files/input_1.txt</b></font>
 Jack Journey
 Mackenzie Olympia
 James Splotch
 Dylan Ache
-UNIX> <font color=darkred><b>simple_set < input-1.txt</b></font>
+UNIX> <font color=darkred><b>bin/simple_set < files/input_1.txt</b></font>
 Dylan Ache
 Jack Journey
 James Splotch
@@ -80,17 +88,17 @@ UNIX> <font color=darkred><b></b></font>
 
 The first question you should have is: "What about duplicate entries?"  For
 example, let's try 
-<b><a href=input-2.txt>input-2.txt</a></b>, which has two duplicate entries:
+<b><a href=files/input_2.txt>files/input_2.txt</a></b>, which has two duplicate entries:
 
 <pre>
-UNIX> <font color=darkred><b>cat input-2.txt</b></font>
+UNIX> <font color=darkred><b>cat files/input_2.txt</b></font>
 John Bevy
 Xavier Ornately
 Nicholas Wyatt Fecund
 Max Inadvertent III
 John Bevy
 Max Inadvertent III
-UNIX> <font color=darkred><b>simple_set < input-2.txt</b></font>
+UNIX> <font color=darkred><b>bin/simple_set < files/input_2.txt</b></font>
 John Bevy
 Max Inadvertent III
 Nicholas Wyatt Fecund
@@ -104,15 +112,15 @@ you use a <b>multiset</b>, as in
 difference with this program is the declaration of <b>names</b> and <b>nit</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-  multiset &lt;string&gt; names;
-  multiset &lt;string&gt;::iterator nit;
+multiset &lt;string&gt; names;
+multiset &lt;string&gt;::const_iterator nit;
 </pre></td></table></center><p>
 
 Everything else is the same, and the duplicate entries each get their own 
 entry in the multiset:
 
 <pre>
-UNIX> <font color=darkred><b>simple_multiset < input-2.txt</b></font>
+UNIX> <font color=darkred><b>bin/simple_multiset < files/input_2.txt </b></font>
 John Bevy
 John Bevy
 Max Inadvertent III
@@ -130,36 +138,51 @@ in the set, it returns an iterator that equals the <b>end()</b> method.
 <p>
 
 Here's an example in
-<b><a href=simple_set_find.cpp>simple_set_find.cpp</a></b>:
+<b><a href=src/simple_set_find.cpp>src/simple_set_find.cpp</a></b>
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program reads lines from a file and stores them in a set.
+   It then queries the user for names, and uses the find() method to find them in the set.
+   It returns whether or not it was successful. */</font>
+
 #include &lt;set&gt;
 #include &lt;fstream&gt;
 #include &lt;iostream&gt;
 #include &lt;cstdlib&gt;
 using namespace std;
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  string s;
+  string s, filename;
   ifstream f;
   set &lt;string&gt; names;
 
-  if (argc != 2) { cerr &lt;&lt; "usage: simple_set_find file\n"; exit(1); }
+  <font color=blue>/* Error check the command line. */</font>
 
-  f.open(argv[1]);
-  if (f.fail()) { perror(argv[1]); exit(1); }
+  try {
+    if (argc != 2) throw((string) "usage: simple_set_find file");
+    filename = argv[1];
+    f.open(filename.c_str());
+    if (f.fail()) throw((string) ("could not open " + filename));
+  } catch (const string s) {
+    cerr &lt;&lt; s &lt;&lt; endl;
+    return 0;
+  }
+
+  <font color=blue>/* Read the lines and insert them into the set */</font>
 
   while(getline(f, s)) names.insert(s);
   f.close();
 
+  <font color=blue>/* Now query the user, and try to find the name.  Print out whether it was successful. */</font>
+
   while (1) {
     cout &lt;&lt; "Enter a name: ";
-    cout.flush();                    // Don't worry about this too much -- I do this
-                                     // to make sure that the string is printed to the screen.
-                                     // Sometimes, partial lines aren't printed immediately,
-                                     // and cout.flush() forces the partial line to be printed.
-    if (!getline(cin, s)) exit(0);
+    cout.flush();                    <font color=blue>// Don't worry about this too much -- I do this</font>
+                                     <font color=blue>// to make sure that the string is printed to the screen.</font>
+                                     <font color=blue>// Sometimes, partial lines aren't printed immediately,</font>
+                                     <font color=blue>// and cout.flush() forces the partial line to be printed.</font>
+    if (!getline(cin, s)) return 0;
     if (names.find(s) == names.end()) {
       cout &lt;&lt; s &lt;&lt; " is not in the set.\n";
     } else {
@@ -173,24 +196,87 @@ The program reads a file and puts each line into a set.  It then reads lines fro
 and prints whether the line is in the set.  For example:
 
 <pre>
-UNIX> <font color=darkred><b>cat input-3.txt</b></font>
+UNIX> <font color=darkred><b>cat files/input_3.txt</b></font>
 Madelyn Psychotic
 Joseph Halverson
 Aidan Pooh
 Bailey Cycad
 Wyatt Advantageous
-UNIX> <font color=darkred><b>simple_set_find input-3.txt</b></font>
+UNIX> <font color=darkred><b>bin/simple_set_find files/input_3.txt</b></font>
 Enter a name: <font color=darkred><b>Aidan Pooh</b></font>
 Aidan Pooh is in the set.
 Enter a name: <font color=darkred><b>Jim Plank</b></font>
 Jim Plank is not in the set.
-Enter a name: <font color=darkred><b></b></font>
-<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+Enter a name: <font color=darkred><b>&lt;CNTL-D&gt;</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
 
 <hr>
+<h3>A digression: "Log" time</h3>
+
+I've used the term "log time" above.  What does that mean?  It means that if there are <i>n</i>
+items in a set, then performing each <b>find()</b> operation takes roughly 
+<i>log<sub><font size=-2>2</font></sub>n</i>
+operations.  This is nice, because
+<i>log<sub><font size=-2>2</font></sub>n</i>
+is incremented by 1 when <i>n</i> doubles.  To wit:
+
+<p><center><table>
+<td>
+<table border=3 cellpadding=5>
+<tr><td align=center><i>n</i></td><td align=center><i>log<sub><font size=-2>2</font></sub>n</i></td></tr>
+<tr><td align=center>2</td><td align=center>1</td></tr>
+<tr><td align=center>4</td><td align=center>2</td></tr>
+<tr><td align=center>8</td><td align=center>3</td></tr>
+<tr><td align=center>16</td><td align=center>4</td></tr>
+<tr><td align=center>32</td><td align=center>5</td></tr>
+<tr><td align=center>64</td><td align=center>6</td></tr>
+<tr><td align=center>128</td><td align=center>7</td></tr>
+<tr><td align=center>256</td><td align=center>8</td></tr>
+<tr><td align=center>512</td><td align=center>9</td></tr>
+<tr><td align=center>1,024</td><td align=center>10</td></tr>
+</table>
+</td>
+<td width=20></td>
+<td>
+<table border=3 cellpadding=5>
+<tr><td align=center><i>n</i></td><td align=center><i>log<sub><font size=-2>2</font></sub>n</i></td></tr>
+<tr><td align=center>2,048</td><td align=center>11</td></tr>
+<tr><td align=center>4,096</td><td align=center>12</td></tr>
+<tr><td align=center>8,192</td><td align=center>13</td></tr>
+<tr><td align=center>16,384</td><td align=center>14</td></tr>
+<tr><td align=center>32,768</td><td align=center>15</td></tr>
+<tr><td align=center>65,536</td><td align=center>16</td></tr>
+<tr><td align=center>131,072</td><td align=center>17</td></tr>
+<tr><td align=center>262,144</td><td align=center>18</td></tr>
+<tr><td align=center>524,288</td><td align=center>19</td></tr>
+<tr><td align=center>1,048,576</td><td align=center>20</td></tr>
+</table>
+</td>
+<td width=20></td>
+<td>
+<table border=3 cellpadding=5>
+<tr><td align=center><i>n</i></td><td align=center><i>log<sub><font size=-2>2</font></sub>n</i></td></tr>
+<tr><td align=center>2,097,152</td><td align=center>21</td></tr>
+<tr><td align=center>4,194,304</td><td align=center>22</td></tr>
+<tr><td align=center>8,388,608</td><td align=center>23</td></tr>
+<tr><td align=center>16,777,216</td><td align=center>24</td></tr>
+<tr><td align=center>33,554,432</td><td align=center>25</td></tr>
+<tr><td align=center>67,108,864</td><td align=center>26</td></tr>
+<tr><td align=center>134,217,728</td><td align=center>27</td></tr>
+<tr><td align=center>268,435,456</td><td align=center>28</td></tr>
+<tr><td align=center>536,870,912</td><td align=center>29</td></tr>
+<tr><td align=center>1,073,741,824</td><td align=center>30</td></tr>
+</table>
+</td>
+</table></center><p>
+
+As you can see, "log time" means fast.  If my set has over a million entries, then it
+takes roughly 20 operations to find something.  That's fast.
+
+<hr>
+
 <h3>Maps</h3>
 
 Although sets are nice, they are a little limited.  Often we want to store key-value
@@ -202,42 +288,56 @@ as well.
 
 <p><center><table border=3 cellpadding=3><td><pre>
 map &lt;string, int&gt; names;
-map &lt;string, int&gt;::iterator nit;
+map &lt;string, int&gt;::iterator nit; <font color=blue>// I didn't declare this as a const_iterator -- you'll see why.</font>
 </pre></td></table></center><p>
 
 We'll write a simple example.  This example assumes that input is as in 
-<b><a href=Roster.txt>Roster.txt</a></b>: it is composed of first and last
+<b><a href=files/Roster.txt>files/Roster.txt</a></b>: it is composed of first and last
 names of people.  (Our example is all the NFL players in 2009 whose last names
 begin with "A", in random order).  We'll use a map as declared above, and 
 what we are going to do is keep track of the last names, and how many players
 have each last name.  The program for this is in
-<b><a href=simple_map.cpp>simple_map.cpp</a></b>:
+<b><a href=src/simple_map.cpp>src/simple_map.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;stdio.h&gt;
+<font color=blue>/* This program reads first name / last name pairs, and keeps track of the last names
+   in a map.  It uses an integer value in the map, and increments that value whenever
+   it encounters a last name.  In other words, it keeps track of the number of people
+   with each last name. */</font>
+
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;map&gt;
 using namespace std;
 
-main()
+int main()
 {
   map &lt;string, int&gt; names;
   map &lt;string, int&gt;::iterator nit;
   string fn, ln;
   
+  <font color=blue>/* Read in first name / Last names */</font>
+
   while (cin &gt;&gt; fn &gt;&gt; ln) {
+
+    <font color=blue>/* Look up the last name in the map.  If we don't find the last name in the map,
+       we insert it there with a value of 1.  Otherwise, we increment the value. */</font>
+
     nit = names.find(ln);
     if (nit == names.end()) {
       names.insert(make_pair(ln, 1));
     } else {
-      nit-&gt;second++;
+      nit-&gt;second++;                <font color=blue>// This statement is why nit cannot be a const_iterator.</font>
     }
   }
+
+  <font color=blue>/* Print out the last names and the number of players */</font>
 
   for (nit = names.begin(); nit != names.end(); nit++) {
     cout &lt;&lt; "Last name: " &lt;&lt; nit-&gt;first &lt;&lt; ". Number of players: " &lt;&lt; nit-&gt;second &lt;&lt; endl;
   }
+
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -249,10 +349,10 @@ in this case, they must be a string and an integer.
 The iterator for a map is different, too.  Instead of simply specifying it with
 pointer indirection, you can grab the key from an iterator with "<b>->first</b>"
 and the value with "<b>->second</b>".  Yes, I wish they were called <b>key</b>
-and <b>val</b>, but that is life.  When we run it on <b>Roster.txt</b>, we get:
+and <b>val</b>, but that is life.  When we run it on <b>files/Roster.txt</b>, we get:
 
 <pre>
-UNIX> <font color=darkred><b>simple_map < Roster.txt</b></font>
+UNIX> <font color=darkred><b>bin/simple_map < files/Roster.txt</b></font>
 Last name: Abdallah. Number of players: 1
 Last name: Abdullah. Number of players: 2
 Last name: Abiamiri. Number of players: 1
@@ -264,9 +364,9 @@ Last name: Adams. Number of players: 7
 We can check for correctness with <b>grep</b>:
 
 <pre>
-UNIX> <font color=darkred><b>grep Abdallah Roster.txt</b></font>
+UNIX> <font color=darkred><b>grep Abdallah files/Roster.txt</b></font>
 Nader Abdallah
-UNIX> <font color=darkred><b>grep Adams Roster.txt</b></font>
+UNIX> <font color=darkred><b>grep Adams files/Roster.txt</b></font>
 Gaines Adams
 Jamar Adams
 Anthony Adams
@@ -274,17 +374,21 @@ Michael Adams
 Titus Adams
 Flozell Adams
 Mike Adams
-UNIX> <font color=darkred><b>grep Adams Roster.txt | wc</b></font>
+UNIX> <font color=darkred><b>grep Adams files/Roster.txt | wc</b></font>
        7      14      90
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
 Like sets, you traverse the maps in ascending order, and you can't insert
 duplicate keys.  Since 
-<b><a href=simple_map.cpp>simple_map.cpp</a></b>
+<b><a href=src/simple_map.cpp>src/simple_map.cpp</a></b>
 calls <b>find()</b> and only performs <b>insert()</b> when the
 key is not found, the limitation on duplicate keys is not a problem.  If
 you need duplicate keys, use a <b>multimap</b>.
+<p>
+A final word about the iterator.  Since I am updating the contents of the map
+when I say <tt>"nit->second++"</tt>, I cannot use a <b>const_iterator</b>.  Were I
+to try to use a <b>const_iterator</b> for <b>nit</b>, I would get a compiler error.
 <p>
 <hr>
 <h3>Writing that last program with a multiset</h3>
@@ -298,340 +402,803 @@ string.  If the current string equals the previous string, then we simply
 increment the count.  Otherwise, we print the previous string and its count,
 and then reset the count.  At the end of the traversal, we print out the
 last element.  The code is in 
-<b><a href=nnames_multiset.cpp>nnames_multiset.cpp</a></b>:
+<b><a href=src/nnames_multiset.cpp>src/nnames_multiset.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program outputs the same thing as src/simple_map.cpp, except it puts the
+   last names into a multiset.  It then counts the duplicate names while traversing
+   the multiset. */</font>
+
 #include &lt;cstdio&gt;
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;set&gt;
 using namespace std;
 
-main()
+int main()
 {
   multiset &lt;string&gt; names;
-  multiset &lt;string&gt;::iterator nit;
+  multiset &lt;string&gt;::const_iterator nit;
   string fn, ln, pn;
   int count;
   
+  <font color=blue>/* Read the last names into the multiset */</font>
+
   while (cin &gt;&gt; fn &gt;&gt; ln) names.insert(ln);
 
-  
+  <font color=blue>/* Traverse the multiset, keeping track of the previous name in the variable pn.
+     When the current name is different from pn, print out the previous name and
+     its count.  Otherwise, increment the count.  You need special code for the 
+     first name in the multiset */</font>
+
   for (nit = names.begin(); nit != names.end(); nit++) {
-    if (nit != names.begin()) {
-      if (*nit == pn) {
-        count++;
-      } else { 
-        printf("%-20s %d\n", pn.c_str(), count);
-        pn = *nit;
-        count = 1;
-      }
-    } else {
+    if (nit == names.begin()) {                           <font color=blue>// First name</font>
       pn = *nit;
       count = 1;
-    }
+    } else if (*nit == pn) {                              <font color=blue>// Current name equals previous name</font>
+      count++;
+    } else {                                              <font color=blue>// Current name doesn't equal previous name</font>
+      cout &lt;&lt; "Last name: " &lt;&lt; pn &lt;&lt; ". Number of players: " &lt;&lt; count &lt;&lt; endl;
+      pn = *nit;
+      count = 1;
+    } 
   }
 
-  if (names.size() &gt; 0) printf("%-20s %d\n", pn.c_str(), count);
+  <font color=blue>/* You have to print the last name after the set traversal */</font>
+
+  if (names.size() &gt; 0) {
+    cout &lt;&lt; "Last name: " &lt;&lt; pn &lt;&lt; ". Number of players: " &lt;&lt; count &lt;&lt; endl;
+  }
+  return 0;
 }
 </pre></td></table></center><p>
 
 Compared to the map, that's a pretty convoluted piece of code.  However,
-make sure that you can step through it and convince yourself that it works.
+make sure that you can step through it and understand how it works.  Let's verify
+that <b>bin/simple_map</b> and <b>bin/nnames_multiset</b> produce the same output
+on <b>files/Roster.txt</b> by using MD5 hashes.  If the outputs are identical, then
+the hashes will be the same.  Otherwise, they will be different with an excruciatingly
+high probability:
 
 <pre>
-UNIX> <font color=darkred><b>head -n 10 Roster.txt</b></font>
-Russell Allen
-Gaines Adams
-Aundrae Allison
-David Anderson
-Adrian Arrington
-Hamza Abdullah
-Tim Anderson
-Devin Aromashodu
-Asher Allen
-Eric Alexander
-UNIX> <font color=darkred><b>head -n 10 Roster.txt | nnames_multiset</b></font>
-Abdullah             1
-Adams                1
-Alexander            1
-Allen                2
-Allison              1
-Anderson             2
-Aromashodu           1
-Arrington            1
+UNIX> <font color=darkred><b>bin/simple_map < files/Roster.txt | openssl md5</b></font>
+(stdin)= 369c61e46fc648d942390ab8b217502a
+UNIX> <font color=darkred><b>bin/nnames_multiset < files/Roster.txt | openssl md5</b></font>
+(stdin)= 369c61e46fc648d942390ab8b217502a
+UNIX> 
+</pre>
+
+
+<hr>
+
+<h3>Nested Data Structures, Good Program Structure, Associative Arrays</h3>
+
+The next program is a more detailed example of the type of program that you end up
+writing quite a bit.  You have some data, and you want to process it in a variety
+of ways.  The example that we'll use here continues the football theme.  It's in the
+file <b><a href=files/2018-QB-Stats.txt>files/2018-QB-Stats.txt</a></b>, and it 
+contains some statistics about NFL quarterbacks in the 2018 football season.
+<p>
+Let's take a look:
+
+<pre>
+UNIX> <font color=darkred><b>head -n 5 < files/2018-QB-Stats.txt </b></font>
+Jared Goff            LA       4688       101.1
+Carson Wentz          PHI      3074       102.2
+Mike Glennon          ARI       174       112.0
+Matt Cassel           DET        59       26.3
+Brock Osweiler        MIA      1247       86.0
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The format of each line of the file is:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+First-Name Last-Name Team Passing-Yards QB-Rating
+</pre></td></table></center><p>
+
+There is one line for each quarterback who played in 2018, and the lines are in no particular
+order.  Now, let's suppose that you are preparing for your 2019 fantasy football draft, and
+you want to crunch this data a little bit.  In particular, suppose you want to be able to
+show:
+
+<UL>
+<LI> The quarterbacks and their stats, sorted by last name, then first name.
+<LI> The quarterbacks and their stats, sorted by rating.
+<LI> The quarterbacks and their stats, sorted by team, and within each team sorted by yards.
+<LI> Info on a particular quarterback when you ask for the quarterback by name.
+</UL>
+
+Maybe you want more stuff.  In the sections below, I show how I would organize this program,
+highlighting some things about maps along the way.
+
+<hr>
+<h3> Step 1: Define the Quarterback class and read the QB's into a vector of pointers </h3>
+
+My first step is to define a <b>Quarterback</b> class, which has all of the info for each Quarterback.
+It will also have a Print() method, which is what you call when you want to print each
+quarterback.
+<p>
+My next step is to define a vector of pointers to Quarterbacks.  
+While this vector won't be sorted,
+it will be a convenient data structure that you can use when you want to do things that
+involve all of the quarterbacks.
+<p>
+We'll write this code and test it before moving on.  It is in 
+<b><a href=src/qb_1_read_input.cpp>src/qb_1_read_input.cpp</a></b>, and I won't put
+all of the code here, but instead, I'll show you the important parts.  First is 
+the <b>Quarterback</b> class, and its very simple <b>Print()</b> method.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The Quarterback class is quite simple -- data and a Print method. 
+   We will construct the Name from the Firstname and Lastname. */</font>
+
+class Quarterback {
+  public:
+    string Name;
+    string Firstname;
+    string Lastname;
+    string Team;
+    int    Yards;
+    double Rating;
+    void Print() const;
+};
+
+void Quarterback::Print() const
+{
+  printf("%-25s %3s   Y: %4d    R: %5.1lf\n", Name.c_str(), Team.c_str(), Yards, Rating);
+} 
+</pre></td></table></center><p>
+
+In the <b>main()</b> we open a file <b>f</b> and then from it, read quarterback entries.
+For each line, we create a new instance of the Quarterback class, and then put a pointer
+to it into a vector <b>qbs</b>.  Here are the relevant variable declarations (there are more
+than these, but these are the ones that involve quarterbacks:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+Quarterback *q;
+vector &lt;Quarterback *&gt; qbs;
+</pre></td></table></center><p>
+
+And here is the code that reads in the quarterbacks, then prints them out:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+  <font color=blue>/* Read the quarterbacks and put their pointers into qbs*/</font>
+
+  while(f &gt;&gt; fn &gt;&gt; ln &gt;&gt; team &gt;&gt; yards &gt;&gt; rating) {
+    q = new Quarterback;
+    q-&gt;Firstname = fn;
+    q-&gt;Lastname = ln;
+    q-&gt;Team = team;
+    q-&gt;Yards = yards;
+    q-&gt;Rating = rating;
+    q-&gt;Name = q-&gt;Firstname + " " + q-&gt;Lastname;
+    qbs.push_back(q);
+  }
+
+  <font color=blue>/* Print out the quarterbacks to test the code. */</font>
+
+  for (i = 0; i &lt; qbs.size(); i++) qbs[i]-&gt;Print();
+  return 0;
+}
+</pre></td></table></center><p>
+
+To test it, we make sure that things look ok, and do some spot checking:
+
+<pre>
+UNIX> <font color=darkred><b>bin/qb_1_read_input files/2018-QB-Stats.txt | head -n 5</b></font>   <font color=blue> # Make sure that the output looks right</font>
+Jared Goff                 LA   Y: 4688    R: 101.1
+Carson Wentz              PHI   Y: 3074    R: 102.2
+Mike Glennon              ARI   Y:  174    R: 112.0
+Matt Cassel               DET   Y:   59    R:  26.3
+Brock Osweiler            MIA   Y: 1247    R:  86.0
+UNIX> <font color=darkred><b>bin/qb_1_read_input files/2018-QB-Stats.txt | grep Ben</b></font>    <font color=blue> # Spot check that Ben Roethlisberger's line is correct</font>
+Ben Roethlisberger        PIT   Y: 5129    R:  96.5
+UNIX> <font color=darkred><b>grep Ben files/2018-QB-Stats.txt</b></font>
+Ben Roethlisberger    PIT      5129       96.5
+UNIX> <font color=darkred><b>bin/qb_1_read_input files/2018-QB-Stats.txt | grep Mahomes</b></font><font color=blue> # Spot check that Patrick Mahomes' line is correct</font>
+Patrick Mahomes            KC   Y: 5097    R: 113.8
+UNIX> <font color=darkred><b>grep Mahomes files/2018-QB-Stats.txt</b></font>         
+Patrick Mahomes       KC       5097       113.8
+UNIX> <font color=darkred><b>bin/qb_1_read_input files/2018-QB-Stats.txt | wc</b></font>          <font color=blue> # Make sure that it is producing the correct number of lines.</font>
+      69     483    3588
+UNIX> <font color=darkred><b>wc files/2018-QB-Stats.txt </b></font>
+      69     345    3256 files/2018-QB-Stats.txt
+UNIX> <font color=darkred><b></b></font>
+</pre>
+<hr>
+
+<h3> Step 2: Define a QBS class to manage the Quarterbacks, and add a map to it</h3>
+
+The next step is one that none of us like to do, but I can tell you that it makes your
+life easier, especially when you do it at this point in your program.  You're going to
+be manipulating your collection of quarterbacks a lot, so it's a good idea to create
+a class to manage quarterbacks.  I do that in 
+<b><a href=src/qb_2_qbs_class.cpp>src/qb_2_qbs_class.cpp</a></b>.  Here's the class
+definition.  Read the header comment for some more information.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The QBS class is to manage my quarterback data.  I use a default
+   constructor, and then implement methods to read from a filename,
+   and to find a Quarterback by name.  In the protected data, I have
+   two data structures: QV, which is a vector of pointers, and QM,
+   which is a map of quarterbacks keyed by name. */</font>
+
+class QBS {
+  public:
+    bool Read(const string &filename);
+    const Quarterback *Find(const string &name) const;
+  protected:
+    vector &lt;Quarterback *&gt; QV;
+    map &lt;string, Quarterback *&gt; QM;
+};
+</pre></td></table></center><p>
+
+Note, I didn't define a constructor.  For that reason, it's very easy for
+me to simply declare an instance of the class as a local variable in <b>main()</b>.
+Instead, I have a <b>Read()</b> method which reads from the file, and creates
+the vector of pointers <b>QV</b>, just like in the <b>main()</b> above.  At the end,
+it runs through the vector and inserts the quarterbacks into the map.  Here's
+the important code:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+bool QBS::Read(const string &filename)
+{
+  <font color=blue>/* Read in the quarterbacks from the file, putting the pointers into the QV vector. */</font>
+
+  ....  I am omiting that code, because it's just like in the main() above.
+
+  <font color=blue>/* Now create the map QM, treating it like an associative array. */</font>
+
+  for (i = 0; i &lt; QV.size(); i++) {
+    q = QV[i];
+    QM[q-&gt;Name] = q;
+  }
+
+  <font color=blue>/* Close the file and return success. */</font>
+  f.close();
+  return true;
+}
+</pre></td></table></center><p>
+
+One of the really convienient (and sometimes dangerous) features of a map is that you can treat it like
+an <i>associative array</i>.  In this case, the string is the "index".  This is more overloading
+from the standard template library.  What is really going on here is the following:
+
+<UL>
+<LI> The <b>find()</b> method of <b>QM</b> is called to see if <b>q->Name</b> is in the map.
+<LI> If it's not there, then <b>QM.insert(make_pair(q->Name, q))</b> is called to put <b>q</b> into the map.
+<LI> If it is there, then the <b>val</b> gets set to <b>q</b>.
+</UL>
+
+You can only do this on a <b>map</b> and not a <b>multimap</b> (because the map has unique keys).
+You'll find yourself using this feature a lot.  It often helps with readability, but again, it can
+get you in trouble, so you need to pay attention to what you're doing when you use it.
+
+<p>
+The <b>Find()</b> method is really straightforward:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The find() simply calls find() on the map, returning NULL if it can't find the quarterback. */</font>
+
+const Quarterback *QBS::Find(const string &name) const
+{
+  map &lt;string, Quarterback *&gt;::const_iterator qit;
+
+  qit = QM.find(name);
+  if (qit == QM.end()) return NULL;
+  return qit-&gt;second;
+}
+</pre></td></table></center><p>
+
+Let's talk about the three <b>const</b> declarations here:
+
+<OL>
+<LI> It returns a <b>(const Quarterback *)</b>.  That means that whoever uses the return
+value cannot modify what it points to.  That's a good feature to use when you can,
+because it helps you find bugs, by restricting how you use the pointer.
+<LI> The argument is <b>(const string &amp;name)</b>.  This is nothing new.
+<LI> The procedure is declared <b>const</b>.  That means that <b>Find()</b> doesn't
+     modify the <b>QBS</b> class.  Again, the compiler enforces this.
+</OL>
+
+There's nothing exciting in the <b>main()</b>.  It simply processes lines of standard
+input in a way that we're used to -- breaking the line up into words and putting the
+words into a vector of strings named <b>sv</b>.  For now, we process three commands,
+"F" for Find, "Q" for Quit and "?" to print the commands.  I'm only going to highlight
+two things about the <b>main()</b>.  First, it declares an instance of <b>QBS</b>
+as a local variable, and it also declared a <b>(const Quarterback *q)</b>, which will
+be the return value of <b>qbs.Find()</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+QBS qbs;
+const Quarterback *q;
+</pre></td></table></center><p>
+
+Second, when we call <b>Find()</b>, we can't modify <b>q</b>.  Since we declared
+the <b>Print()</b> method to be <b>const</b>, the compiler knows that calling <b>q->Print()</b>
+won't violate the fact that it is <b>const</b>:
+
+
+<p><center><table border=3 cellpadding=3><td><pre>
+    } else if (sv[0] == "F") {
+      if (sv.size() != 3) {
+        printf("usage: F firstname lastname\n");
+      } else {
+        name = sv[1] + " " + sv[2];
+        q = qbs.Find(name);                   <font color=blue>// Find the quarterback</font>
+        if (q == NULL) {
+          printf("Not there.\n");
+        } else {
+          q-&gt;Print();                      <font color=blue>// Since Print() is const, this is ok</font>
+        }
+      }
+    }
+</pre></td></table></center><p>
+
+Let's run it, and make sure that it finds the quarterbacks correctly:
+
+<pre>
+UNIX> <font color=darkred><b>bin/qb_2_qbs_class files/2018-QB-Stats.txt</b></font>
+QB> <font color=darkred><b>?</b></font>
+F name -- Find the quarterback with the given name.
+Q      -- Quit.
+?      -- Print the commands.
+QB> <font color=darkred><b>F Patrick Mahomes</b></font>
+Patrick Mahomes            KC   Y: 5097    R: 113.8
+QB> <font color=darkred><b>F Carson Wentz</b></font>
+Carson Wentz              PHI   Y: 3074    R: 102.2
+QB> <font color=darkred><b>F Jim Plank</b></font>
+Not there.
+QB> <font color=darkred><b>Q</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
+<h3>An aside - more array associativity, and more const</h3>
 
-<h3>Maps and Sets together</h3>
-
-The next program is a more detailed example.
-This program reads an input file like <b>Roster.txt</b> 
-and prints out the players sorted by last name. When two players have the same
-last name, they are sorted by first name.  The program is in
-<b><a href=sort_names_1.cpp>sort_names_1.cpp</a></b>:
+Above we treated the map like an associative array so that we could insert/set a value.
+You can also treat an associative array to find a value.  We try to use that feature
+when we implement <b>Find()</b> in 
+<b><a href=src/qb_2a_bad_find.cpp>src/qb_2a_bad_find.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;stdio.h&gt;
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;set&gt;
-#include &lt;map&gt;
-using namespace std;
-
-typedef set &lt;string&gt; fnset;
-
-main()
+const Quarterback *QBS::Find(const string &name) const
 {
-  map &lt;string, fnset *&gt; lnames;
-  map &lt;string, fnset *&gt;::iterator lnit;
-  fnset *fnames;
-  fnset::iterator fnit;
-  string fn, ln;
-  
-  while (cin &gt;&gt; fn &gt;&gt; ln) {
-    lnit = lnames.find(ln);
-    if (lnit == lnames.end()) {
-      fnames = new fnset;
-      lnames.insert(make_pair(ln, fnames));
-    } else {
-      fnames = lnit-&gt;second;
-    }
-    fnames-&gt;insert(fn);
+  return QM[name];
+}
+</pre></td></table></center><p>
+
+There are two problems here, both related.  The first is that the compiler
+won't allow this.  When we try to compile it, it will fail:
+
+<pre>
+UNIX> <font color=darkred><b>make bin/qb_2a_bad_find</b></font>
+g++ -Wall -Wextra -o bin/qb_2a_bad_find src/qb_2a_bad_find.cpp
+src/qb_2a_bad_find.cpp:90:12: error: no viable overloaded operator[] for type 'const map&lt;string,
+      Quarterback *&gt;' (aka 'const map&lt;basic_string&lt;char, char_traits&lt;char&gt;, allocator&lt;char&gt; &gt;,
+      Quarterback *&gt;')
+  return QM[name];
+........
+</pre>
+
+The reason it fails is the second problem -- when <b>name</b> isn't in the map,
+what happens is that it is inserted into the map with a default value of NULL,
+and then NULL is returned.  Since that 
+modifies the map, that is why you can't have the procedure be <b>const</b>.
+However, if you remove the <b>const</b>, now when I look up a name
+that is not in the map, that name is <i>inserted</i> into the map.  That's
+going to mess things up here, so I'm glad that by using <b>const</b>
+correctly, we've avoided this bug!
+
+<hr>
+<h3> Step 3: Sorting the quarterback by rating -- the buggy version</h3>
+
+We're going to add three methods to our class to do the various printouts:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* I'm adding the methods Print_By_Rating(), Print_By_Name() and Print_By_Team(). */</font>
+
+class QBS {
+  public:
+    bool Read(const string &filename);
+    const Quarterback *Find(const string &name) const;
+    void Print_By_Rating() const;
+    void Print_By_Name() const;
+    void Print_By_Team() const;
+  protected:
+    vector &lt;Quarterback *&gt; QV;
+    map &lt;string, Quarterback *&gt; QM;
+};
+</pre></td></table></center><p>
+
+In 
+<b><a href=src/qb_3_sort_by_rating_bad.cpp>src/qb_3_sort_by_rating_bad.cpp</a></b>, we only implement
+<b>Print_By_Rating()</b>, and we love the convenience of associative arrays so much that we 
+use them here.  We'll use a temporary map keyed by double, into which we'll insert the negation of the
+quarterback rating.  That will have the map store the ratings from high to low.  We then print the
+map, and since it is a local variable, when the method returns, the map is deallocated.  That's nice.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void QBS::Print_By_Rating() const
+{
+  Quarterback *q;
+  size_t i;
+  map &lt;double, Quarterback *&gt; m;
+  map &lt;double, Quarterback *&gt;::const_iterator mit;
+
+  for (i = 0; i &lt; QV.size(); i++) {
+    q = QV[i];
+    m[-q-&gt;Rating] = q;
   }
 
-  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
-    fnames = lnit-&gt;second;
-    for (fnit = fnames-&gt;begin(); fnit != fnames-&gt;end(); fnit++) {
-      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
-    }
+  for (mit = m.begin(); mit != m.end(); mit++) {
+    mit-&gt;second-&gt;Print();
   }
 }
 </pre></td></table></center><p>
 
-The program uses a map to sort the last names.  The "second" field of the map is a pointer
-to a set, which
-sorts the first names that belong to that last name.  When you read in a name, you check the
-last name to see if it's in the map.  If so, then it sets <b>fnames</b> to be the set of
-first names with that last name.  If not, it creates a new <b>fnames</b> set and inserts it
-and the last name into the map.  Last, it inserts the first name into the set.
-<p>
-When it's done reading input, it does a nested traversal to print out all of the names.
-<p>
-Note the <b>typedef</b> statement to make the program read more easily.
-<p>
-This program will not print out duplicate names, because sets don't hold 
-duplicate entries.  If you wanted it to print out duplicate names, you would have to use
-a multiset.
+We run it, and it appears to be working ok:
+(I added extra commands for printing to the <b>main()</b>, and
+I made the prompt optional, so that I can call the program in non-interactive mode) 
 
 <pre>
-UNIX> <font color=darkred><b>sort_names_1 < Roster.txt | head</b></font>
-Nader Abdallah
-Hamza Abdullah
-Husain Abdullah
-Victor Abiamiri
-John Abraham
-Anthony Adams
-Flozell Adams
-Gaines Adams
-Jamar Adams
-Michael Adams
+UNIX> <font color=darkred><b>bin/qb_3_sort_by_rating_bad                                          <font color=blue> # I changed the command line processing, so test that.</b></font></font>
+usage: qb_2_qbs_class file [prompt]
+UNIX> <font color=darkred><b>bin/qb_3_sort_by_rating_bad files/2018-QB-Stats.txt "QB>"            <font color=blue> # Test setting the prompt, and the printing of new commands</b></font></font>
+QB> ?
+F name -- Find the quarterback with the given name.
+R      -- Print the quarterbacks by rating.
+N      -- Print the quarterbacks by name (last, first).
+T      -- Print the quarterbacks by team, then by yardage.
+Q      -- Quit.
+?      -- Print the commands.
+QB> Q
+UNIX> <font color=darkred><b>echo R | bin/qb_3_sort_by_rating_bad files/2018-QB-Stats.txt | head  <font color=blue> # Take a look at the printout by rating -- it looks good!</b></font></font>
+Nate Sudfeld              PHI   Y:   22    R: 129.2
+Matt Barkley              BUF   Y:  232    R: 117.4
+Drew Brees                 NO   Y: 3992    R: 115.7
+Patrick Mahomes            KC   Y: 5097    R: 113.8
+Kyle Allen                CAR   Y:  266    R: 113.1
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Let's do a spot check, though, to make sure that all of the quarterbacks are being
+printed.  Something's wrong:
+
+<pre>
+UNIX> <font color=darkred><b>echo R | bin/qb_3_sort_by_rating_bad files/2018-QB-Stats.txt | wc</b></font>
+      68     476    3536
+UNIX> <font color=darkred><b>wc files/2018-QB-Stats.txt</b></font>
+      69     345    3256 files/2018-QB-Stats.txt
+UNIX>
+</pre>
+
+We're missing a quarterback, because we're only getting 68 lines of output, and we should be getting 69.
+Who are we missing?  Here's how I'd find out -- I'm going to isolate the names of the output, and of
+the original file, and sort them.  The difference between the two files will give me the answer:
+
+<pre>
+UNIX> <font color=darkred><b>echo R | bin/qb_3_sort_by_rating_bad files/2018-QB-Stats.txt | sed 's/  .*//' | sort | head -n 5</b></font>
+AJ McCarron
+Aaron Rodgers
+Alex Smith
+Andrew Luck
+Baker Mayfield
+UNIX> <font color=darkred><b>echo R | bin/qb_3_sort_by_rating_bad files/2018-QB-Stats.txt | sed 's/  .*//' | sort > tmp-1.txt</b></font>
+UNIX> <font color=darkred><b>sed 's/  .*//' files/2018-QB-Stats.txt | sort | head -n 5</b></font>
+AJ McCarron
+Aaron Rodgers
+Alex Smith
+Andrew Luck
+Andy Dalton
+UNIX> <font color=darkred><b>sed 's/  .*//' files/2018-QB-Stats.txt | sort > tmp-2.txt</b></font>
+UNIX> <font color=darkred><b>diff tmp-1.txt tmp-2.txt</b></font>
+4a5
+> Andy Dalton
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+What gives with Andy Dalton?  Well, let's take a look at his quarterback rating, and what our <b>Print_By_Rating()</b> 
+gives us:
+
+<pre>
+UNIX> <font color=darkred><b>grep Dalton files/2018-QB-Stats.txt </b></font>
+Andy Dalton           CIN      2566       89.6
+UNIX> <font color=darkred><b>echo R | bin/qb_3_sort_by_rating_bad files/2018-QB-Stats.txt </b></font>
+<font color=blue># ...... skipping a bunch of lines</font>
+Jimmy Garoppolo            SF   Y:  718    R:  90.0
+Matthew Stafford          DET   Y: 3777    R:  89.9
+Sean Mannion               LA   Y:   23    R:  89.6
+Brock Osweiler            MIA   Y: 1247    R:  86.0
+Alex Smith                WAS   Y: 2180    R:  85.7
+<font color=blue># ...... skipping a bunch of lines</font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Do you see what happened?  There's another quarterback, Sean Mannion, who has a rating of 89.6.  Since I 
+used a map and not a multimap, I can't store both Sean Mannion and Andy Dalton in the map, with their
+ratings of 89.6.  That's a rough bug, and I'm lucky that I had two quarterbacks with the same rating
+to find it.  (And that I did the extra testing).  
+
+<hr>
+<h3> Step 4: Using a multimap to implement Print_By_Rating() correctly.</h3>
+
+We fix the bug by using a multimap instead of the
+map, and using <b>insert()</b> rather than the associative array feature.  We can't use associative arrays with multimaps.
+The code is in 
+<b><a href=src/qb_4_sort_by_rating.cpp>src/qb_4_sort_by_rating.cpp</a></b>.  Here's
+<b>Print_By_Rating()</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* I'm using a multimap now to handle duplicate ratings. */</font>
+
+void QBS::Print_By_Rating() const
+{
+  Quarterback *q;
+  size_t i;
+  multimap &lt;double, Quarterback *&gt; m;
+  multimap &lt;double, Quarterback *&gt;::const_iterator mit;
+
+  for (i = 0; i &lt; QV.size(); i++) {
+    q = QV[i];
+    m.insert(make_pair(q-&gt;Rating, q));
+  }
+
+  for (mit = m.begin(); mit != m.end(); mit++) {
+    mit-&gt;second-&gt;Print();
+  }
+}
+</pre></td></table></center><p>
+
+Now it prints out all 69 entries:
+
+<pre>
+UNIX> <font color=darkred><b>echo R | bin/qb_4_sort_by_rating files/2018-QB-Stats.txt | wc</b></font>
+      69     483    3588
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
 <hr>
-<h3>You should use pointers as the <i>val</i> part of a map</h3>
+<h3> Step 5: Implementing Print_By_Name()</h3>
 
-The program above uses a pointer to a <b>fnset</b> rather than 
-simply using a <b>fnset</b>.  You may wonder, "Why not just use a <b>fnset</b>, so
-I don't have to mess with pointers?"  The reason is that C++'s habit of making
-copies of things makes this an inefficient and often bug-prone ordeal.  First, 
-take a look at
-<b><a href=sort_names_bad.cpp>sort_names_bad.cpp</a></b>.  This is a mapping 
-of <b>sort_names_1.cpp</b> that doesn't use the pointer. 
+With <b>Print_By_Name()</b>, we want to sort the quarterbacks by their last names, and then if
+two quarterbacks have the same last name, we sort them by their first names.  I'm going to 
+do this by having the following structure:
+
+<UL>
+<LI> I will have a map keyed by first name, whose vals are also maps.
+<LI> The maps in the vals are keyed by first name, and their vals are pointers to quarterbacks.
+<LI> When I print out the quarterbacks, I'm going to do a nested traversal.  At the first level, I
+traverse the last-name map.  Then for each of these nodes, we traverse the first-name map.
+</UL>
+
+The code is in 
+<b><a href=src/qb_5_print_by_name.cpp>src/qb_5_print_by_name.cpp</a></b>.
+Here is <b>Print_By_Name()</b>, and you can see that it uses the associative array 
+feature of maps.  This is really nice, because if a last name is not in the map, it
+is created with an empty map as a val, and then the first name is inserted into the empty
+map with the quarterback as the val.  That's really nice!
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;stdio.h&gt;
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;set&gt;
-#include &lt;map&gt;
-using namespace std;
+<font color=blue>/* Here's the newly implemented method, with a two-level tree. */</font>
 
-typedef set &lt;string&gt; fnset;
-
-main()
+void QBS::Print_By_Name() const
 {
-  map &lt;string, fnset&gt; lnames;
-  map &lt;string, fnset&gt;::iterator lnit;
-  fnset fnames;
-  fnset::iterator fnit;
-  string fn, ln;
-  
-  while (cin &gt;&gt; fn &gt;&gt; ln) {
-    lnit = lnames.find(ln);
-    if (lnit == lnames.end()) {
-      lnames.insert(make_pair(ln, fnames));
-    } else {
-      fnames = lnit-&gt;second;
-    }
-    fnames.insert(fn);
+  map &lt;string, map &lt;string, Quarterback *&gt; &gt; m;
+  map &lt;string, map &lt;string, Quarterback *&gt; &gt;::const_iterator mit;
+  map &lt;string, Quarterback *&gt;::const_iterator qit;
+  size_t i;
+  Quarterback *q;
+
+  <font color=blue>/* Traverse the vector, and insert the quarterbacks into the map.
+     As you can see, I'm using the associative array feature to do this rather easily. */</font>
+
+  for (i = 0; i &lt; QV.size(); i++) {
+    q = QV[i];
+    m[q-&gt;Lastname][q-&gt;Firstname] = q;
   }
 
-  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
-    fnames = lnit-&gt;second;
-    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
-      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+  <font color=blue>/* Now do a nested traversal, and print out the quarterbacks. */</font>
+
+  for (mit = m.begin(); mit != m.end(); mit++) {
+    for (qit = mit-&gt;second.begin(); qit != mit-&gt;second.end(); qit++) {
+      qit-&gt;second-&gt;Print();
     }
   }
 }
 </pre></td></table></center><p>
 
-This program is very buggy.  Take a simple example:
+Here we see it working, since there are two quarterbacks whose last names are "Allen".
 
 <pre>
-UNIX> <font color=darkred><b>head -n 2 Roster.txt</b></font>
-Adam Anderson
-Andy Alleman
-UNIX> <font color=darkred><b>head -n 2 Roster.txt | sort_names_1</b></font>
-Andy Alleman
-Adam Anderson
-UNIX> <font color=darkred><b>head -n 2 Roster.txt | sort_names_bad</b></font>
-Adam Alleman
-UNIX> 
+UNIX> <font color=darkred><b>echo N | bin/qb_5_print_by_name files/2018-QB-Stats.txt | head </b></font>
+Josh Allen                BUF   Y: 2074    R:  67.9
+Kyle Allen                CAR   Y:  266    R: 113.1
+Derek Anderson            BUF   Y:  465    R:  56.0
+Matt Barkley              BUF   Y:  232    R: 117.4
+C.J. Beathard              SF   Y: 1252    R:  81.8
+Blake Bortles             JAX   Y: 2718    R:  79.8
+Sam Bradford              ARI   Y:  400    R:  62.5
+Tom Brady                  NE   Y: 4355    R:  97.7
+Drew Brees                 NO   Y: 3992    R: 115.7
+Teddy Bridgewater          NO   Y:  118    R:  70.6
+UNIX> <font color=darkred><b>echo N | bin/qb_5_print_by_name files/2018-QB-Stats.txt | wc</b></font>
+      69     483    3588
+UNIX> <font color=darkred><b>vi index.html</b></font>
 </pre>
 
-Yuck.  What's going on?  Well, two things.  Let's concentrate on the most egregious.
-This is the fact that you reuse <b>fnames</b> to insert a name into the set, and
-then you use that same <b>fnames</b> when you insert a last name into the map.  That's
-wrong.  Let's fix that by having two <b>fnset</b>'s: <b>fnames</b>, which we'll
-use to insert first names, and <b>fnames_empty</b>, which we use to put an empty
-set into a newly created last name map:
-(<b><a href=sort_names_bad2.cpp>sort_names_bad2.cpp</a></b>)
+Do you find that last for loop ugly?  You may be tempted to use a temporary variable, like:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;stdio.h&gt;
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;set&gt;
-#include &lt;map&gt;
-using namespace std;
+map &lt;string, Quarterback *&gt; tmp;
+</pre></td></table></center><p>
 
-typedef set &lt;string&gt; fnset;
+And then, do the following for that last for loop:
 
-main()
+<p><center><table border=3 cellpadding=3><td><pre>
+for (mit = m.begin(); mit != m.end(); mit++) {
+  tmp = mit-&gt;second;
+  for (qit = tmp.begin(); qit != tmp.end(); qit++) {
+    qit-&gt;second-&gt;Print();
+  }
+}
+</pre></td></table></center><p>
+
+The code will produce correct output, but you need to know that it makes a copy of
+<tt>mit->second</tt>, which is inefficient.  If you want to do this correctly, you
+can have tmp be a pointer:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+const map &lt;string, Quarterback *&gt; *tmp;  <font color=blue>// This has to be const because mit is a const_iterator</font>
+
+<font color=blue>.... and later:</font>
+
+for (mit = m.begin(); mit != m.end(); mit++) {
+  tmp = &mit-&gt;second;
+  for (qit = tmp-&gt;begin(); qit != tmp-&gt;end(); qit++) {
+    qit-&gt;second-&gt;Print();
+  }
+}
+</pre></td></table></center><p>
+
+You can also use a <i>reference variable</i>, but then you would need to declare it
+inside the for loop, and since I don't approve of that, I won't show it.  You can google it...
+
+
+<hr>
+<h3> Step 6: Implementing Print_By_Team()</h3>
+
+Now, <b>Print_By_Team()</b> is similar.  You want to print the quarterbacks sorted by team,
+and within a team, you want them sorted by yardage, highest to lowest.  So, we're going to
+have the following structure:
+
+<UL>
+<LI> We will have a map keyed by team name, with multimaps in the vals.
+<LI> The multimaps in the vals are keyed by negated yardage, and their vals are pointers to quarterbacks.
+<LI> When I print out the quarterbacks, I'm going to do a nested traversal.  At the first level, I
+traverse the team map.  Then for each of these nodes, we traverse the yardage multimap.
+</UL>
+
+The code is in 
+<b><a href=src/qb_6_print_by_team.cpp>src/qb_6_print_by_team.cpp</a></b>, and here is
+<b>Print_By_Team()</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void QBS::Print_By_Team() const
 {
-  map &lt;string, fnset&gt; lnames;
-  map &lt;string, fnset&gt;::iterator lnit;
-  fnset fnames, fnames_empty;
-  fnset::iterator fnit;
-  string fn, ln;
-  
-  while (cin &gt;&gt; fn &gt;&gt; ln) {
-    lnit = lnames.find(ln);
-    if (lnit == lnames.end()) {
-      lnames.insert(make_pair(ln, fnames_empty));
-      lnit = lnames.find(ln);
-    }
-    fnames = lnit-&gt;second;
-    fnames.insert(fn);
+  map &lt;string, multimap &lt;int, Quarterback *&gt; &gt; m;
+  map &lt;string, multimap &lt;int, Quarterback *&gt; &gt;::const_iterator mit;
+  const multimap &lt;int, Quarterback *&gt; *tmp;
+  multimap &lt;int, Quarterback *&gt;::const_iterator qit;
+  size_t i;
+  Quarterback *q;
+
+  <font color=blue>/* Traverse the vector, and insert all of the Quarterbacks into the map. */</font>
+
+  for (i = 0; i &lt; QV.size(); i++) {
+    q = QV[i];
+    m[q-&gt;Team].insert(make_pair(-q-&gt;Yards, q));
   }
 
-  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
-    fnames = lnit-&gt;second;
-    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
-      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
+  <font color=blue>/* Again we have a double-nested loop to print the map -- I'm using a
+     temporary variable this time, which is a pointer, so that it doesn't make a copy. */</font>
+  
+  for (mit = m.begin(); mit != m.end(); mit++) {
+    tmp = &mit-&gt;second;
+    for (qit = tmp-&gt;begin(); qit != tmp-&gt;end(); qit++) {
+      qit-&gt;second-&gt;Print();
     }
   }
 }
 </pre></td></table></center><p>
 
-This one still doesn't work:
+The code is similar to <b>Print_By_Name()</b>, except we have to use <b>insert()</b>,
+because we cannot treat a multimap as an associative array.  You'll note that I use a
+temporary variable to traverse the loop, as advocated in the section above.  
+<p>
+It looks good:
 
 <pre>
-UNIX> <font color=darkred><b>head -n 2 Roster.txt | sort_names_bad2</b></font>
-UNIX> 
+UNIX> <font color=darkred><b>echo T | bin/qb_6_print_by_team files/2018-QB-Stats.txt | head</b></font>
+Josh Rosen                ARI   Y: 2278    R:  66.7
+Sam Bradford              ARI   Y:  400    R:  62.5
+Mike Glennon              ARI   Y:  174    R: 112.0
+Matt Ryan                 ATL   Y: 4924    R: 108.1
+Matt Schaub               ATL   Y:   20    R:  74.1
+Joe Flacco                BAL   Y: 2465    R:  84.2
+Lamar Jackson             BAL   Y: 1201    R:  84.5
+Robert Griffin-III        BAL   Y:   21    R:  44.4
+Josh Allen                BUF   Y: 2074    R:  67.9
+Derek Anderson            BUF   Y:  465    R:  56.0
+UNIX> <font color=darkred><b>echo T | bin/qb_6_print_by_team files/2018-QB-Stats.txt | wc</b></font>
+      69     483    3588
+UNIX> <font color=darkred><b></b></font>
 </pre>
 
-Why? The culprit lies in these two lines:
+<hr>
+<h3> Step 7: On Destructors, Copy Constructors and the Assignment Overload</h3>
+
+At this point, were I writing this program, I'd be done.  You might ask, "Don't you need
+a destructor, to delete what you've allocated with <b>new</b>?"  The answer is that you 
+don't here, because all memory is deallocated when the program exits.  However, suppose that
+you wanted other programs to use the <b>QBS</b> class.  You would put the two class definitions
+into a header file, and the method implementations into a .cpp file.  And you would have to 
+write a destructor, because you don't know how others will use the class.  The destructor should
+free the memory.  The code is in 
+<b><a href=src/qb_7_destructor_etc.cpp>src/qb_7_destructor_etc.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-      fnames = lnit-&gt;second;
-      fnames.insert(fn);
+class QBS {
+  public:
+    ~QBS();                               <font color=blue>// Destructor</font>
+    QBS();                                <font color=blue>// You need to specify a regular constructor, that does nothing</font>
+    QBS(const QBS &qbs) = delete;         <font color=blue>// Disable the copy constructor</font>
+    QBS& operator= (QBS &qbs) = delete;   <font color=blue>// Disable the assignment overload</font>
+
+    bool Read(const string &filename);
+    const Quarterback *Find(const string &name) const;
+    void Print_By_Rating() const;
+    void Print_By_Name() const;
+    void Print_By_Team() const;
+  protected:
+    vector &lt;Quarterback *&gt; QV;
+    map &lt;string, Quarterback *&gt; QM;
+};
+
+QBS::QBS() {}
+
+<font color=blue>/* The destructor needs to delete what it allocated.
+   You'll note, I don't need to clear QV or QM, because that is done automatically. */</font>
+
+QBS::~QBS()
+{
+  size_t i;
+
+  for (i = 0; i &lt; QV.size(); i++) delete QV[i];
+}
 </pre></td></table></center><p>
 
-The first of these lines makes a <i>copy</i> of <b>lnit-&gt;second</b>;  You insert
-the first name into the copy, which does not modifiy the <b>fnset</b> that is actually
-in <b>lnit-&gt;second</b>.  To fix this, you need to insert directly into 
-<b>lnit-&gt;second</b>.    I do this in 
-<b><a href=sort_names_bad3.cpp>sort_names_bad3.cpp</a></b>:
+You'll note, I disabled the copy constructor and assignment overload (and I compile
+with -std=c++11, because this is a C++ 11 feature).  If I wanted to enable
+them, I would have to have them allocate new quarterbacks, copy them from the old quarterbacks,
+and then remake <b>QM</b>.  Here's example code for the copy constructor:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;stdio.h&gt;
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;set&gt;
-#include &lt;map&gt;
-using namespace std;
-
-typedef set &lt;string&gt; fnset;
-
-main()
+QBS::QBS(const QBS &qbs)
 {
-  map &lt;string, fnset&gt; lnames;
-  map &lt;string, fnset&gt;::iterator lnit;
-  fnset fnames, fnames_empty;
-  fnset::iterator fnit;
-  string fn, ln;
-  
-  while (cin &gt;&gt; fn &gt;&gt; ln) {
-    lnit = lnames.find(ln);
-    if (lnit == lnames.end()) {
-      lnames.insert(make_pair(ln, fnames_empty));
-      lnit = lnames.find(ln);
-    }
-    lnit-&gt;second.insert(fn);
-  }
+  size_t i;
+  Quarterback *q;
 
-  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
-    fnames = lnit-&gt;second;
-    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
-      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
-    }
+  for (i = 0; i &lt; qbs.QV.size(); i++) {
+    q = new Quarterback;
+    q = qbs.QV[i];
+    QV.push_back(q);
+    QM[q-&gt;Name] = q;
   }
 }
 </pre></td></table></center><p>
 
-This works as it should:
-
-<pre>
-UNIX> <font color=darkred><b>sort_names_1 < Roster.txt > out1.txt</b></font>
-UNIX> <font color=darkred><b>sort_names_bad3 < Roster.txt > out2.txt</b></font>
-UNIX> <font color=darkred><b>diff out1.txt out2.txt</b></font>
-UNIX> 
-</pre>
-
-So, now you say, "Ok, it works.  Why can't I do this?"  The answer is twofold.
-First, the fact that you can't have a variable point to 
-<b>lnit-&gt;second</b> is not only inconvenient, it makes your programs
-very hard to read.  Second, you'll find yourself setting variables to 
-<b>lnit-&gt;second</b> and making copies when you don't have to.  For example,
-look at the <b>for</b> loop that prints out the names:
-
-<p><center><table border=3 cellpadding=3><td><pre>
-  for (lnit = lnames.begin(); lnit != lnames.end(); lnit++) {
-    fnames = lnit-&gt;second;
-    for (fnit = fnames.begin(); fnit != fnames.end(); fnit++) {
-      cout &lt;&lt; *fnit &lt;&lt; " " &lt;&lt; lnit-&gt;first &lt;&lt; endl;
-    }
-  }
-</pre></td></table></center><p>
-
-It is making copies of <b>lnit-&gt;second</b>.  Even though it's not a bug, it's
-extremely inefficient in terms of both time and memory.  Get into the habit of
-using pointers in the <b>second</b> field of your maps.
 
 <hr>
 <h3>The return value of <i>insert()</i></h3>
@@ -654,22 +1221,21 @@ and the iterator is to the value already in the set.  The <b>second</b> field
 reports whether the item was inserted or not.
 <p>
 To see usage, take a look at 
-<b><a href=setreturn.cpp>setreturn.cpp</a></b>:
+<b><a href=src/setreturn.cpp>src/setreturn.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This shows how to look at the return value of insert in a set (a map is similar) */</font>
+
 #include &lt;set&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-typedef set &lt;string&gt; string_set;
-
-main()
+int main()
 {
   string s;
-  string_set names;
-  string_set::iterator nit;
-  pair &lt;string_set::iterator, bool&gt; retval;
-  
+  set &lt;string&gt;  names;
+  set &lt;string&gt;::iterator nit;
+  pair &lt;set &lt;string&gt;::iterator, bool&gt; retval;
 
   while(getline(cin, s)) {
     retval = names.insert(s);
@@ -679,6 +1245,7 @@ main()
       cout &lt;&lt; s &lt;&lt; ": Duplicate not inserted.\n";
     }
   }
+  return 0;
 } 
 </pre></td></table></center><p>
 
@@ -687,20 +1254,50 @@ Why then do you use arrows in iterators on maps?  Because those iterators <i>poi
 to pairs -- they are not pairs themselves.
 
 <pre>
-UNIX> <font color=darkred><b>cat input-2.txt</b></font>
-John Bevy
-Xavier Ornately
-Nicholas Wyatt Fecund
-Max Inadvertent III
-John Bevy
-Max Inadvertent III
-UNIX> <font color=darkred><b>setreturn < input-2.txt</b></font>
-John Bevy: Successfully inserted.
-Xavier Ornately: Successfully inserted.
-Nicholas Wyatt Fecund: Successfully inserted.
-Max Inadvertent III: Successfully inserted.
-John Bevy: Duplicate not inserted.
-Max Inadvertent III: Duplicate not inserted.
-UNIX> <font color=darkred><b></b></font>
+UNIX> <font color=darkred><b>bin/setreturn</b></font>
+<font color=darkred><b>James Plank</b></font>
+James Plank: Successfully inserted.
+<font color=darkred><b>James Plank</b></font>
+James Plank: Duplicate not inserted.
+UNIX>
 </pre>
 
+<hr>
+<h2>Summary</h2>
+
+Ok -- we've learned a ton in this lecture.  Let's summarize:
+
+<UL>
+<LI> A set is a data structure where you perform storage and retrieval.  Each of those 
+operations is log time in the number of elements in the set.  That means that the operations
+are fast.
+<p>
+<LI> Sets don't store duplicate elements.  Multisets store duplicate elements.
+<p>
+<LI> A map is a data structure like a set, but you associate a value (which I call a "val")
+with each element (which I call a "key").  Like the sets, storage and retrieval is log time.
+<p>
+<LI> Maps don't store duplicate elements -- multimaps do.
+<p>
+<LI> You can traverse a set, multiset, map or multimap with iterators.
+<p>
+<LI> When you try to <b>find()</b> something in a set, multiset, map or multimap,
+     it returns an iterator, which is equal to the <b>end()</b> method if the item is not found.
+<p>
+<LI> You can treat a map like an associative array, where the "indices" to the array are
+     the keys.
+<p>
+<LI> You need to be careful when treating a map like an associative array, because when you
+     don't find the key, it is automatically inserted into the map.
+<p>
+<LI> We developed a program that used maps and multimaps in a variety of ways.  With all of
+     those, we only have one copy of the data (the quarterbacks) and our data structures
+     store pointers.
+<p>
+<LI> If your program is just reading data, processing and exiting, you don't need to worry
+     about destructors or copy constructors.  If you want to make your classes so that they may
+     be used by others, you need to worry about these things.
+<p>
+<LI> Sets (and maps) return pairs from their <b>insert()</b> methods.  Multisets and 
+     multimaps return iterators to the newly inserted items.
+</UL>
