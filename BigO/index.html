@@ -1,0 +1,465 @@
+<title>CS140 Lecture notes -- Big-O</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Big-O</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI>Directory: <b>/home/plank/cs140/notes/BigO</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Fall-2004/notes/BigO/>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Fall-2004/notes/BigO/</b></a>
+<LI>
+Original Notes: <i>
+Wed Sep 22 11:48:08 EDT 2004
+</i>
+<LI>
+Last Modification: <i>
+Thu Mar 27 09:33:06 EDT 2014
+</i>
+
+
+<hr>
+<h2>Big-O</h2>
+
+Big-O notation is one of the ways in which we talk about how complex
+an algorithm or program is.  It gives us a nice way of quantifying or 
+classifying how fast or slow a program is as a function of the size
+of its input, and independently of the machine on which it runs.
+<p>
+<h2>Examples</h2>
+
+Let's look at a program (in <b><a href=linear1.cpp>linear1.cpp</a></b>):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+main(int argc, char **argv)
+{
+  int n;
+  double f;
+  double count;
+  int i, j;
+  long t0;
+
+  if (argc != 2) { 
+    fprintf(stderr, "Usage: linear1 n\n");
+    exit(1);
+  }
+
+  n = atoi(argv[1]);
+
+  t0 = time(0);
+  count = 0;
+  f = 23.4;
+  for (i = 0; i &lt; n; i++) {
+    count++;
+    f = f * f + 1;
+    j = (int) f / 1000;
+    f = f - j*1000;
+    // printf("%g\n", f);
+  }
+  printf("N: %d   Count: %.0lf   Time: %ld\n", n, count, time(0)-t0);
+}
+
+</pre></td></table></center><p>
+
+What this does is compute <b>n</b> random-ish numbers between one and
+1000, and if we uncommented the <b>printf()</b> statement, then it
+would print them -- try it out (uncomment the print statement).  
+<p>
+Suppose we run this program with varying values of <b>n</b>.
+What do we expect?  Well, as <b>n</b> increases, so will
+the <b>count</b>, and so will the running time of the program:
+<p>
+(This is on my machine at home -- I don't know how fast the machines
+here will be.)
+<pre>
+UNIX> <font color=darkred><b>g++ -o linear1 linear1.c</b></font>
+UNIX> <font color=darkred><b>linear1 1</b></font>
+N: 1   Count: 1 Time: 0
+UNIX> <font color=darkred><b>linear1 10000</b></font>
+N: 10000   Count: 10000 Time: 0
+UNIX> <font color=darkred><b>linear1 10000000</b></font>
+N: 10000000   Count: 10000000 Time: 8
+UNIX> <font color=darkred><b>linear1 20000000</b></font>
+N: 20000000   Count: 20000000 Time: 14
+UNIX> <font color=darkred><b>linear1 100000000</b></font>
+N: 100000000   Count: 100000000 Time: 72
+UNIX>
+</pre>
+Just what you'd think.  The running time is roughly linear:
+<p>
+<center>
+<i>running time = 72n/100000000</i>
+</center>
+Obviously, <b>count</b> equals <b>n</b>.
+<p>
+
+Now, look at four other programs below.  I will just show their loops:
+<p>
+
+<table border=7 cellpadding=3>
+<tr>
+<td valign=top>
+<a href=linear2.cpp><b>linear2.cpp</b></a>:<br>
+<pre>
+  ...
+  for (i = 0; i < n; i++) {
+    count++;
+    f = f * f + 1;
+    j = (int) f / 1000;
+    f = f - j*1000;
+  }
+  for (i = 0; i < n; i++) {
+    count++;
+    f = f * f + 1;
+    j = (int) f / 1000;
+    f = f - j*1000;
+  }
+  ...
+</pre>
+</td>
+
+<td valign=top>
+<a href=log.cpp><b>log.cpp</b></a>:<br>
+<pre>
+  ...
+  for (i = 1; i <= n; i *= 2) {
+    count++;
+    f = f * f + 1;
+    j = (int) f / 1000;
+    f = f - j*1000;
+  }
+  ...
+  </pre>
+</td>
+</tr>
+
+<tr>
+<td valign=top>
+<a href=nlogn.cpp><b>nlogn.cpp</b></a>:<br>
+<pre>
+  ...
+  for (k = 0; k < n; k++) {
+    for (i = 1; i <= n; i *= 2) {
+      count++;
+      f = f * f + 1;
+      j = (int) f / 1000;
+      f = f - j*1000;
+    }
+  }
+  ...
+  </pre>
+</td>
+
+<td valign=top>
+<a href=nsquared.cpp><b>nsquared.cpp</b></a>:<br>
+<pre>
+  ... 
+  for (i = 0; i < n; i++) {
+    for (k = 0; k < n; k++) {
+      count++;
+      f = f * f + 1;
+      j = (int) f / 1000;
+      f = f - j*1000;
+    }
+  }
+  ...
+  </pre>
+</td> 
+</tr>
+</table>
+
+<p>
+In the five programs total, the value of <b>count</b> will be the 
+following (note, I will expect you to be able to do things like 
+tell me what <b>count</b> is as a function of <b>n</b> on tests):
+<UL>
+<LI> <b>linear1.cpp</b>: <b>count = n</b>.
+<LI> <b>linear2.cpp</b>: <b>count = 2n</b>.
+<LI> <b>log.cpp</b>: <b>count = log(n)</b>. (where the logarithm is base 2).
+<LI> <b>nlogn.cpp</b>: <b>count = n*log(n)</b>. (where the logarithm is base 2).
+<LI> <b>nsquared.cpp</b>: <b>count = n*n</b>. 
+</UL>
+
+In each program, the running time is going to be directly proportional
+to <b>count</b>.  Why?  Read chapter two for how to count instructions.
+So, what do the running times look like if you increase <b>n</b> to large
+values.  I have the output of the various programs in the following
+table of links:
+<p>
+<center>
+<table border=7 cellpadding=3>
+<tr>
+<td><a href=linear1_o.html><b>linear1</b></a></td>
+<td><a href=linear2_o.html><b>linear2</b></a></td>
+<td><a href=log_o.html><b>log</b></a></td>
+<td><a href=nlogn_o.html><b>nlogn</b></a></td>
+<td><a href=nsquared_o.html><b>nsquared</b></a></td>
+</tr></table>
+</center>
+</p>
+
+Some things you should notice right off the bat: <b>log(n)</b> is very,
+very small in comparison to <b>n</b>.  This means that <b>log.cpp</b>
+is blazingly fast for even huge values of <b>n</b>.  On the other end 
+of the spectrum, <b>n*n</b> grows very quickly as <b>n</b> increases.
+Below, I graph all of the programs' running times as a function of
+<b>n</b>:
+<hr>
+<IMG SRC=times.gif>
+<hr>
+
+So, this shows what you'd think: 
+<p>
+<center>
+<i><b>log(n)</b> < <b>n</b> < <b>2n</b> < <b>n*log(n)</b> < <b>n*n</b></i>
+</center>
+<p>
+Perhaps its hard to gauge how much each is less than the other until you
+see it.  Below I plot the same graph, but zoomed up a bit so you can get
+a better feel for <b>n*log(n)</b> and <b>n*n</b>.
+<p>
+
+<hr>
+<IMG SRC=time2.gif>
+<hr>
+<IMG SRC=time3.gif>
+<hr>
+
+<h2>Back to Big-O: Function comparison </h2>
+Big-O notation tries to work on classifying functions.  The functions that
+we care about are the running times of programs.  The first concept when
+we deal with Big-O is comparing functions.  Basically, we will say that
+one function <i>f(n)</i>is <b><i>greater</i></b> than another <i>g(n)</i>
+if there is a value <i>x<sub>0</sub></i> so that for all <i>x >= x<sub>0</sub></i>:
+<p><center>
+<i> f(x) >= g(x)</i>
+</center><p>
+
+Put graphically, it means that after a certain point on the x axis,
+as we go right, the curve for <i>f(n)</i> will always be higher than
+<i>g(n)</i>.  Thus, given the graphs above, you can see that 
+<i>n*n</i> is greater than
+<i>n*log(n)</i>, which is greater than
+<i>2n</i>, which is greater than
+<i>n</i>, which is greater than
+<i>log(n)</i>.
+
+<p>
+So, here are some functions:
+<UL>
+<LI> <i>a(n) = 1</i>
+<LI> <i>b(n) = 100</i>
+<LI> <i>c(n) = 6-n</i>
+<LI> <i>d(n) = n</i>
+<LI> <i>e(n) = 2n</i>
+<LI> <i>f(n) = 2n-5</i>
+<LI> <i>g(n) = n*n - 5000000000</i>
+<LI> <i>h(n) = log(n)</i>
+<LI> <i>i(n) = log(n) - 100</i>
+<LI> <i>j(n) = n*log(n)-100</i>
+</UL>
+
+So, we can ask ourselves questions:  Is <i>b(n) > a(n)</i>?  Yes.  Why?
+Because for any value of <i>n</i>, <i>b(n)</i> is 100, and <i>a(n)</i> is
+1.  Therefore for any value of <i>n</i>, <i>b(n)</i> is greater than
+<i>a(n)</i>.
+<p>
+That was easy.  How about <i>c(n)</i> and <i>b(n)</i>?  <i>b(n)</i> is
+greater, because we can set <i>x<sub>0</sub></i> equal to 6: 
+For any value of <i>x</i> greater than 6, <i>b(x)</i>
+is 100 and <i>c(x)</i> is negative.  
+<p>
+Here's a total ordering of the above.  Make sure you can prove all 
+of these to yourselves:
+<p>
+<center>
+<i> g(n) > j(n) > e(n) > f(n) > d(n) > h(n) > i(n) > b(n) > a(n) > c(n)</i>
+</center>
+<p>
+Some rules:  
+<UL>
+<LI>If <i>f(n)</i> and <i>g(n)</i> are both polynomials of 
+degree <i>k</i>, then the lead coefficient defines which one is greater.
+<LI>
+If <i>f(n)</i> is a polynomial of degree <i>k</i> and <i>g(n)</i> is a 
+polynomial of degree <i>l < k</i>, and both lead coefficients are 
+positive, then <i>f(n) > g(n)</i>.
+<LI> If <i>a*f(n) > b*g(n)</i> for all positive constants <i>a</i> and
+<i>b</i>, then <i>c*f(n) + d*g(n) > e*f(n) + x*g(n)</i> if and only
+if <i>c > e</i>.  For example, <i>20n*n - 100n > 19n*n + 60,000n</i>.
+</UL>
+
+<hr>
+<h2>Big-O</h2>
+Given the above, we can now define 
+Big-O:
+<p>
+<center>
+<i>T(N) = O(f(N))</i> if there exists a constant <i>c</i> such that
+<i>c*f(N) >= T(N)</i>.
+</center>
+<p>
+
+Given the definitions of <i>a(n)</i> through <i>j(n)</i> 
+above:
+<UL>
+<LI> <i>a(n) = O(1)</i>.
+<LI> <i>b(n) = O(1)</i>.  This is because we can set <i>c</i> to 101.
+<LI> <i>b(n) = O(n)</i>.  Why?  Set <i>c</i> equal to 1 and <i>x<sub>0</sub></i> equal to 101. 
+Then, <b>b(x)</b> will equal 100, and <i>cx</i> will be greater than 100.
+<LI> <i>b(n) = O(n*n)</i>.  Set <i>c</i> equal to 1 -- you can demonstrate easily that <i>n*n > b(n)</i>.
+<LI> <i>b(n) = O(a(n))</i>. Set <i>c</i> equals to 101, and this is equivalent to the second case above.
+<LI> <i>a(n) = O(b(n))</i>. Set <i>c</i> equal to one.
+<LI> <i>e(n) = O(n)</i>.  Set <i>c</i> equal to three and <i>x<sub>0</sub></i> equal to 1.  
+<LI> <i>i(n) = O(log(n))</i>.  Set <i>c</i> equal to one and <i>x<sub>0</sub></i> equal to 1. 
+<LI> <i>j(n) = O(n*log(n))</i>. Ditto.
+<LI> <i>g(n) = O(n*n)</i>. Ditto.
+</UL>
+
+<hr>
+<H2>Big Omega and Big Theta</h2>
+Note that <i>O(f(N))</i> is an upper bound on <i>T(N)</i>.  That means
+that <i>T(N)</i> is definitely not bigger than <i>f(n)</i>.  Similarly,
+if <i>g(N) > f(N)</i> and <i>T(N) = O(f(N))</i>, then 
+<i>T(N) = O(g(n))</i> too.  That's inconvenient.  Why?  Well, if a program's running time is linear
+in the size of its input, then we'd like to say that the running time is <i>O(n)</i> and not 
+<i>O(n<sup>2</sup>)</i>.  Unfortunately, it is both.
+<p>
+Big Omega and Bit Theta help make things more precise:
+<p>
+<UL>
+<LI> <b>Big-Omega</b>: <i>T(N) = &Omega;(f(N))</i> if <i>f(N) = O(T(N))</i>.  While Big-O says that
+<i>T(N)</i> is no bigger than a factor times <i>f(N)</i>, Big-Omega says that 
+<i>T(N)</i> is no smaller than a factor times <i>f(N)</i>.
+<p>
+<LI> <b>Big-Theta</b>: <i>T(N) = &Theta;(f(N))</i> 
+if <i>T(N) = O(f(N))</i> and <i>T(N) = &Omega;(f(N))</i>.  Big-Theta is the most precise of these
+specifications.  It says that <i>T(N)</i> and <i>f(N)</i> are equivalent to constant factors of
+each other.
+</UL>
+
+Let me give an example.  Suppose I have a program that takes <i>3n + 5</i> operations on an input of
+size <i>n</i>.  We typically say that the program is <i>O(n)</i>.  That is clearly true 
+(choose <i>c=4</i> and <i>x<sub>0</sub>=10</i>).  
+However, as mentioned above, the program is also 
+<i>O(n<sup>2</sup>)</i> 
+(choose <i>c=1</i> and <i>x<sub>0</sub>=10</i>).  
+Is it <i>O(1)</i>?  No -- there is no <i>c</i> such that <i>c &ge; 3n + 5</i>.
+<p>
+The program is <i>&Omega;(n)</i>: choose <i>c = 1</i> and <i>x<sub>0</sub>=1</i> (in other words, 
+for any <i>x</i> &ge; 1, <i>3x+5 > x</i>).  However, it is not
+<i>&Omega;(n<sup>2</sup>)</i>, because there is no <i>c</i> such that <i>c(3x+5) &ge; x<sup>2</sup></i>.  It is, however, 
+<i>&Omega;(1)</i>: choose <i>c = 1</i> and <i>x<sub>0</sub>=1</i>  -- it's pretty easy to 
+see that <i>3x + 5 > 1</i>.
+<p>
+Now, we can put this in terms of Big-Theta.
+The program is 
+<i>&Theta;(n)</i>, but not 
+<i>&Theta;(n<sup>2</sup>)</i> or
+<i>&Theta;(1)</i>.  
+<p>
+It is unfortunate that we as computer scientists quantify algorithms using Big-O rather than Big-Theta,
+but it is a fact of life.  You need to know these definitions, and remember that most of the time, when
+we say something is Big-O, in reality it is also Big-Theta, which is <i>much</i> more precise.
+<hr>
+
+At this point, I think that giving the 
+<a href=http://en.wikipedia.org/wiki/Big_O_notation>Wikipedia page on Big-O</a>
+a scan is a good idea.  This includes:
+<p>
+<UL>
+<LI> The introduction.
+<LI> The first two equations in the <b>Formal Definition</b>.
+<LI> The <b>Example</b>.
+<LI> The <b>Infinite asymptotics</b> section.
+<LI> The <b>Equals Sign</b> section.
+<LI> The <b>Orders of common functions</b> section (ignore the "L-notation" line).
+<LI> The definitions of Big-O, Big-Omega and Big-Theta in the <b>Family of Bachmann-Landau notations</b> section.
+<li> The text starting with "Aside from Big-O notation, ..." until the end of the section.
+</UL>
+
+<p>
+<h2>Two Big-O Proofs</h2>
+
+You are not responsible for proofs like this, but it's not a bad idea to see them:
+<p>
+Is <i>n*n + n + 1 = O(n*n)?</i>  See the following <a href=proof.pdf>PDF file</a> 
+for a proof.
+
+<p>
+
+Generalizing, is <i>an*n + bn + d = O(n*n)</i> for <i>a,b,d > 1</i> and <i>b > d</i>? 
+See the following <a href=proof2.pdf>PDF file</a> for a proof.
+<hr>
+<h2>Using Big-O to Categorize</h2>
+
+Although Big-O is laden with math, we use it to characterize the running times of
+programs and algorithms.  The following Big-O characterizations are particularly useful
+(and they are all Big-Theta as well, even though we don't say so).
+
+<UL>
+<LI> <i>O(1)</i>: This is called ``constant time.'' Any time a program takes a constant
+number of instructions, regardless of the input, it is constant time.  For example, 
+determining the size of a vector is <i>O(1)</i>, regardless of the size of the vector, 
+because the STL stores the size as part of the vector.
+<p>
+Appending an element to a list, deque or vector is <i>O(1)</i>.  Pushing an element onto the
+front of a list or deque is <i>O(1)</i>.  Accessing any element of a vector or deque
+is also <i>O(1)</i>.
+<p>
+Calling <b>begin()</b> or <b>end()</b> on any of the STL's data structures -- vector, deque,
+list, set or map -- is <i>O(1)</i>.  Perhaps that is counterintuitive with a set or map,
+but so be it.
+<p>
+<LI> <i>O(n)</i>: This is called ``linear.'' This is when the program takes time that is
+directly proportional to size of its input.  For example, creating a vector, list or 
+deque with <i>n</i> elements is <i>O(n)</i>.  Of course, creating the vector is faster, 
+but they are both linear, and their performance is directly proportional to <i>n</i>.
+This is why we have the constant <i>c</i> in the definition of Big-O -- so that both 
+of these are <i>O(n)</i>, even though the vector version is faster.
+<p>
+Traversing a set or map with an iterator is also <i>O(n)</i>.  This confuses students, 
+because the other operations on sets or map involve logarithms.  So, memorize it.  Hopefully,
+when you learn about AVL trees, you'll get a better feeling for that.
+<p>
+And finally, deleting an element or inserting an element in the front of a vector is
+also <i>O(n)</i>.  This is why you don't want to use a vector for this operation.
+<p>
+<LI> <i>O(n<sup>2</sup>)</i>: This is called ``quadratic time,'' and as the graphs above show,
+it does not scale well.  In particular, when <i>n</i> hits a value of 10,000, <i>n<sup>2</sup></i>
+gets pretty big (100,000,000).  That doubly nested loop that I've gone over in class so many
+time is <i>O(n<sup>2</sup>):</i>
+<pre>
+for (i = 0; i < n; i++) {
+  for (j = 0; j < i; j++) {
+    ...
+  }
+}
+</pre>
+Why? Recall that this loop is the summation of numbers from 0 to n-1, which is <i>(n-1)n/2</i>,
+which equals <i>n<sup>2</sup>/2 - n/2</i>.  You could prove that this is <i>O(n)</i> by 
+choosing <i>c = 1</i>, and <i>x<sub>0</sub></i> equal to 1.
+
+<p>
+<LI> <i>O(log(n))</i>: This is called ``log time.''   Now, you may ask "what base?"  The
+answer is that the base doesn't matter.  Why is that?  Because:
+<p>
+<center>
+    <i>log<sub>b</sub>(c) = log<sub>a</sub>(c) / log<sub>a</sub>(b)</i>.
+</center>
+<p>
+Since <i>log<sub>a</sub>(b)</i> is a constant, for the purposes of Big-O, it doesn't matter.
+That may seem confusing, so make it concrete.  If <i>a = log<sub>10</sub>(n)</i>, 
+then <i>log<sub>2</sub>(n) = log<sub>2</sub>(10)*a</i>.  Since <i>log<sub>2</sub>(10)</i> is
+a constant (a little greater than three), for the purposes of Big-O, logarithms in base 10 and
+base 2 are equivalent.
+<p>
+Insertion, deletion, and finding elements in sets and maps are <i>O(log(n))</i> operations.
+
+<p>
+<LI> <i>O(n*log(n))</i>: This is called ``N log N.''   Creating maps and sets are
+<i>O(n*log(n))</i> operations.  So is sorting a vector with <i>n</i> elements.
+</UL>

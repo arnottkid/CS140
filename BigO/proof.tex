@@ -1,0 +1,52 @@
+\documentclass[onecolumn,11pt]{article}
+\usepackage{times,url}
+\usepackage{epsfig}
+
+\setlength{\textheight}{8.75in} %.
+\setlength{\columnsep}{2.0pc} %.
+\setlength{\textwidth}{6.78in} %.
+\setlength{\topmargin}{0.in} %.
+\setlength{\headheight}{0.0in} %.
+\setlength{\headsep}{0.0in} %.
+\setlength{\oddsidemargin}{-.19in} %.
+\setlength{\parindent}{1pc} %.
+\renewcommand{\baselinestretch}{1.5} %.
+
+\begin{document}
+
+Is $n^2 + n + 1 = O(n^2)$?   To prove this, we need to find a constant $c$
+such that $cn^2 \ge n^2 + n + 1$.  Let $c=2$ -- that should work.  Now we need
+to find a constant $x$ such that for all $n >= x$, 
+$2n^2 \ge n^2 + n + 1$.  We'll try $x = 10$.  
+
+Let's proceed by an inductive argument.  To make our life simpler, let $f(n) = 2n^2$, 
+and $g(n) = n^2 + n + 1$.  When $n$ = 10, $f(n) = 200$ and $g(n) = 111$, so
+$f(x) > g(x)$.
+Now, let's assume that our statement is true for all values between
+10 and~$n$ for some~$n$.  We already know that this is true for~$n=10$.
+Let's look at~$n+1$:
+\begin{eqnarray*}
+f(n+1) & = & 2(n+1)^2 \\ & = & 2n^2 + 4n + 2 \\
+ & = & f(n) + 4n + 2\\
+& & \\
+g(n+1) & = & (n+1)^2 + (n+1) + 1 \\ & = & n^2 + 2n + 1 + n + 1 + 1\\
+    & = & n^2 + 3n + 3 \\
+    & = & (n^2 + n + 1) + 2n + 2 \\
+    & = & g(n) + 2n + 2
+\end{eqnarray*}
+
+From our inductive hypothesis, we know $f(n) \ge g(n)$, thus:
+\begin{eqnarray*}
+f(n) + 4n + 2 & \ge & g(n) + 4n +2
+\end{eqnarray*}
+
+Since $n \ge 10$, $4n + 2 > 2n + 2$, and therefore:
+\begin{eqnarray*}
+f(n) + 4n + 2 & > & g(n) + 2n +2\\
+f(n+1) & > & g(n+1)
+\end{eqnarray*}
+
+Therefore, for all $n >= 10$, $2n^2 > n^2 + n + 1$, meaning 
+$2n^2 \ge n^2 + n + 1$, and therefore $n^2 + n + 1 = O(n^2) \; \rule{2mm}{2mm}$.
+
+\end{document}

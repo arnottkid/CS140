@@ -1,0 +1,62 @@
+\documentclass[onecolumn,11pt]{article}
+\usepackage{times,url}
+\usepackage{epsfig}
+
+\setlength{\textheight}{8.75in} %.
+\setlength{\columnsep}{2.0pc} %.
+\setlength{\textwidth}{6.78in} %.
+\setlength{\topmargin}{0.in} %.
+\setlength{\headheight}{0.0in} %.
+\setlength{\headsep}{0.0in} %.
+\setlength{\oddsidemargin}{-.19in} %.
+\setlength{\parindent}{1pc} %.
+\renewcommand{\baselinestretch}{1.5} %.
+
+\begin{document}
+
+Is $an^2 + bn + d = O(n^2)$ for $a,b,d >= 1, b > d$?   
+To prove this, we need to find a constant $c$
+such that $cn^2 \ge an^2 + bn + d$.  Let $c=2a$.  Now we need
+to find a constant $x$ such that for all $n >= x$, 
+$2an^2 \ge an^2 + bn + d$.  We'll try $x = 2b$.  
+
+Let's proceed by an inductive argument.  To make our life simpler, let $f(n) = 2an^2$, 
+and $g(n) = an^2 + bn + d$.  When $n$ = 2b, $f(2b) = 8ab^2$ and $g(2b) = 4ab^2 + 2b^2 + d =
+(4a+2)b^2 + d.$  Since $b > d$ and $b^2 > b$, $f(x) > g(x)$.
+
+Now, let's assume that our statement is true for all values between
+$x$ and~$n$ for some~$n$.  We already know that this is true for~$n=x$.
+Let's look at~$n+1$:
+\begin{eqnarray*}
+f(n+1) & = & 2a(n+1)^2 \\ & = & 2an^2 + 4an + 2a \\
+ & = & f(n) + 4an + 2a\\
+& & \\
+g(n+1) & = & a(n+1)^2 + b(n+1) + d \\ & = & an^2 + 2an + a + bn + b + d\\
+    & = & an^2 + bn + d + 2an + (a + b)\\
+    & = & g(n) + 2an + (a + b)
+\end{eqnarray*}
+
+From our inductive hypothesis, we know $f(n) \ge g(n)$, thus:
+\begin{eqnarray*}
+f(n) + 4an + 2a & \ge & g(n) + 4an + 2a
+\end{eqnarray*}
+
+All that we need to show is that $4an + 2a > 2an + a + b$:
+\begin{eqnarray*}
+4an + 2a & >^? & 2an + a + b\\
+2an & >^? & b - a
+\end{eqnarray*}
+
+Since $n \ge 2b$, this means $4ab >^? b - a$, which is clearly true when $a,b \ge 1$.
+Thus:
+\begin{eqnarray*}
+f(n) + 4an + 2a & > & g(n) + 4an +2\\
+                & > & g(n) + 2an + a + b\\
+f(n+1) & > & g(n+1)
+\end{eqnarray*}
+
+Therefore, for all $n >= 2b$, $2an^2 > an^2 + bn + d$, meaning 
+$2an^2 \ge an^2 + bn + d$, meaning 
+$an^2 + bn + d = O(n^2) \; \rule{2mm}{2mm}$.
+
+\end{document}

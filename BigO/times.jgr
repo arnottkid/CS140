@@ -1,0 +1,27 @@
+newgraph
+xaxis min 0 size 6 label fontsize 22 : N
+hash_labels fontsize 18
+yaxis min 0 size 6 label fontsize 22 : Time (seconds)
+hash_labels fontsize 18
+
+newline linethickness 3 color 1 0 1 pts 
+shell : awk '{ print $2, $6 }' log_output
+label : log(n)
+
+copycurve color 0 1 0 pts 
+shell : awk '{ print $2, $6 }' linear1_output
+label : Linear1
+
+copycurve color 1 0 0 pts 
+shell : awk '{ print $2, $6 }' linear2_output
+label : Linear2
+
+copycurve color 0 0 0 pts 
+shell : awk '{ print $2, $6 }' nlogn_output
+label : n log(n)
+
+copycurve color 0 1 1 pts 
+shell : awk '{ print $2, $6 }' nsquared_output
+label : n * 2
+
+legend on top defaults fontsize 20
