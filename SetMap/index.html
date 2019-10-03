@@ -1182,7 +1182,7 @@ QBS::~QBS()
 You'll note, I disabled the copy constructor and assignment overload (and I compile
 with -std=c++11, because this is a C++ 11 feature).  If I wanted to enable
 them, I would have to have them allocate new quarterbacks, copy them from the old quarterbacks,
-and then remake <b>QM</b>.  Here's example code for the copy constructor:
+and then remake <b>QM</b>.  Here's example code for a copy constructor:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 QBS::QBS(const QBS &qbs)
@@ -1199,6 +1199,9 @@ QBS::QBS(const QBS &qbs)
 }
 </pre></td></table></center><p>
 
+You'll note, this code isn't in 
+<b><a href=src/qb_7_destructor_etc.cpp>src/qb_7_destructor_etc.cpp</a></b>, though -- I 
+just provide it as an example, in case you care what a copy constructor would look like.
 
 <hr>
 <h3>The return value of <i>insert()</i></h3>
