@@ -2,7 +2,7 @@
 <body bgcolor=ffffff>
 <h1>CS140 Lecture notes -- Big-O</h1>
 <LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
-<LI>Directory: <b>/home/plank/cs140/notes/BigO</b>
+<LI>Directory: <b>/home/jplank/cs140/notes/BigO</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Fall-2004/notes/BigO/>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Fall-2004/notes/BigO/</b></a>
@@ -12,7 +12,7 @@ Wed Sep 22 11:48:08 EDT 2004
 </i>
 <LI>
 Last Modification: <i>
-Thu Mar 27 09:33:06 EDT 2014
+Thu Oct  3 13:36:31 EDT 2019
 </i>
 
 
@@ -26,195 +26,231 @@ of its input, and independently of the machine on which it runs.
 <p>
 <h2>Examples</h2>
 
-Let's look at a program (in <b><a href=linear1.cpp>linear1.cpp</a></b>):
+Let's look at a program (in <b><a href=src/linear1.cpp>src/linear1.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This program takes a number n on standard input.  
+   It then executes a for loop that iterates n times, counting the iterations.  
+   It prints the number of iterations and a timing that uses the system call gettimeofday().  
+   That's why you need to include &lt;sys/time.h&gt;. */</font>
+
+#include &lt;sys/time.h&gt;
 #include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 #include &lt;iostream&gt;
 using namespace std;
 
-main(int argc, char **argv)
+int main()
 {
-  int n;
-  double f;
-  double count;
-  int i, j;
-  long t0;
+  long long n, count, i;
+  double start_time, end_time;
+  struct timeval tv;
 
-  if (argc != 2) { 
-    fprintf(stderr, "Usage: linear1 n\n");
-    exit(1);
-  }
+  if (!(cin &gt;&gt; n)) return 1;
 
-  n = atoi(argv[1]);
+  <font color=blue>/* Get the starting time. */</font>
 
-  t0 = time(0);
+  gettimeofday(&tv, NULL);
+  start_time = tv.tv_usec;
+  start_time /= 1000000.0;
+  start_time += tv.tv_sec;
+
+  <font color=blue>/* Here's the loop, that executes n times. */</font>
+
   count = 0;
-  f = 23.4;
-  for (i = 0; i &lt; n; i++) {
-    count++;
-    f = f * f + 1;
-    j = (int) f / 1000;
-    f = f - j*1000;
-    // printf("%g\n", f);
-  }
-  printf("N: %d   Count: %.0lf   Time: %ld\n", n, count, time(0)-t0);
-}
+  for (i = 0; i &lt; n; i++) count++;
 
+  <font color=blue>/* Get the ending time. */</font>
+
+  gettimeofday(&tv, NULL);
+  end_time = tv.tv_usec;
+  end_time /= 1000000.0;
+  end_time += tv.tv_sec;
+
+  <font color=blue>/* Print N, the iterations, and the time. */</font>
+
+  printf("N: %lld     Count: %lld    Time: %.3lf\n", n, count, end_time - start_time);
+  return 0;
+}
 </pre></td></table></center><p>
 
-What this does is compute <b>n</b> random-ish numbers between one and
-1000, and if we uncommented the <b>printf()</b> statement, then it
-would print them -- try it out (uncomment the print statement).  
-<p>
+Obviously, this is a simple program.  I don't want to go into <b>gettimeofday</b> too much.
+It returns the value of a timer, which includes seconds and microseconds.  I convert that
+to a double, so that we can print out the timing the for loop.
+
 Suppose we run this program with varying values of <b>n</b>.
 What do we expect?  Well, as <b>n</b> increases, so will
 the <b>count</b>, and so will the running time of the program:
 <p>
-(This is on my machine at home -- I don't know how fast the machines
-here will be.)
-<pre>
-UNIX> <font color=darkred><b>g++ -o linear1 linear1.c</b></font>
-UNIX> <font color=darkred><b>linear1 1</b></font>
-N: 1   Count: 1 Time: 0
-UNIX> <font color=darkred><b>linear1 10000</b></font>
-N: 10000   Count: 10000 Time: 0
-UNIX> <font color=darkred><b>linear1 10000000</b></font>
-N: 10000000   Count: 10000000 Time: 8
-UNIX> <font color=darkred><b>linear1 20000000</b></font>
-N: 20000000   Count: 20000000 Time: 14
-UNIX> <font color=darkred><b>linear1 100000000</b></font>
-N: 100000000   Count: 100000000 Time: 72
-UNIX>
-</pre>
-Just what you'd think.  The running time is roughly linear:
-<p>
-<center>
-<i>running time = 72n/100000000</i>
-</center>
-Obviously, <b>count</b> equals <b>n</b>.
-<p>
+(This is on my Macbook, chunking along at 2.2 Ghz in 2019):
 
-Now, look at four other programs below.  I will just show their loops:
+<pre>
+UNIX> <font color=darkred><b>echo 100000 | bin/linear1</b></font>
+N: 100000     Count: 100000    Time: 0.000
+UNIX> <font color=darkred><b>echo 1000000 | bin/linear1</b></font>
+N: 1000000     Count: 1000000    Time: 0.003
+UNIX> <font color=darkred><b>echo 10000000 | bin/linear1</b></font>
+N: 10000000     Count: 10000000    Time: 0.020
+UNIX> <font color=darkred><b>echo 100000000 | bin/linear1</b></font>
+N: 100000000     Count: 100000000    Time: 0.195
+UNIX> <font color=darkred><b>echo 1000000000 | bin/linear1</b></font>
+N: 1000000000     Count: 1000000000    Time: 2.021
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Just what you'd think.  The running time is roughly linear.
+
+Now, look at six other programs below.  I will just show their loops:
 <p>
 
 <table border=7 cellpadding=3>
 <tr>
 <td valign=top>
-<a href=linear2.cpp><b>linear2.cpp</b></a>:<br>
+<b><a href=src/linear2.cpp>src/linear2.cpp</a></b>:<br>
 <pre>
-  ...
-  for (i = 0; i < n; i++) {
-    count++;
-    f = f * f + 1;
-    j = (int) f / 1000;
-    f = f - j*1000;
-  }
-  for (i = 0; i < n; i++) {
-    count++;
-    f = f * f + 1;
-    j = (int) f / 1000;
-    f = f - j*1000;
-  }
-  ...
+<font color=blue>/* This loop executes 2n times. */</font>
+
+count = 0;
+for (i = 0; i &lt; 2*n; i++) count++;
 </pre>
 </td>
-
 <td valign=top>
-<a href=log.cpp><b>log.cpp</b></a>:<br>
+<a href=src/log.cpp><b>src/log.cpp</b></a>:<br>
 <pre>
-  ...
-  for (i = 1; i <= n; i *= 2) {
-    count++;
-    f = f * f + 1;
-    j = (int) f / 1000;
-    f = f - j*1000;
-  }
-  ...
-  </pre>
+<font color=blue>/* This loop  executes log_2(n) times. */</font>
+
+count = 0;
+for (i = 1; i &lt; n; i *= 2) count++;
+</pre>
 </td>
+<td valign=top>
+<b><a href=src/nlogn.cpp>src/nlogn.cpp</a></b>:<br>
+<pre>
+<font color=blue>/* This loop executes n*log_2(n) times. */</font>
+
+count = 0;
+for (j = 0; j &lt; n; j++) {
+  for (i = 1; i &lt; n; i *= 2) {
+    count++;
+  }
+}
+</pre></td>
 </tr>
 
 <tr>
 <td valign=top>
-<a href=nlogn.cpp><b>nlogn.cpp</b></a>:<br>
+<b><a href=src/nsquared.cpp>src/nsquared.cpp</a></b>:<br>
 <pre>
-  ...
-  for (k = 0; k < n; k++) {
-    for (i = 1; i <= n; i *= 2) {
-      count++;
-      f = f * f + 1;
-      j = (int) f / 1000;
-      f = f - j*1000;
-    }
+<font color=blue>/* This loop executes n*n times. */</font>
+
+count = 0;
+for (j = 0; j &lt; n; j++) {
+  for (i = 0; i &lt; n; i++) {
+    count++;
   }
-  ...
-  </pre>
+}
+</pre>
 </td>
 
 <td valign=top>
-<a href=nsquared.cpp><b>nsquared.cpp</b></a>:<br>
+<b><a href=src/all_i_j_pairs.cpp>src/all_i_j_pairs.cpp</a></b>:<br>
 <pre>
-  ... 
-  for (i = 0; i < n; i++) {
-    for (k = 0; k < n; k++) {
-      count++;
-      f = f * f + 1;
-      j = (int) f / 1000;
-      f = f - j*1000;
-    }
+<font color=blue>/* This loop executes (n + 1) * n / 2 times.
+   It arises when you enumerate all (i,j) pairs
+   such at 0 <= i < j < n. */</font>
+
+count = 0;
+for (j = 0; j &lt; n; j++) {
+  for (i = 0; i &lt; j; i++) {
+    count++;
   }
-  ...
-  </pre>
+}
+</pre>
+</td> 
+<td valign=top>
+<b><a href=src/two_to_the_n.cpp>src/two_to_the_n.cpp</a></b>:<br>
+<pre>
+<font color=blue>/* This loop executes 2^n times. */</font>
+
+count = 0;
+for (i = 0; i &lt; (1LL &lt;&lt; n); i++) {
+  count++;
+}
+</pre>
 </td> 
 </tr>
 </table>
 
 <p>
-In the five programs total, the value of <b>count</b> will be the 
-following (note, I will expect you to be able to do things like 
-tell me what <b>count</b> is as a function of <b>n</b> on tests):
-<UL>
-<LI> <b>linear1.cpp</b>: <b>count = n</b>.
-<LI> <b>linear2.cpp</b>: <b>count = 2n</b>.
-<LI> <b>log.cpp</b>: <b>count = log(n)</b>. (where the logarithm is base 2).
-<LI> <b>nlogn.cpp</b>: <b>count = n*log(n)</b>. (where the logarithm is base 2).
-<LI> <b>nsquared.cpp</b>: <b>count = n*n</b>. 
-</UL>
+In each of the programs, I tell you how many times the loop executes in the comment.
+That will be the final value of <b>count</b>.  Make sure you can calculate all of these
+below -- it's an easy test question:
+
+<pre>
+UNIX> <font color=darkred><b>echo 16 | bin/linear1</b></font>
+N: 16     Count: 16    Time: 0.000
+UNIX> <font color=darkred><b>echo 16 | bin/linear2</b></font>
+N: 16     Count: 32    Time: 0.000
+UNIX> <font color=darkred><b>echo 16 | bin/log</b></font>
+N: 16     Count: 4    Time: 0.000
+UNIX> <font color=darkred><b>echo 16 | bin/nlog</b></font>
+bin/nlog: Command not found.
+UNIX> <font color=darkred><b>echo 16 | bin/nlogn</b></font>
+N: 16     Count: 64    Time: 0.000
+UNIX> <font color=darkred><b>echo 16 | bin/nsquared</b></font>
+N: 16     Count: 256    Time: 0.000
+UNIX> <font color=darkred><b>echo 16 | bin/all_i_j_pairs </b></font>
+N: 16     Count: 120    Time: 0.000
+UNIX> <font color=darkred><b>echo 16 | bin/two_to_the_n</b></font>
+N: 16     Count: 65536    Time: 0.000
+UNIX> <font color=darkred><b></b></font>
+</pre>
 
 In each program, the running time is going to be directly proportional
-to <b>count</b>.  Why?  Read chapter two for how to count instructions.
+to <b>count</b>.  
 So, what do the running times look like if you increase <b>n</b> to large
-values.  I have the output of the various programs in the following
-table of links:
+values?  To test this, I ran all of the programs with increasing values of <i>n</i>.
+I quit either when <i>n</i> got really large (about 10<sup>15</sup>), or when 
+the running time exceeded a minute.  You can see the data in the following
+files (these are in the <b>data</b> directory</b>):
 <p>
 <center>
 <table border=7 cellpadding=3>
 <tr>
-<td><a href=linear1_o.html><b>linear1</b></a></td>
-<td><a href=linear2_o.html><b>linear2</b></a></td>
-<td><a href=log_o.html><b>log</b></a></td>
-<td><a href=nlogn_o.html><b>nlogn</b></a></td>
-<td><a href=nsquared_o.html><b>nsquared</b></a></td>
+<td><a href=data/linear1.txt><b>linear1</b></a></td>
+<td><a href=data/linear2.txt><b>linear2</b></a></td>
+<td><a href=data/log.txt><b>log</b></a></td>
+<td><a href=data/nlogn.txt><b>nlogn</b></a></td>
+<td><a href=data/nsquared.txt><b>nsquared</b></a></td>
+<td><a href=data/all_i_j_pairs.txt><b>all_i_j_pairs</b></a></td>
+<td><a href=data/two_to_the_n.txt><b>two_to_the_n</b></a></td>
 </tr></table>
 </center>
 </p>
 
-Some things you should notice right off the bat: <b>log(n)</b> is very,
-very small in comparison to <b>n</b>.  This means that <b>log.cpp</b>
-is blazingly fast for even huge values of <b>n</b>.  On the other end 
-of the spectrum, <b>n*n</b> grows very quickly as <b>n</b> increases.
-Below, I graph all of the programs' running times as a function of
-<b>n</b>:
-<hr>
-<IMG SRC=times.gif>
-<hr>
+It's pretty illustrative if you look at the last line of each file -- I've 
+done some formatting:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+log            N: 7500000000000000  Count: 53          Time: 0.000
+linear1        N: 50000000000       Count: 50000000000 Time: 98.628
+linear2        N: 25000000000       Count: 50000000000 Time: 99.176
+nlogn          N: 2500000000        Count: 80000000000 Time: 167.156
+nsquared       N: 250000            Count: 62500000000 Time: 125.680
+all_i_j_pairs  N: 250000            Count: 31249875000 Time: 61.589
+two_to_the_n   N: 35                Count: 34359738368 Time: 76.261
+</pre></td></table></center><p>
+
+Two quick observations: <b>log(n)</b> is <i>really</i> fast.  On the flip side,
+<i>2<sup>n</sup></i> is <i>really</i> slow.  Below I show some graphs of the data.
+The graphs all graph the same data; they just have different scales, so that you 
+can do some visual comparisons:
+
+<p><center><table border=3><td><img src=jpg/comparison-1.jpg width=800></td></table></center><p>
 
 So, this shows what you'd think: 
 <p>
 <center>
-<i><b>log(n)</b> < <b>n</b> < <b>2n</b> < <b>n*log(n)</b> < <b>n*n</b></i>
+<i><b>log(n)</b> < <b>n</b> < <b>2n</b> < <b>n*log(n)</b> < <b>all_pairs(n)</b> < <b>n*n</b> < <b>2<sup>n</sup></b> </i>
 </center>
 <p>
 Perhaps its hard to gauge how much each is less than the other until you
@@ -222,10 +258,6 @@ see it.  Below I plot the same graph, but zoomed up a bit so you can get
 a better feel for <b>n*log(n)</b> and <b>n*n</b>.
 <p>
 
-<hr>
-<IMG SRC=time2.gif>
-<hr>
-<IMG SRC=time3.gif>
 <hr>
 
 <h2>Back to Big-O: Function comparison </h2>
@@ -311,7 +343,7 @@ above:
 <LI> <i>b(n) = O(n)</i>.  Why?  Set <i>c</i> equal to 1 and <i>x<sub>0</sub></i> equal to 101. 
 Then, <b>b(x)</b> will equal 100, and <i>cx</i> will be greater than 100.
 <LI> <i>b(n) = O(n*n)</i>.  Set <i>c</i> equal to 1 -- you can demonstrate easily that <i>n*n > b(n)</i>.
-<LI> <i>b(n) = O(a(n))</i>. Set <i>c</i> equals to 101, and this is equivalent to the second case above.
+<LI> <i>b(n) = O(a(n))</i>. Set <i>c</i> equal to 101, and this is equivalent to the second case above.
 <LI> <i>a(n) = O(b(n))</i>. Set <i>c</i> equal to one.
 <LI> <i>e(n) = O(n)</i>.  Set <i>c</i> equal to three and <i>x<sub>0</sub></i> equal to 1.  
 <LI> <i>i(n) = O(log(n))</i>.  Set <i>c</i> equal to one and <i>x<sub>0</sub></i> equal to 1. 
@@ -381,18 +413,6 @@ a scan is a good idea.  This includes:
 <li> The text starting with "Aside from Big-O notation, ..." until the end of the section.
 </UL>
 
-<p>
-<h2>Two Big-O Proofs</h2>
-
-You are not responsible for proofs like this, but it's not a bad idea to see them:
-<p>
-Is <i>n*n + n + 1 = O(n*n)?</i>  See the following <a href=proof.pdf>PDF file</a> 
-for a proof.
-
-<p>
-
-Generalizing, is <i>an*n + bn + d = O(n*n)</i> for <i>a,b,d > 1</i> and <i>b > d</i>? 
-See the following <a href=proof2.pdf>PDF file</a> for a proof.
 <hr>
 <h2>Using Big-O to Categorize</h2>
 
@@ -401,7 +421,7 @@ programs and algorithms.  The following Big-O characterizations are particularly
 (and they are all Big-Theta as well, even though we don't say so).
 
 <UL>
-<LI> <i>O(1)</i>: This is called ``constant time.'' Any time a program takes a constant
+<LI> <i>O(1)</i>: This is called "constant time." Any time a program takes a constant
 number of instructions, regardless of the input, it is constant time.  For example, 
 determining the size of a vector is <i>O(1)</i>, regardless of the size of the vector, 
 because the STL stores the size as part of the vector.
@@ -414,7 +434,7 @@ Calling <b>begin()</b> or <b>end()</b> on any of the STL's data structures -- ve
 list, set or map -- is <i>O(1)</i>.  Perhaps that is counterintuitive with a set or map,
 but so be it.
 <p>
-<LI> <i>O(n)</i>: This is called ``linear.'' This is when the program takes time that is
+<LI> <i>O(n)</i>: This is called "linear." This is when the program takes time that is
 directly proportional to size of its input.  For example, creating a vector, list or 
 deque with <i>n</i> elements is <i>O(n)</i>.  Of course, creating the vector is faster, 
 but they are both linear, and their performance is directly proportional to <i>n</i>.
@@ -428,23 +448,13 @@ when you learn about AVL trees, you'll get a better feeling for that.
 And finally, deleting an element or inserting an element in the front of a vector is
 also <i>O(n)</i>.  This is why you don't want to use a vector for this operation.
 <p>
-<LI> <i>O(n<sup>2</sup>)</i>: This is called ``quadratic time,'' and as the graphs above show,
+<LI> <i>O(n<sup>2</sup>)</i>: This is called "quadratic time," and as the graphs above show,
 it does not scale well.  In particular, when <i>n</i> hits a value of 10,000, <i>n<sup>2</sup></i>
-gets pretty big (100,000,000).  That doubly nested loop that I've gone over in class so many
-time is <i>O(n<sup>2</sup>):</i>
-<pre>
-for (i = 0; i < n; i++) {
-  for (j = 0; j < i; j++) {
-    ...
-  }
-}
-</pre>
-Why? Recall that this loop is the summation of numbers from 0 to n-1, which is <i>(n-1)n/2</i>,
-which equals <i>n<sup>2</sup>/2 - n/2</i>.  You could prove that this is <i>O(n)</i> by 
-choosing <i>c = 1</i>, and <i>x<sub>0</sub></i> equal to 1.
+gets pretty big (100,000,000).  The <b>all_i_j_pairs</b> program above has <b>count</b> equal
+<i>(n+1)n/2</i>.  This is <i>O(n<sup>2</sup>)</i> as well.
 
 <p>
-<LI> <i>O(log(n))</i>: This is called ``log time.''   Now, you may ask "what base?"  The
+<LI> <i>O(log(n))</i>: This is called "log time."   Now, you may ask "what base?"  The
 answer is that the base doesn't matter.  Why is that?  Because:
 <p>
 <center>
@@ -460,6 +470,18 @@ base 2 are equivalent.
 Insertion, deletion, and finding elements in sets and maps are <i>O(log(n))</i> operations.
 
 <p>
-<LI> <i>O(n*log(n))</i>: This is called ``N log N.''   Creating maps and sets are
+<LI> <i>O(n*log(n))</i>: This is called "N log N."   Creating maps and sets are
 <i>O(n*log(n))</i> operations.  So is sorting a vector with <i>n</i> elements.
 </UL>
+<hr>
+<h2>Two Big-O Proofs</h2>
+
+You are not responsible for proofs like this, but it's not a bad idea to see them:
+<p>
+Is <i>n*n + n + 1 = O(n*n)?</i>  See the following <a href=latex/proof.pdf>PDF file</a> 
+for a proof.
+
+<p>
+
+Generalizing, is <i>an*n + bn + d = O(n*n)</i> for <i>a,b,d > 1</i> and <i>b > d</i>? 
+See the following <a href=latex/proof2.pdf>PDF file</a> for a proof.

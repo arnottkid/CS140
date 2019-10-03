@@ -1,30 +1,37 @@
-# +mkmake+ -- Everything after this line is automatically generated
+EXECUTABLES = \
+bin/linear1 \
+bin/linear2 \
+bin/log \
+bin/nlogn \
+bin/nsquared \
+bin/all_i_j_pairs \
+bin/two_to_the_n
 
-EXECUTABLES = linear1 linear2 log nlogn nsquared
-CC = g++
-CFLAGS = 
+CFLAGS ?= -Wall -Wextra
 
 all: $(EXECUTABLES)
 
 clean:
-	rm -f core *.o $(EXECUTABLES) a.out
+	rm -f bin/* obj/* a.out
 
-.SUFFIXES: .cpp .o
-.cpp.o:
-	$(CC) $(CFLAGS) -c $*.cpp
+bin/linear1: src/linear1.cpp
+	g++ $(CFLAGS) -o bin/linear1 src/linear1.cpp
 
+bin/linear2: src/linear2.cpp
+	g++ $(CFLAGS) -o bin/linear2 src/linear2.cpp
 
-linear1: linear1.o
-	$(CC) $(CFLAGS) -o linear1 linear1.o
+bin/log: src/log.cpp
+	g++ $(CFLAGS) -o bin/log src/log.cpp
 
-linear2: linear2.o
-	$(CC) $(CFLAGS) -o linear2 linear2.o
+bin/nlogn: src/nlogn.cpp
+	g++ $(CFLAGS) -o bin/nlogn src/nlogn.cpp
 
-log: log.o
-	$(CC) $(CFLAGS) -o log log.o
+bin/nsquared: src/nsquared.cpp
+	g++ $(CFLAGS) -o bin/nsquared src/nsquared.cpp
 
-nlogn: nlogn.o
-	$(CC) $(CFLAGS) -o nlogn nlogn.o
+bin/all_i_j_pairs: src/all_i_j_pairs.cpp
+	g++ $(CFLAGS) -o bin/all_i_j_pairs src/all_i_j_pairs.cpp
 
-nsquared: nsquared.o
-	$(CC) $(CFLAGS) -o nsquared nsquared.o
+bin/two_to_the_n: src/two_to_the_n.cpp
+	g++ $(CFLAGS) -o bin/two_to_the_n src/two_to_the_n.cpp
+

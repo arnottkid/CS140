@@ -1,0 +1,82 @@
+newgraph
+legend defaults x -30  y 30 hjl vjc fontsize 11
+
+xaxis min 0 max 25 size 1.5 label : n * 1,000,000,000
+yaxis min 0 max 60 size 1.5 label : Seconds
+
+newline clip linethickness 2 linetype dotdotdashdash color 1 0 1 label : two_to_the_n
+  pts shell : cat data/two_to_the_n.txt | awk '{ printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+newline clip linethickness 2 linetype dotted color 1 .5 0 label : nsquared
+  pts shell : cat data/nsquared.txt | awk '{ printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+newline clip linethickness 2 linetype dotted color .5 .5 0 label : all_i_j_pairs
+  pts shell : cat data/all_i_j_pairs.txt | awk '{ printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+newline clip linethickness 2 linetype solid color 0 0 1 label : nlogn
+  pts shell : cat data/nlogn.txt | awk '{ printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+newline clip linethickness 2 linetype longdash color 0 0 0 label : linear2
+  pts shell : cat data/linear2.txt | awk '{ printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+newline clip linethickness 2 linetype longdash color 0 .5 0 label : linear1
+  pts shell : cat data/linear1.txt | awk '{ printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+newline linethickness 2 linetype dashed color 1 0 0 label : log
+  pts shell : cat data/log.txt | awk '{ if ($2 <= 25000000000.0) printf "%lf %lf\n", $2 / 1000000000.0, $6 }'
+
+(* --------------- *)
+
+copygraph x_translate 2 
+xaxis min 0 max 25 size 1.5 label : n * 1,0000
+yaxis min 0 max 60 size 1.5 label : Seconds
+
+newline clip linethickness 2 linetype dotdotdashdash color 1 0 1 
+  pts shell : cat data/two_to_the_n.txt | awk '{ printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+newline clip linethickness 2 linetype dotted color 1 .5 0 
+  pts shell : cat data/nsquared.txt | awk '{ printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+newline clip linethickness 2 linetype dotted color .5 .5 0 
+  pts shell : cat data/all_i_j_pairs.txt | awk '{ printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+newline clip linethickness 2 linetype solid color 0 0 1 
+  pts shell : cat data/nlogn.txt | awk '{ printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+newline clip linethickness 2 linetype longdash color 0 0 0 
+  pts shell : cat data/linear2.txt | awk '{ printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+newline clip linethickness 2 linetype longdash color 0 .5 0 
+  pts shell : cat data/linear1.txt | awk '{ printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+newline linethickness 2 linetype dashed color 1 0 0 
+  pts shell : cat data/log.txt | awk '{ if ($2 <= 250000.0) printf "%lf %lf\n", $2 / 10000.0, $6 }'
+
+
+(* --------------- *)
+
+copygraph x_translate 4 
+xaxis min 0 max 40 size 1.5 label : n
+yaxis min 0 max 60 size 1.5 label : Seconds
+
+newline clip linethickness 2 linetype dotdotdashdash color 1 0 1 
+  pts shell : cat data/two_to_the_n.txt | awk '{ printf "%lf %lf\n", $2, $6 }'
+
+newline clip linethickness 2 linetype dotted color 1 .5 0 
+  pts 1 0 40 0 
+
+newline clip linethickness 2 linetype dotted color .5 .5 0 
+  pts 1 0 40 0 
+
+newline clip linethickness 2 linetype solid color 0 0 1 
+  pts 1 0 40 0 
+
+newline clip linethickness 2 linetype longdash color 0 0 0 
+  pts 1 0 40 0 
+
+newline clip linethickness 2 linetype longdash color 0 .5 0 
+  pts 1 0 40 0 
+
+newline linethickness 2 linetype dashed color 1 0 0 
+  pts 1 0 40 0 
+
