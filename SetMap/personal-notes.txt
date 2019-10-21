@@ -1,0 +1,15 @@
+- When you get to the QB example, first just show them qb_1_read_input.cpp, and how you test it.
+- Then, start with src qb_2_qbs_starter.cpp, and write the rest of read, and find.
+  And go over the main().
+- Test it.
+- Try using an associative array for the find and go over that.
+- Add Print_By_Rating() and do it wrong, using the associative array.
+  - Test and discover why it's wrong.
+- Use the multimap to do it correctly.
+- Implement Print_By_Name() -- nested map.
+- Test (two allen's)
+- Implement Print_By_Team() -- straightforward.
+- "On Destructors, Copy Constructors and Assignment Overload" -- Implement the destructor,
+  and talk about copy constructor.
+- Return value of insert -- setreturn.cpp
+

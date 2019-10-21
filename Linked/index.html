@@ -2,12 +2,14 @@
 <body bgcolor=ffffff>
 <h2>CS140 Lecture notes -- Linked Data Structures (Stacks/Queues/Lists)</h2>
 <LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
-<LI>Directory: <b>/home/plank/cs140/Notes/Stack-Queue</b>
+<LI>Directory: <b>/home/jplank/cs140/Notes/Stack-Queue</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Linked/>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Linked/</b></a>
-<LI> Last Modification: <i>
-Mon Mar 12 17:00:19 EDT 2012
+<LI> Original Notes: <i> Mon Mar 12 17:00:19 EDT 2012
+</i>
+<LI> Last Modification: <i> 
+Sun Oct 20 14:30:40 EDT 2019
 </i>
 <hr>
 
@@ -30,55 +32,77 @@ A stack is a "LIFO" -- "Last in, first out" data structure.  It supports two
 main operations:
 <p>
 <UL>
-<LI> <b>void Push(string s)</b>:  The adds a string to the stack.
+<LI> <b>void Push(const string &amp;s)</b>:  The adds a string to the stack.
 <LI> <b>string Pop()</b>: This returns the most recently added string.
 </UL>
 <p>
 The full stack API is in 
-<b><a href=stack.h>stack.h</a></b>, which contains class definitions:
+<b><a href=include/stack.hpp>include/stack.hpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+#pragma once
 #include &lt;string&gt;
+
+<font color=blue>/* Ignore the Stacknode class for now.  I'll get around to it when we need it. */</font>
 
 class Stacknode {
   public:
-    string s;
+    std::string s;
     Stacknode *next;
 };
 
+<font color=blue>/* Here is the stack class.  This is a data structure that holds strings in a
+  "Last in, first out" manner.  */</font>
+
 class Stack {
   public:
-    Stack();
-    ~Stack();
-    int Empty();
-    void Push(string s);
-    string Pop();
+ 
+    Stack();                               <font color=blue>// Regular constructor</font>
+    Stack(const Stack &s);                 <font color=blue>// Copy constructor</font>
+    Stack& operator= (const Stack &s);     <font color=blue>// Assignment overload</font>
+    ~Stack();                              <font color=blue>// Destructor</font>
+    void Clear();                          <font color=blue>// Clear it out</font>
+
+    void Push(const std::string &s);   <font color=blue>// This puts a string on the stack.</font>
+    std::string Pop();                 <font color=blue>// This removes a string from the stack.</font>
+
+    bool Empty() const;                <font color=blue>// These return information about the stack.</font>
+    size_t Size() const;
   protected:
-    Stacknode *top;
+    Stacknode *top;                    <font color=blue>// This is how the stack is implemented.</font>
+    size_t size;
 };
 </pre></td></table></center><p>
 
 Ignore the "Stacknode" stuff for now.  Just concentrate on the public methods for the
-stack.  Besides the <b>Push()</b> and <b>Pop()</b> methods, there is an <b>Empty()</b> method, plus a
-constructor and a destructor.  
+stack.  Besides the <b>Push()</b> and <b>Pop()</b> methods, there are straightforward <b>Clear()</b>, <b>Empty()</b> and <b>Size()</b> methods, plus the full complement of constructors, destructor and
+assignment overload.
 <p>
 A simple application that uses a stack is a program that reverses standard input --
 you read each line and push it onto a stack, and then pop each string from the 
 stack, printing as you go.  The code is in 
-<b><a href=stackrev.cpp>stackrev.cpp</a></b>:
+<b><a href=src/stack_rev.cpp>src/stack_rev.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "stack.h"
+#include "stack.hpp"
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   Stack st;
 
+  <font color=blue>/* Create the stack with every line of standard input. */</font>
+
   while (getline(cin, s)) st.Push(s);
+
+  <font color=blue>/* Now, pop each string off the stack and print it out.
+     This will print standard output in reverse order. */</font>
+
   while (!st.Empty()) cout &lt;&lt; st.Pop() &lt;&lt; endl;
+
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -88,11 +112,25 @@ some clean code.
 <h3>Implementation</h3>
 
 Now let's look at the implementation.  Each value that gets stored on the
-stack is going to be stored in a single instance of the <b>Stacknode</b> class.  
-The top of the stack will be a pointer to last <b>Stacknode</b> that was
-pushed, and then each <b>Stacknode</b> will point the previously pushed
-node with its <b>next</b> pointer.  The very first <b>Stacknode</b> will
-have <b>next</b> equal <b>NULL</b>.
+stack is going to be stored in a single instance of the <b>Stacknode</b> class, which
+we'll revisit here (it was defined above in 
+<b><a href=include/stack.hpp>include/stack.hpp</a></b>).
+
+<p><center><table border=3 cellpadding=3><td><pre>
+class Stacknode {
+  public:
+    std::string s;
+    Stacknode *next;
+};
+</pre></td></table></center><p>
+
+You'll note that one protected member variable of the stack is a pointer to
+a <b>Stacknode</b>, called <b>top</b>.  This is going to point to a <b>Stacknode</b>
+whose string <b>s</b> is the last string that was pushed onto the stack.  
+The 
+a <b>Stacknode's</b> pointer <b>next</b> is going to point to the string that was
+pushed before the most recent one, and so on.  The final <b>Stacknode's</b> <b>next</b>
+pointer will be <b>NULL</b>.  If the stack is empty, then <b>top</b> will be <b>NULL</b>
 <p>
 For example, suppose we do:
 
@@ -106,14 +144,17 @@ st.Push("Six");
 
 Our stack is going to look as follows:
 
-<p><center><table border=0><td><img src=Stack-1.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Stack-1.jpg></td></table></center><p>
 
 The reason that we have this structure is that it facilitates adding new <b>Stacknode</b>'s
 via <b>Push()</b>, and removing them via <b>Pop()</b>.  Let's consider <b>Push()</b>.  Here's
 the code (in <b><a href=stack.cpp>stack.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
-void Stack::Push(string s)
+<font color=blue>/* Push allocates a new node, whose pointer points to the current top of the stack.
+   Then, it sets the top of the stack to this new node. */</font>
+
+void Stack::Push(const string &s)
 {
   Stacknode *newnode;
 
@@ -121,6 +162,7 @@ void Stack::Push(string s)
   newnode-&gt;s = s;
   newnode-&gt;next = top;
   top = newnode;
+  size++;
 }
 </pre></td></table></center><p>
 
@@ -128,15 +170,15 @@ What this does is create a new node with the given string, and hook that node on
 top of the stack.  Consider calling <b>Push("Now")</b> on the stack above.  We'll go through
 each step:
 
-<p><center><table border=3><tr><td><img src=Stack-2.jpg></td><tr>
-<tr><td><img src=Stack-3.jpg></td><tr>
-<tr><td><img src=Stack-4.jpg></td><tr></table></center><p>
+<p><center><table border=3 cellpadding=6><tr><td><img src=jpg/Stack-2.jpg></td><tr>
+<tr><td><img src=jpg/Stack-3.jpg></td><tr>
+<tr><td><img src=jpg/Stack-4.jpg></td><tr></table></center><p>
 
 When <b>Push()</b> returns, the variable <b>newnode</b> goes away, and we are left with 
 a stack that has "Now" on top:
 
 
-<p><center><table border=0><tr><td><img src=Stack-5.jpg></td><tr></table></center><p>
+<p><center><table border=0><tr><td><img src=jpg/Stack-5.jpg></td><tr></table></center><p>
 
 <b>Pop()</b> on the other hand, needs to store the string that is on the first node,
 remove that node from the stack, and return the stored string.  Since <b>Push()</b>
@@ -146,62 +188,79 @@ will have a memory leak.
 Here's the code:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Pop "unhooks" the top node from the stack, sets s to the string on top,
+   and then deletes it.  It throws an exception if the stack is empty.
+   That is because it's the user of the stack making a mistake, and throwing
+   the exception is a clean way of handling the error. */</font>
+
 string Stack::Pop()
 {
   string rv;
   Stacknode *oldtop;
 
-  if (top == NULL) {
-    cerr &lt;&lt; "Error: pop() called on an empty stack\n";
-    exit(1);
-  }
+  if (top == NULL) throw((string) "Stack::Pop() called on an empty stack");
 
   oldtop = top;
   top = oldtop-&gt;next;
   rv = oldtop-&gt;s;
   delete oldtop;
+
+  size--;
   return rv;
 }
 </pre></td></table></center><p>
-
 And below we step through <b>Pop()</b> called on the original three-node stack:
 
-<p><center><table border=3 cellpadding=3><tr><td><img src=Stack-6.jpg></td><tr>
-<tr><td><img src=Stack-7.jpg></td><tr>
-<tr><td><img src=Stack-8.jpg></td><tr></table></center><p>
+<p><center><table border=3 cellpadding=6><tr><td><img src=jpg/Stack-6.jpg></td><tr>
+<tr><td><img src=jpg/Stack-7.jpg></td><tr>
+<tr><td><img src=jpg/Stack-8.jpg></td><tr></table></center><p>
 
 When we're done, we return "Six" to the caller, and our stack only has two elements:
 
-<p><center><table border=0><td><img src=Stack-9.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Stack-9.jpg></td></table></center><p>
 
 Be sure you understand how these two methods work.  Understanding linked data structures
 is a fundamental concept, and this is the easiest example.  You need to understand it before
 you can move on.
 <p>
-With the exception of the destructor, the remaining two methods are straightforward:
-
+The regular constructor, <b>Empty()</b> and <b>Print()</b> are straightforward:
 <p><center><table border=3 cellpadding=3><td valign=top><pre>
 Stack::Stack()
 {
   top = NULL;
+  size = 0;
 }
-</pre></td><td><pre>
-int Stack::Empty()
+</pre></td><td valign=top><pre>
+bool Stack::Empty()
 {
-  return (top == NULL);
+  return (size == 0);
+}
+</pre></td><td valign=top><pre>
+size_t Stack::Size()
+{
+  return size;
 }
 </pre></td></table></center><p>
 
-The destructor is a little subtle.  It is called whenever a <b>Stack</b> is deallocated.
-This can happen if you allocate a <b>Stack</b> with <b>new</b> and then call <b>delete</b>.
-It also happens when you return from a procedure in which you declared a <b>Stack</b> 
-as a variable.  Destructors are necessary because you called <b>new</b> during your
-<b>Push()</b> calls.  If the <b>Stack</b> goes away and no destructor were called, then
-the nodes on the stack would constitute a memory leak.  You need to define a destructor
-which deletes all the nodes on the stack:
+The other methods are a little subtle.  Let's first concentrate on <b>Clear()</b>, which
+converts a potentially non-empty stack to an empty one.  I could implement <b>Clear()</b>
+very easily:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-Stack::~Stack()
+void Stack::Clear()
+{
+  while (!Empty()) (void) Pop();
+}
+</pre></td></table></center><p>
+
+However, I'm going to implement it more efficiently, without making all of those
+method calls.  Instead, I'm going to keep deleting the top of the stack until there
+are no more nodes on the stack.  You'll note, I need the <b>next</b> variable to 
+keep track of the "next" node, because after I delete <b>top</b>, <b>top</b> is no
+longer a valid pointer:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+void Stack::Clear()
 {
   Stacknode *next;
 
@@ -210,43 +269,233 @@ Stack::~Stack()
     delete top;
     top = next;
   }
+  size = 0;
 }
 </pre></td></table></center><p>
 
-I could have made this code simpler:
+The destructor is simple now -- it just calls <b>Clear()</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 Stack::~Stack()
 {
-  while (!Empty()) Pop();
+  Clear();
 }
 </pre></td></table></center><p>
 
-However, my code is more efficient, because it is not making a bunch of 
-method calls, and it is not performing the error checking that <b>Pop()</b>
-performs.
 <p>
-Go ahead and double-check that <b>stackrev</b> works:
+We'll stop here, and check that 
+<b><a href=src/stack_rev.cpp>src/stack_rev.cpp</a></b> works:
 
 <pre>
-UNIX> <font color=darkred><b>make stackrev</b></font>
-g++ -c stackrev.cpp
-g++ -c stack.cpp
-g++ -o stackrev stackrev.o stack.o
-UNIX> <font color=darkred><b>head -n 5 input.txt</b></font>
-John Eighth
-Tristan Passenger
-Joshua Classroom
-Oliver Andrew Propagandist
-Tristan Tristan Hieratic
-UNIX> <font color=darkred><b>head -n 5 input.txt | stackrev</b></font>
-Tristan Tristan Hieratic
-Oliver Andrew Propagandist
-Joshua Classroom
-Tristan Passenger
-John Eighth
+UNIX> <font color=darkred><b>make bin/stack_rev</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_rev.o src/stack_rev.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack.o src/stack.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/stack_rev obj/stack_rev.o obj/stack.o
+UNIX> <font color=darkred><b>head -n 5 txt/input.txt </b></font>
+ 0  John Eighth
+ 1  Tristan Passenger
+ 2  Joshua Classroom
+ 3  Oliver Andrew Propagandist
+ 4  Tristan Tristan Hieratic
+UNIX> <font color=darkred><b>head -n 5 txt/input.txt | bin/stack_rev</b></font>
+ 4  Tristan Tristan Hieratic
+ 3  Oliver Andrew Propagandist
+ 2  Joshua Classroom
+ 1  Tristan Passenger
+ 0  John Eighth
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
+You'll note, this does call the destructor, when <b>main()</b> returns.
+<hr>
+<h3>The Copy Constructor and Assignment Overload</h3>
+
+As with all data structures, you need to evaluate whether or not you need a copy 
+constructor and assignment overload.  To help you think about this, take a look
+at <b><a href=src/stack_overload.cpp>src/stack_overload.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include "stack.hpp"
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This program demonstrates the assignment overload in action. */</font>
+
+int main()
+{
+  string s;
+  Stack s1, s2;
+
+  <font color=blue>/* Read standard input into a stack. */</font>
+
+  while (getline(cin, s)) s1.Push(s);
+
+  <font color=blue>/* Copy the stack and clear out the original stack */</font>
+
+  s2 = s1;
+  s1.Clear();
+
+  <font color=blue>/* Print the copied stack */</font>
+
+  while (!s2.Empty()) {
+    cout &lt;&lt; s2.Pop() &lt;&lt; endl;
+  }
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we say "<b>s2 = s1</b>", and we don't implement an assignment overload, then
+<b>s2</b> gets a copy of <b>s1</b>'s member variables, which means a copy of <b>size</b>
+and a copy of <b>top</b>.  Now you have two data structures pointing to the same 
+memory (<b>s1.top</b> and <b>s2.top</b>), which is a problem.  Why?  Well, what happens
+when one of them deletes <b>top</b>?  Then the other one has a stale pointer.
+<p>
+To highlight that, I have copied: 
+<UL>
+<LI> <b><a href=include/stack.hpp>include/stack.hpp</a></b> to <b><a href=include/stack_no_ao_or_cc.hpp>include/stack_no_ao_or_cc.hpp</a></b>.
+<LI> <b><a href=src/stack.cpp>src/stack.cpp</a></b> to <b><a href=src/stack_no_ao_or_cc.cpp>src/stack_no_ao_or_cc.cpp</a></b>.
+<LI> <b><a href=src/stack_overload.cpp>src/stack_overload.cpp</a></b> to <b><a href=src/stack_overload_naoc.cpp>src/stack_overload_naoc.cpp</a></b>
+</UL>
+
+In these, I have deleted the assignment overload and copy constructor, so that 
+the "<b>s2 = s1</b>" statement uses the default assignment overload.  When you run
+it, you get an error, which happens for the following reason:
+
+<OL>
+<LI> <b>s2</b> is a copy of <b>s1</b>, which means that <b>s2.top</b> equals <b>s1.top</b>.
+<LI> <b>s1.Clear()</b> is called, which means that <b>s1.top</b> is deleted.
+<LI> When <b>s2.Pop()</b> is called, it uses <b>s2.top</b>, which is no longer a valid
+     pointer.  This is when you get the error.
+</OL>
+
+<pre>
+UNIX> <font color=darkred><b>make bin/stack_overload_naoc</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_overload_naoc.o src/stack_overload_naoc.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_no_ao_or_cc.o src/stack_no_ao_or_cc.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/stack_overload_naoc obj/stack_overload_naoc.o obj/stack_no_ao_or_cc.o
+UNIX> <font color=darkred><b>bin/stack_overload_naoc < txt/input.txt</b></font>
+stack_overload_naoc(85803,0x7fff7ea10000) malloc: *** error for object 0x7fe91ac03530: pointer being freed was not allocated
+*** set a breakpoint in malloc_error_break to debug
+Abort
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+In <b><a href=src/stack.cpp>src/stack.cpp</a></b>, we implement the assignment overload.
+As the comment says, it's a little tricky -- what we do is make a temporary stack, which 
+contains the original stack in reverse order.  Then we pop all of the nodes off the
+temporary stack, which copies them in their original order:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The assignment overload is tricky.  Since we can only traverse the stack
+   from top to bottom, what we do is create a temporary stack, which has nodes in 
+   reverse order, and then we pop all of its nodes, and push them onto our
+   returning stack. */</font>
+
+Stack& Stack::operator= (const Stack &s)
+{
+  Stack tmp;
+  Stacknode *sn;
+
+  <font color=blue>/* We need to set these, because the regular constructor is not called, so their
+     values are uninitialized.  This is a hard bug to find, btw. */</font>
+
+  size = 0;
+  top = NULL;
+
+  for (sn = s.top; sn != NULL; sn = sn-&gt;next) tmp.Push(sn-&gt;s);
+  while (!tmp.Empty()) Push(tmp.Pop());
+  return *this;
+}
+</pre></td></table></center><p>
+
+Now, <b>bin/stack_overload</b> works properly:
+
+<pre>
+UNIX> <font color=darkred><b>make bin/stack_overload</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_overload.o src/stack_overload.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack.o src/stack.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/stack_overload obj/stack_overload.o obj/stack.o
+UNIX> <font color=darkred><b>head -n 5 txt/input.txt | bin/stack_overload </b></font>
+ 4  Tristan Tristan Hieratic
+ 3  Oliver Andrew Propagandist
+ 2  Joshua Classroom
+ 1  Tristan Passenger
+ 0  John Eighth
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+This implementation is inefficient, because it calls all of those methods.
+Like the implementation of <b>Clear()</b>, I could implement the assignment overload
+without calling any methods, and make it more efficient.  I'm not going to do that here,
+because I think this lecture is complicated enough;  however, put it in the back of your
+mind.
+<p>
+I implement the copy constructor by simply calling the assignment overload:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+Stack::Stack(const Stack &s)
+{
+  *this = s;
+}
+</pre></td></table></center><p>
+
+To test it, take a look at
+<b><a href=src/stack_copy.cpp>src/stack_copy.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include "stack.hpp"
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This program demonstrates the copy constructor in action. */</font>
+
+void Print_Stack(Stack st)
+{
+  while (!st.Empty()) cout &lt;&lt; st.Pop() &lt;&lt; endl;
+  cout &lt;&lt; endl;
+}
+
+int main()
+{
+  string s;
+  Stack st;
+
+  <font color=blue>/* Create a stack from the lines of standard input. */</font>
+
+  while (getline(cin, s)) st.Push(s);
+
+  <font color=blue>/* Print it twice, using a procedure, which calls the copy constructor twice. */</font>
+
+  Print_Stack(st);
+  Print_Stack(st);
+  return 0;
+}
+</pre></td></table></center><p>
+
+When we run it, you see that it does indeed print the stack twice, so the copy constructor 
+is in working order:
+
+<pre>
+UNIX> <font color=darkred><b>make bin/stack_copy</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_copy.o src/stack_copy.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack.o src/stack.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/stack_copy obj/stack_copy.o obj/stack.o
+UNIX> <font color=darkred><b>head -n 5 txt/input.txt | bin/stack_copy</b></font>
+ 4  Tristan Tristan Hieratic
+ 3  Oliver Andrew Propagandist
+ 2  Joshua Classroom
+ 1  Tristan Passenger
+ 0  John Eighth
+
+ 4  Tristan Tristan Hieratic
+ 3  Oliver Andrew Propagandist
+ 2  Joshua Classroom
+ 1  Tristan Passenger
+ 0  John Eighth
+
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
 
 <hr>
 <h2>Queues</h2>
@@ -258,41 +507,60 @@ understand it before proceeding</i>.
 <p>
 A queue is a FIFO data structure: first-in, first-out.  It can be used to mimic lines at
 the grocery store, or cars waiting at a traffic light.  The <b>Queue</b> API 
-(in <b><a href=queue.h>queue.h</a></b>)
+(in <b><a href=include/queue.hpp>include/queue.hpp</a></b>)
 is pretty 
 much identical to the <b>Stack</b> API. It works differently, though, because 
 <b>Pop()</b> now removes the oldest element
 of the queue, rather than the newest.
 
 <p><center><table border=3 cellpadding=3><td><pre>
+#pragma once
 #include &lt;string&gt;
-using namespace std;
+
+<font color=blue>/* This defines the nodes of the queue.  It's only used internally to
+   the queue, but we have to define it here.  */</font>
 
 class Qnode {
   public:
-    string s;
+    std::string s;
     Qnode *ptr;
 };
 
+<font color=blue>/* Here's the Queue class. */</font>
+
 class Queue {
   public:
+
+    <font color=blue>/* Constructors, Destructor, Assignment Overload */</font>
+
     Queue();
+    Queue(const Queue &q);
+    Queue& operator= (const Queue &q);
     ~Queue();
-    int Empty();
-    int Size();
-    void Push(string s);
-    string Pop();
+
+    <font color=blue>/* Same operators as stacks. */</font>
+
+    void Clear();
+    bool Empty() const;
+    size_t Size() const;
+
+    <font color=blue>/* Push puts the string on the end of the queue, 
+       and Pop removes the string from the beginning of the queue. */</font>
+
+    void Push(std::string s);
+    std::string Pop();
+
   protected:
-    Qnode *first;
-    Qnode *last;
-    int size;
+    Qnode *first;           <font color=blue>// Pointer to the first node on the queue.</font>
+    Qnode *last;            <font color=blue>// Pointer to the last node on the queue.</font>
+    int size;               <font color=blue>// The queue's size.</font>
 };
 </pre></td></table></center><p>
-
 The <b>protected</b> data is different, too.  Now you are going to keep a pointer to the
 first and last nodes on the queue.  If the queue is empty, then both will be <b>NULL</b>.
 <p>
-Each <b>Qnode</b> has <b>ptr</b>, which points to the <i>previous</i> node on the queue.
+Each <b>Qnode</b> has a pointer called <b>ptr</b>, 
+which points to the <i>previous</i> node on the queue.
 The anology here is that if you are in line, you point to the person <i>behind</i> you, not the
 person in front of you.  The reason is that this way you can insert new nodes behind the
 last one, and you can delete the first node.
@@ -307,51 +575,57 @@ q.Push("Him");
 q.Push("Six");
 </pre></td></table></center><p>
 
-
 This is going to result in the following layout of data:
 
-<p><center><table border=0><td><img src=Queue-1.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Queue-1.jpg></td></table></center><p>
 
 Let's first consider calling <b>Pop()</b>.  The code is nearly exactly like the stack
 code, only we are removing the <b>first</b> node rather than the <b>top</b> node,
 and we have to put some extra code in to handle popping the last node on a queue.
 The code is in 
-<b><a href=queue.cpp>queue.cpp</a></b>:
+
+<b><a href=src/queue.cpp>src/queue.cpp</a></b>
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Pop is actually very similar to the stack code.  
+   You save the first string, save a pointer to the first node, 
+   set "first" to point to the next node, and delete the first node. */</font>
+
 string Queue::Pop()
 {
   Qnode *oldfirst;
   string rv;
 
-  if (size == 0) {
-    cerr &lt;&lt; "Error: pop() called on an empty queue\n";
-    exit(1);
-  }
+  if (size == 0) throw((string) "Queue::Pop() called on an empty queue");
+
+  <font color=blue>/* Move "first" to point to the next node, store the return value, and
+    delete the previous first node. */</font>
 
   rv = first-&gt;s;
-
-  oldfirst = first;
+  oldfirst = first;            
   first = oldfirst-&gt;ptr;
   delete oldfirst;
 
+  <font color=blue>/* Handle the empty queue. */</font>
+
   if (first == NULL) last = NULL;
 
-  size--;
+  <font color=blue>/* Update size and return. */</font>
 
+  size--;
   return rv;
 }
 </pre></td></table></center><p>
 
 As with the stack code, we'll go over an example step by step:
 
-<p><center><table border=3 cellpadding=3><tr><td><img src=Queue-2.jpg></td><tr>
-<tr><td><img src=Queue-3.jpg></td><tr>
-<tr><td><img src=Queue-4.jpg></td><tr></table></center><p>
+<p><center><table border=3 cellpadding=3><tr><td><img src=jpg/Queue-2.jpg></td><tr>
+<tr><td><img src=jpg/Queue-3.jpg></td><tr>
+<tr><td><img src=jpg/Queue-4.jpg></td><tr></table></center><p>
 
 <b>Pop()</b> then returns "Give", its local variables go away, and then resulting Queue is:
 
-<p><center><table border=0><td><img src=Queue-5.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Queue-5.jpg></td></table></center><p>
 
 The code for <b>Push()</b> is quite different from the stack code.  As before, we
 create a new node with <b>new</b> and set its string.  However, we differ by setting
@@ -361,101 +635,177 @@ then we set <b>first</b> and <b>last</b> to the new node.  Otherwise, we set
 the <b>last</b> element's <b>ptr</b> to the new node, and then set <b>last</b> to be
 the new node.  In that way, the new node
 goes after the <b>last</b> element.  Here is the code:
+
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Push() creates a new node and then puts it at the end of the queue, 
+   by having the last node point to it.  We need special case
+   code for when the queue is empty. */</font>
+
 void Queue::Push(string s)
 {
   Qnode *newnode;
 
-  newnode = new Qnode;
+  newnode = new Qnode;      <font color=blue>// Create the new node. </font>
   newnode-&gt;s = s;
   newnode-&gt;ptr = NULL;
 
-  if (last == NULL) {
+  if (last == NULL) {       <font color=blue>// If the queue is empty, set first to be this new node. </font>
     first = newnode;  
-  } else {
-    last-&gt;ptr = newnode;
+  } else {                  <font color=blue>// If the queue is non-empty, set the pointer of the last node to be this new node. </font>
+    last-&gt;ptr = newnode; 
   }
-  last = newnode;
 
+  last = newnode;           <font color=blue>// Finally, set last to point to the new node, and increment size.</font>
   size++;
 }
 </pre></td></table></center><p>
 <p>
 Below is an example of calling <b>Push("Now")</b> on the two element list above:
 
-<p><center><table border=3 cellpadding=3><tr><td><img src=Queue-6.jpg></td><tr>
-<tr><td><img src=Queue-7.jpg></td><tr>
-<tr><td><img src=Queue-8.jpg></td><tr></table></center><p>
+<p><center><table border=3 cellpadding=3><tr><td><img src=jpg/Queue-6.jpg></td><tr>
+<tr><td><img src=jpg/Queue-7.jpg></td><tr>
+<tr><td><img src=jpg/Queue-8.jpg></td><tr></table></center><p>
 
 When it returns, <b>newnode</b> goes away, and the resulting queue is:
 
-<p><center><table border=0><td><img src=Queue-9.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Queue-9.jpg></td></table></center><p>
 
-
-The rest of the code is straightforward -- you can just click on 
-<b><a href=queue.cpp>queue.cpp</a></b> to see it all.  Make special note of the 
-destructor, which is very much like the stack code.
-<p>
-For our example, we implement <b>tail</b> with a queue in 
-<b><a href=queuetail.cpp>queuetail.cpp</a></b>:
+<b>Clear()</b>, <b>Empty()</b>, <b>Size()</b>, the regular constructor and the destructor
+are all straightforward.  I'll visit the assignment overload and copy constructor below.
+To test this, let's implement <b>tail</b> with a queue.  Go ahead and simply read the 
+comments in <b><a href=src/queue_tail.cpp>src/queue_tail.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "queue.h"
+<font color=blue>/* This program implements tail using a queue.  It reads lines of standard input
+   into the queue, and once the queue reaches ten elements in size, then every
+   time a line is pushed onto the end of the queue, a line is popped off the front.
+   At the end, the queue is printed. */</font>
+
+#include "queue.hpp"
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   Queue q;
 
+  <font color=blue>/* Read the lines into the queue, and keep it at a maximum of 10 elements. */</font>
+
   while (getline(cin, s)) {
     q.Push(s);
-    if (q.Size() &gt; 10) q.Pop();
+    if (q.Size() &gt; 10) (void) q.Pop();
   }
+
+  <font color=blue>/* Print the queue. */</font>
+
   while (!q.Empty()) cout &lt;&lt; q.Pop() &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
 
-Verify to yourself that it works:
+As with <b>stack_rev.cpp</b>, this is a really straightfoward program, because the data structure
+fits the task so nicely.  We can verify that it works, both when it receives more than ten lines,
+and less:
 
 <pre>
-UNIX> <font color=darkred><b>make queuetail</b></font>
-g++ -c queuetail.cpp
-g++ -c queue.cpp
-g++ -o queuetail queuetail.o queue.o
-UNIX> <font color=darkred><b>cat -n input.txt</b></font>
-     1	John Eighth
-     2	Tristan Passenger
-     3	Joshua Classroom
-     4	Oliver Andrew Propagandist
-     5	Tristan Tristan Hieratic
-     6	Isabelle Bailey Prey
-     7	Ellie Alkaloid
-     8	Elijah Epithelium
-     9	Daniel Topgallant
-    10	Kate Surcease
-    11	Brayden Clarinet
-    12	Nicholas Casteth
-    13	Hunter Hart
-    14	Ellie Bangle
-    15	Addison Fracture
-    16	Ava Hereafter
-    17	Evelyn Kigali
-    18	Tristan Housewives
-    19	Jack Bodybuilder
-    20	Gabriel Millionth
-UNIX> <font color=darkred><b>cat -n input.txt | queuetail</b></font>
-    11	Brayden Clarinet
-    12	Nicholas Casteth
-    13	Hunter Hart
-    14	Ellie Bangle
-    15	Addison Fracture
-    16	Ava Hereafter
-    17	Evelyn Kigali
-    18	Tristan Housewives
-    19	Jack Bodybuilder
-    20	Gabriel Millionth
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make bin/queue_tail</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/queue_tail.o src/queue_tail.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/queue.o src/queue.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/queue_tail obj/queue_tail.o obj/queue.o
+UNIX> <font color=darkred><b>wc txt/input.txt</b></font>
+      20      63     423 txt/input.txt
+UNIX> <font color=darkred><b>tail txt/input.txt</b></font>
+10  Brayden Clarinet
+11  Nicholas Casteth
+12  Hunter Hart
+13  Ellie Bangle
+14  Addison Fracture
+15  Ava Hereafter
+16  Evelyn Kigali
+17  Tristan Housewives
+18  Jack Bodybuilder
+19  Gabriel Millionth
+UNIX> <font color=darkred><b>bin/queue_tail < txt/input.txt</b></font>
+10  Brayden Clarinet
+11  Nicholas Casteth
+12  Hunter Hart
+13  Ellie Bangle
+14  Addison Fracture
+15  Ava Hereafter
+16  Evelyn Kigali
+17  Tristan Housewives
+18  Jack Bodybuilder
+19  Gabriel Millionth
+UNIX> <font color=darkred><b>head -n 3 txt/input.txt</b></font>
+ 0  John Eighth
+ 1  Tristan Passenger
+ 2  Joshua Classroom
+UNIX> <font color=darkred><b>head -n 3 txt/input.txt | bin/queue_tail </b></font>
+ 0  John Eighth
+ 1  Tristan Passenger
+ 2  Joshua Classroom
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+As with the Stack data structure, we need to implement a copy constructor and assignment
+overload.  This one is more simple, because you can simply Push() each node on the queue,
+from front to back.
+Here's the code:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The assignment overload traverses the nodes and pushes each one. */</font>
+
+Queue& Queue::operator= (const Queue &q)
+{
+  Qnode *tmp;
+
+  Clear();
+  for (tmp = q.first; tmp != NULL; tmp = tmp-&gt;ptr) Push(tmp-&gt;s);
+  return *this;
+}
+
+<font color=blue>/* The copy constructor calls the assignment overload. */</font>
+
+Queue::Queue(const Queue &q)
+{
+  *this = q;
+}
+</pre></td></table></center><p>
+
+To test, the programs
+<b><a href=src/queue_overload.cpp>src/queue_overload.cpp</a></b>
+and 
+<b><a href=src/queue_copy.cpp>src/queue_copy.cpp</a></b> work just like their stack counterparts.
+<b><a href=src/queue_overload.cpp>src/queue_overload.cpp</a></b> reads standard input into a 
+queue, assigns a second queue to equal the first, clears the first and then prints the second.
+If correct, standard input should equal standard output:
+
+<pre>
+UNIX> <font color=darkred><b>cat txt/input.txt | openssl md5</b></font>
+(stdin)= 5fddce6788199e7a51227f78a9f3bb4f
+UNIX> <font color=darkred><b>bin/queue_overload < txt/input.txt | openssl md5</b></font>
+(stdin)= 5fddce6788199e7a51227f78a9f3bb4f
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<b><a href=src/queue_copy.cpp>src/queue_copy.cpp</a></b> calls a procedure to print the queue,
+which makes a copy.  It does it twice, so you should see the input twice (with an extra newline
+at the end):
+
+<pre>
+UNIX> <font color=darkred><b>head -n 2 txt/input.txt</b></font>
+ 0  John Eighth
+ 1  Tristan Passenger
+UNIX> <font color=darkred><b>head -n 2 txt/input.txt | bin/queue_copy </b></font>
+ 0  John Eighth
+ 1  Tristan Passenger
+
+ 0  John Eighth
+ 1  Tristan Passenger
+
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -469,60 +819,79 @@ of doubly-linked lists are that they may be traversed in the forward and reverse
 direction, they allow for arbitrary insertion of nodes <i>anywhere</i> in the list,
 and they allow for arbitrary deletion of <i>any</i> nodes.  Our API for 
 the doubly linked list is in 
-<b><a href=dlist.h>dlist.h</a></b>:
+<b><a href=include/dlist.hpp>include/dlist.hpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+#pragma once
 #include &lt;string&gt;
-using namespace std;
 
 class Dnode {
   public:
-    string s;
+    std::string s;
     Dnode *flink;
     Dnode *blink;
 };
 
 class Dlist {
   public:
+
+    <font color=blue>/* Constructors, Destructor, Assignment Overload */</font>
+
     Dlist();
+    Dlist(const Dlist &d);
+    Dlist& operator= (const Dlist &d);
     ~Dlist();
-    int Empty();
-    int Size();
-    void Push_Front(string s);
-    void Push_Back(string s);
-    string Pop_Front();
-    string Pop_Back();
-    Dnode *Begin();
-    Dnode *End();
-    Dnode *Rbegin();
-    Dnode *Rend();
-    void Insert_Before(string s, Dnode *n);
-    void Insert_After(string s, Dnode *n);
+
+    void Clear();          <font color=blue>// This should not delete the sentinel node.</font>
+    bool Empty() const;
+    size_t Size() const;
+
+    <font color=blue>/* Put new strings on the front or back of the list */</font>
+
+    void Push_Front(const std::string &s);
+    void Push_Back(const std::string &s);
+
+    <font color=blue>/* Remove and return the first or last element of the list */</font>
+
+    std::string Pop_Front();
+    std::string Pop_Back();
+
+    Dnode *Begin() const;         <font color=blue>// Pointer to the first node on the list </font>
+    Dnode *End() const;           <font color=blue>// Pointer to "one past" the last node on the list.</font>
+    Dnode *Rbegin() const;        <font color=blue>// Pointer to the last node on the list</font>
+    Dnode *Rend() const;          <font color=blue>// Pointer to "one before" the first node on the list.</font>
+
+    void Insert_Before(const std::string &s, Dnode *n);
+    void Insert_After(const std::string &s, Dnode *n);
     void Erase(Dnode *n);
+
   protected:
     Dnode *sentinel;
-    int size;
+    size_t size;
 };
 </pre></td></table></center><p>
 
+
 All of these methods should be familiar to you, as they are analogous to STL
 methods.  There are two simple implementations of reversing standard input in
-<b><a href=dlistrev-1.cpp>dlistrev-1.cpp</a></b> and 
-<b><a href=dlistrev-2.cpp>dlistrev-2.cpp</a></b>.  The first works by calling
+<b><a href=src/dlist_rev_1.cpp>src/dlist_rev_1.cpp</a></b> and
+<b><a href=src/dlist_rev_2.cpp>src/dlist_rev_2.cpp</a></b>.
+The first works by calling
 <b>Push_Back()</b> and <b>Pop_Back()</b>, and the second works by calling 
 <b>Push_Front()</b> and <b>Pop_Front()</b>.   
 <p>
 A little more subtle is 
-<b><a href=dlistrev-3.cpp>dlistrev-3.cpp</a></b>, which creates the list 
+<b><a href=src/dlist_rev_3.cpp>src/dlist_rev_3.cpp</a></b>,
+which creates the list 
 using <b>Push_Front()</b>, and then traverses it using <b>Begin()</b> and
 <b>End()</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "dlist.h"
+#include "dlist.hpp"
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   Dlist l;
@@ -530,6 +899,7 @@ main()
 
   while (getline(cin, s)) l.Push_Front(s);
   for (d = l.Begin(); d != l.End(); d = d-&gt;flink) cout &lt;&lt; d-&gt;s &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
 
@@ -550,15 +920,16 @@ the <b>++</b> operator.
 
 <p>
 In a similar manner, in 
-<b><a href=dlistrev-4.cpp>dlistrev-4.cpp</a></b>, the list is created with <b>Push_Back()</b>,
+<b><a href=src/dlist_rev_4.cpp>src/dlist_rev_4.cpp</a></b>, 
+the list is created with <b>Push_Back()</b>,
 and we traverse it from back to front using <b>Rbegin()</b>, <b>Rend()</b> and <b>d->blink</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "dlist.h"
+#include "dlist.hpp"
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   Dlist l;
@@ -566,19 +937,21 @@ main()
 
   while (getline(cin, s)) l.Push_Back(s);
   for (d = l.Rbegin(); d != l.Rend(); d = d-&gt;blink) cout &lt;&lt; d-&gt;s &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
 
 Alternatively, in 
-<b><a href=dlistrev-5.cpp>dlistrev-5.cpp</a></b>, we create the list with <b>Push_Front()</b>
+<b><a href=src/dlist_rev_5.cpp>src/dlist_rev_5.cpp</a></b>, 
+we create the list with <b>Push_Front()</b>
 and print it by repeatedly printing the first element and then erasing it:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "dlist.h"
+#include "dlist.hpp"
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   Dlist l;
@@ -588,21 +961,23 @@ main()
     cout &lt;&lt; l.Begin()-&gt;s &lt;&lt; endl;
     l.Erase(l.Begin());
   }
+  return 0;
 }
 </pre></td></table></center><p>
 
 And finally, in 
-<b><a href=dlistrev-6.cpp>dlistrev-6.cpp</a></b>, we use the <b>Insert_Before()</b> 
+<b><a href=src/dlist_rev_6.cpp>src/dlist_rev_6.cpp</a></b>,
+, we use the <b>Insert_Before()</b> 
 method, which inserts a new node before the given node, to create the list in a manner
 equivalent to <b>Push_Back()</b>.  We do this by inserting before <b>End()</b>.
 We then traverse the list from back to front.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include "dlist.h"
+#include "dlist.hpp"
 #include &lt;iostream&gt;
 using namespace std;
 
-main()
+int main()
 {
   string s;
   Dlist l;
@@ -612,13 +987,14 @@ main()
   for (d = l.Rbegin(); d != l.Rend(); d = d-&gt;blink) {
     cout &lt;&lt; d-&gt;s &lt;&lt; endl;
   }
+  return 0;
 }
 </pre></td></table></center><p>
-
 <hr>
+
 <h2>Circular Lists with a Sentinel</h2>
 
-I'm not going to implement <b>dlist.cpp</b> for you.  That's your job in lab.
+I'm not going to implement <b>src/dlist.cpp</b> for you.  That's your job in lab.
 However, I will outline the structure, which may seem convoluted at first, but
 will seem elegant and beautiful by the time you're done with it.
 <p>
@@ -641,13 +1017,13 @@ l.Push_Back("Six");
 
 Then our list looks as follows:
 
-<p><center><table border=0><td><img src=List-1.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-1.jpg></td></table></center><p>
 
 Think about traversing such a list.  Typically, a student's first response to this
 structure is, "How do I keep from getting into an infinite loop when I'm traversing?"
 The answer is that you end when you reach the sentinel node.  Consider the loop 
 from 
-<b><a href=dlistrev-3.cpp>dlistrev-3.cpp</a></b>:
+<b><a href=src/dlist_rev_3.cpp>src/dlist_rev_3.cpp</a></b>
 
 <p><center><table border=3 cellpadding=3><td><pre>
   for (d = l.Begin(); d != l.End(); d = d-&gt;flink) cout &lt;&lt; d-&gt;s &lt;&lt; endl;
@@ -664,7 +1040,7 @@ When the constructor for a list is called, it is going to allocate a sentinel no
 and have its <b>flink</b> and <b>blink</b> pointers point to itself:
 
 
-<p><center><table border=0><td><img src=List-2.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-2.jpg></td></table></center><p>
 
 That means you are going to have to call <b>new</b> in the constructor.  Consider
 the previous <b>for</b> loop executing on the empty list.  Since <b>sentinel->flink</b> 
@@ -680,33 +1056,33 @@ Suppose I want to insert a new node before a given node in the list.  For exampl
 Dlist l;
 Dnode *d;
 
-l.Push_Back("Come");
-l.Push_Back("Eileen");
+l.Push_Back("Give");
+l.Push_Back("Six");
 d = l.Begin();
 d = d->flink;
-l.Insert_Before("On", d);
+l.Insert_Before("Him", d);
 </pre></td></table></center><p>
 
 At the point of the <b>Insert_Before()</b> statement, here's the state of the program:
 
-<p><center><table border=0><td><img src=List-3.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-3.jpg></td></table></center><p>
 
 In <b>Insert_Before()</b>, we'll have two <b>(Dnode *)</b>'s called <b>prev</b> and <b>newnode</b>.
 We'll set <b>prev</b> to <b>d->blink</b> and set <b>newnode</b> equal to a newly allocated
 <b>Dnode</b> with the proper string:
 
-<p><center><table border=0><td><img src=List-4.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-4.jpg></td></table></center><p>
 
 Now we can hook <b>newnode</b> into the list by appropriately setting its <b>flink</b> and
 <b>blink</b> pointers, and by appropriately setting <b>prev->flink</b> and <b>d->blink</b>.
 When we're done, the new node is hooked into the list:
 
-<p><center><table border=0><td><img src=List-5.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-5.jpg></td></table></center><p>
 
 <b>Insert_Before()</b> returns to the caller, which means that <b>newnode</b> and <b>prev</b>
 go away, and the list is as we want it:
 
-<p><center><table border=0><td><img src=List-6.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-6.jpg></td></table></center><p>
 
 Since the list is circular, you can insert new nodes between the sentinel and the last node
 on the list.  What will that do?  That will effect <b>Push_Back()</b>!  In fact, you can 
@@ -724,9 +1100,9 @@ Consider the following code:
 Dlist l;
 Dnode *d;
 
-l.Push_Back("Come");
-l.Push_Back("On");
-l.Push_Back("Eileen");
+l.Push_Back("Give");
+l.Push_Back("Him");
+l.Push_Back("Six");
 d = l.Begin();
 d = d->flink;
 l.Erase(d);
@@ -734,36 +1110,40 @@ l.Erase(d);
 
 At the point of the <b>Erase()</b> call, the state of the program is:
 
-<p><center><table border=0><td><img src=List-7.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-7.jpg></td></table></center><p>
 
 As before, in <b>Erase()</b>, we'll have two <b>(Dnode *)</b>'s, this time
 called <b>prev</b> and <b>next</b>.  We set them to the two nodes surrounding
 <b>d</b>:
 
-<p><center><table border=0><td><img src=List-8.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-8.jpg></td></table></center><p>
 
 We can then remove <b>d</b> from the list by setting <b>next</b>'s <b>blink</b>
 pointer and <b>prev</b>'s <b>flink</b> pointer:
 
-<p><center><table border=0><td><img src=List-9.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-9.jpg></td></table></center><p>
 
 And calling delete on <b>d</b> (and decrementing <b>size</b>):
 
-<p><center><table border=0><td><img src=List-A.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-A.jpg></td></table></center><p>
 
 When <b>Erase()</b> returns, the node is gone, as are <b>prev</b> and <b>next</b>.
 The variable <b>d</b> is now pointing to deleted memory, you should should take care
 not to use it.
 
-<p><center><table border=0><td><img src=List-B.jpg></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/List-B.jpg></td></table></center><p>
 
 As with <b>Insert_Before()</b>, you can use <b>Erase()</b> to implement other
 methods like <b>Pop_Back()</b> and <b>Pop_Front()</b>.  
 
 <hr>
-<h2>The destructor</h2>
+<h2>Clear, The destructor, The assignment overload and the copy constructor</h2>
 
-As with the Stack and Queue implementations, the Dlist destructor has to deallocate
-all memory that has been allocated for the list.  That includes the sentinel node.
-Be careful when you implement it.
+<b>Clear()</b> is a little different from the stack and queue versions.  The reason is
+that <b>Clear()</b> should erase all nodes <i>but the sentinel</i>.  That means that the
+destructor needs to do more than just call <b>Clear()</b> -- it will have to delete the
+sentinel, too.
 
+<p>
+The assignment overload and copy constructor may call <b>Push_Back()</b>, so they will
+be simple to implement.
