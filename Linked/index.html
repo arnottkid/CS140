@@ -547,7 +547,7 @@ class Queue {
     <font color=blue>/* Push puts the string on the end of the queue, 
        and Pop removes the string from the beginning of the queue. */</font>
 
-    void Push(std::string s);
+    void Push(const std::string &s);
     std::string Pop();
 
   protected:
@@ -641,7 +641,7 @@ goes after the <b>last</b> element.  Here is the code:
    by having the last node point to it.  We need special case
    code for when the queue is empty. */</font>
 
-void Queue::Push(string s)
+void Queue::Push(const string &s)
 {
   Qnode *newnode;
 

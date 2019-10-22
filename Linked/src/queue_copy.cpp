@@ -23,6 +23,5 @@ int main()
 
   Print_Queue(q);
   Print_Queue(q);
-  printf("Here.\n");
   return 0;
 }

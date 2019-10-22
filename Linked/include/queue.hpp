@@ -31,7 +31,7 @@ class Queue {
     /* Push puts the string on the end of the queue, 
        and Pop removes the string from the beginning of the queue. */
 
-    void Push(std::string s);
+    void Push(const std::string &s);
     std::string Pop();
 
   protected:
