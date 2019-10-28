@@ -60,7 +60,7 @@ size_t Queue::Size() const
    of the last, by having the last node point to it.  We need special case
    code for when the queue is empty. */
 
-void Queue::Push(string s)
+void Queue::Push(const string &s)
 {
   Qnode *newnode;
 
