@@ -873,7 +873,10 @@ class Dlist {
 
 
 All of these methods should be familiar to you, as they are analogous to STL
-methods.  There are two simple implementations of reversing standard input in
+methods.  (Although in the STL, <b>pop_back()</b> and <b>pop_front()</b> don't
+actually return the values.)
+<p>
+There are two simple implementations of reversing standard input in
 <b><a href=src/dlist_rev_1.cpp>src/dlist_rev_1.cpp</a></b> and
 <b><a href=src/dlist_rev_2.cpp>src/dlist_rev_2.cpp</a></b>.
 The first works by calling
@@ -1145,5 +1148,9 @@ destructor needs to do more than just call <b>Clear()</b> -- it will have to del
 sentinel, too.
 
 <p>
-The assignment overload and copy constructor may call <b>Push_Back()</b>, so they will
-be simple to implement.
+Remember that when the assignment overload is called, it will hold a (potentially non-empty)
+list.  You'll need to clear it before copying the list from which you are doing the assignment.
+<p>
+Similarly, remember that when the copy constructor is called, nothing is initialized, so you'll
+have to create the sentinel node, and then you can do the copy.  It's fine for both of these
+to call <b>Push_Back()</b> to do the copying;
