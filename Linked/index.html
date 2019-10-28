@@ -308,7 +308,7 @@ UNIX> <font color=darkred><b></b></font>
 
 You'll note, this does call the destructor, when <b>main()</b> returns.
 <hr>
-<h3>The Copy Constructor and Assignment Overload</h3>
+<h3>The Assignment Overload</h3>
 
 As with all data structures, you need to evaluate whether or not you need a copy 
 constructor and assignment overload.  To help you think about this, take a look
@@ -396,13 +396,16 @@ Stack& Stack::operator= (const Stack &s)
   Stack tmp;
   Stacknode *sn;
 
-  <font color=blue>/* We need to set these, because the regular constructor is not called, so their
-     values are uninitialized.  This is a hard bug to find, btw. */</font>
+  <font color=blue>/* First we call clear, because the stack may already have elements in it. */</font>
 
-  size = 0;
-  top = NULL;
+  Clear();
+
+  <font color=blue>/* Next, we create the temporary stack */</font>
 
   for (sn = s.top; sn != NULL; sn = sn-&gt;next) tmp.Push(sn-&gt;s);
+
+  <font color=blue>/* And finally we pop nodes off the temporary stack and onto this stack. */</font>
+
   while (!tmp.Empty()) Push(tmp.Pop());
   return *this;
 }
@@ -430,11 +433,102 @@ without calling any methods, and make it more efficient.  I'm not going to do th
 because I think this lecture is complicated enough;  however, put it in the back of your
 mind.
 <p>
-I implement the copy constructor by simply calling the assignment overload:
+It's very important that you understand why I'm calling <b>Clear()</b> at the beginning
+of the assignment overload.  When I call:
+<p><center>
+<pre>
+s2 = s1;
+</pre>
+</center>
+What is happening is that the assignment method of <b>s2</b> is being called with <b>s1</b>
+as a parameter.  If <b>s2</b> already has some elements on it, then I need to clear them
+out before I push more nodes onto the stack.
+<p>
+To illustrate this, take a look at the program
+<b><a href=src/stack_overload_2.cpp>src/stack_overload_2.cpp</a></b>
 
 <p><center><table border=3 cellpadding=3><td><pre>
+#include "stack.hpp"
+#include &lt;iostream&gt;
+using namespace std;
+
+<font color=blue>/* This program demonstrates why you have to call Clear() inside the assignment overload*/</font>
+
+int main()
+{
+  string s;
+  Stack s1, s2;
+
+  <font color=blue>/* Read standard input into a stack. */</font>
+
+  while (getline(cin, s)) s1.Push(s);
+
+  <font color=blue>/* Copy the stack twice. The second one should overwrite the first one. */</font>
+
+  s2 = s1;
+  s2 = s1;
+
+  <font color=blue>/* Print the copied stack.  It should only print the stack once. */</font>
+
+  while (!s2.Empty()) cout &lt;&lt; s2.Pop() &lt;&lt; endl;
+
+  return 0;
+}
+</pre></td></table></center><p>
+
+You'll note that the second time I call "s2 = s1", <tt>s2</tt> already has elements in it.
+If I don't call <b>Clear()</b> in the assignment overload implementation, then it will 
+add <tt>s1</tt> twice.  
+<p>
+I compile this with <b>src/stack.cpp</b> into the executable <b>bin/stack_overload_2</b>, 
+and it works correctly, because <b>Clear()</b>
+is called:
+
+<pre>
+UNIX> <font color=darkred><b>head -n 2 txt/input.txt | bin/stack_overload_2</b></font>
+ 1  Tristan Passenger
+ 0  John Eighth
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+However, in 
+<b><a href=src/stack_bad_overload.cpp>src/stack_bad_overload.cpp</a></b>, I have copied
+<b><a href=src/stack.cpp>src/stack.cpp</a></b>, and deleted the <b>Clear()</b>.  Now, you 
+get two copies of <b>s1</b> in <b>s2</b>, because <b>s2</b> is not cleared:
+
+<pre>
+UNIX> <font color=darkred><b>make bin/stack_overload_2_bad</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_overload_2.o src/stack_overload_2.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/stack_bad_overload.o src/stack_bad_overload.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/stack_overload_2_bad obj/stack_overload_2.o obj/stack_bad_overload.o
+UNIX> <font color=darkred><b>head -n 2 txt/input.txt | bin/stack_overload_2_bad</b></font>
+ 1  Tristan Passenger
+ 0  John Eighth
+ 1  Tristan Passenger
+ 0  John Eighth
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+<hr>
+<h3>The Copy Constructor</h3>
+
+<p>
+I implement the copy constructor by simply calling the assignment overload.  You'll note,
+though, that I have to set up the stack as an empty stack first, because the regular 
+constructor is not called:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The copy constructor simply calls the assignment overload.
+   However, we need to initialize an empty stack, first, because the
+   regular constructor has not been called. */</font>
+
 Stack::Stack(const Stack &s)
 {
+  <font color=blue>/* Create an empty stack and call the assignment overload. */</font>
+
+  top = NULL;
+  size = 0;
   *this = s;
 }
 </pre></td></table></center><p>
@@ -1148,9 +1242,11 @@ destructor needs to do more than just call <b>Clear()</b> -- it will have to del
 sentinel, too.
 
 <p>
+<p>
 Remember that when the assignment overload is called, it will hold a (potentially non-empty)
 list.  You'll need to clear it before copying the list from which you are doing the assignment.
 <p>
 Similarly, remember that when the copy constructor is called, nothing is initialized, so you'll
 have to create the sentinel node, and then you can do the copy.  It's fine for both of these
 to call <b>Push_Back()</b> to do the copying;
+
