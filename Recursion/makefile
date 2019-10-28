@@ -1,52 +1,65 @@
-# +mkmake+ -- Everything after this line is automatically generated
+EXECUTABLES =  \
+     bin/rec1 \
+     bin/rec2 \
+     bin/rec3 \
+     bin/fact1 \
+     bin/fact2 \
+     bin/mult1 \
+     bin/mult2 \
+     bin/fib1 \
+     bin/fib2 \
+     bin/towers_play \
+     bin/towers_solution \
 
-EXECUTABLES = rec1 rec2 rec3 fact1 fact2 mult1 mult2 fib1 fib2 tower_solution \
-              tower_play
-CC = g++
+CFLAGS = -Wall -Wextra -Iinclude
 
 all: $(EXECUTABLES)
 
 clean:
-	rm -f core *.o $(EXECUTABLES) a.out
+	rm -f bin/* obj/* a.out
 
-.SUFFIXES: .c .o
-.cpp.o:
-	$(CC) -c -g $*.cpp
+# ------------- Executable Files
 
+bin/fact1: src/fact1.cpp
+	g++ $(CFLAGS) -o bin/fact1 src/fact1.cpp
 
-rec3: rec3.o
-	$(CC) -g -o rec3 rec3.o
+bin/fact2: src/fact2.cpp
+	g++ $(CFLAGS) -o bin/fact2 src/fact2.cpp
 
-rec2: rec2.o
-	$(CC) -g -o rec2 rec2.o
+bin/fib1: src/fib1.cpp
+	g++ $(CFLAGS) -o bin/fib1 src/fib1.cpp
 
-rec1: rec1.o
-	$(CC) -g -o rec1 rec1.o
+bin/fib2: src/fib2.cpp
+	g++ $(CFLAGS) -o bin/fib2 src/fib2.cpp
 
-fact1: fact1.o
-	$(CC) -g -o fact1 fact1.o
+bin/mult1: src/mult1.cpp
+	g++ $(CFLAGS) -o bin/mult1 src/mult1.cpp
 
-fact2: fact2.o
-	$(CC) -g -o fact2 fact2.o
+bin/mult2: src/mult2.cpp
+	g++ $(CFLAGS) -o bin/mult2 src/mult2.cpp
 
-mult1: mult1.o
-	$(CC) -g -o mult1 mult1.o
+bin/rec1: src/rec1.cpp
+	g++ $(CFLAGS) -o bin/rec1 src/rec1.cpp
 
-mult2: mult2.o
-	$(CC) -g -o mult2 mult2.o
+bin/rec2: src/rec2.cpp
+	g++ $(CFLAGS) -o bin/rec2 src/rec2.cpp
 
-fib1: fib1.o
-	$(CC) -g -o fib1 fib1.o
+bin/rec3: src/rec3.cpp
+	g++ $(CFLAGS) -o bin/rec3 src/rec3.cpp
 
-fib2: fib2.o
-	$(CC) -g -o fib2 fib2.o
+bin/towers_play: obj/towers_play.o obj/towers.o
+	g++ $(CFLAGS) -o bin/towers_play obj/towers_play.o obj/towers.o
 
-tower_solution: tower_solution.o towers.o
-	$(CC) -g -o tower_solution tower_solution.o towers.o
+bin/towers_solution: obj/towers_solution.o obj/towers.o
+	g++ $(CFLAGS) -o bin/towers_solution obj/towers_solution.o obj/towers.o
 
-tower_play: tower_play.o towers.o
-	$(CC) -g -o tower_play tower_play.o towers.o $(LIBS)
+# ------------- Object Files
 
-tower_solution.o: towers.h
-tower_play.o: towers.h
-towers.o: towers.h
+obj/towers.o: src/towers.cpp include/towers.hpp
+	g++ $(CFLAGS) -c -o obj/towers.o src/towers.cpp
+
+obj/towers_play.o: src/towers_play.cpp include/towers.hpp
+	g++ $(CFLAGS) -c -o obj/towers_play.o src/towers_play.cpp
+
+obj/towers_solution.o: src/towers_solution.cpp include/towers.hpp
+	g++ $(CFLAGS) -c -o obj/towers_solution.o src/towers_solution.cpp

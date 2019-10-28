@@ -1,49 +1,50 @@
 <title>CS140 Lecture notes -- Recursion Debugging Example</title>
 <body bgcolor=ffffff>
 <h1>CS140 Lecture notes -- Recursion Debugging Example</h1>
-<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
-<LI>Directory: <b>~cs140/www-home/notes/Recursion/debug.html</b>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S Plank</a>
+<LI>Directory: <b>/home/jplank/cs140/Recursion/debug.html</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Recursion/debug.html>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Recursion/debug.html</b></a>
 <LI>
 Last Modified: <i>
-Mon Apr 25 13:57:42 EDT 2011
+Mon Oct 28 16:41:49 EDT 2019
 </i>
 <hr>
 
 
 This is a simple example of using <b>gdb</b> to print the stack.
 Below we debug <a href=rec2.cpp><b>rec2.cpp</b></a> using <b>gdb</b>
-and we set breakpoints at lines 11 and 20.  First, let's take a look at
+and we set breakpoints at lines 13 and 22.  First, let's take a look at
 those lines:
 
-<pre>
-UNIX> <font color=darkred><b>cat -n rec2.cpp</b></font>
-     1	#include <iostream>
-     2	using namespace std;
-     3	
-     4	
-     5	void a(int i)
-     6	{
-     7	  int j;
-     8	
-     9	  j = i*5;
-    10	  printf("In procedure a: i = %d, j = %d\n", i, j);
-    11	  if (i > 0) a(i-1);
-    12	  printf("Later In procedure a: i = %d, j = %d\n", i, j);
-    13	}
-    14	
-    15	main()
-    16	{
-    17	  int i;
-    18	  
-    19	  i = 16;
-    20	  a(3);
-    21	  printf("main: %d\n", i);
-    22	}
-UNIX> <font color=darkred><b></b></font>
-</pre>
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Line  1 */</font>    #include &lt;cstdio&gt;
+<font color=blue>/* Line  2 */</font>    using namespace std;
+<font color=blue>/* Line  3 */</font>    
+<font color=blue>/* Line  4 */</font>    /* This is a slightly more complex recursion example, where the
+<font color=blue>/* Line  5 */</font>       procedure a() calls itself recursively twice. */
+<font color=blue>/* Line  6 */</font>    
+<font color=blue>/* Line  7 */</font>    void a(int i)
+<font color=blue>/* Line  8 */</font>    {
+<font color=blue>/* Line  9 */</font>      int j;
+<font color=blue>/* Line 10 */</font>    
+<font color=blue>/* Line 11 */</font>      j = i*5;
+<font color=blue>/* Line 12 */</font>      printf("In procedure a: i = %d, j = %d\n", i, j);
+<font color=blue>/* Line 13 */</font>      if (i &gt; 0) a(i-1);
+<font color=blue>/* Line 14 */</font>      printf("Later In procedure a: i = %d, j = %d\n", i, j);
+<font color=blue>/* Line 15 */</font>    }
+<font color=blue>/* Line 16 */</font>    
+<font color=blue>/* Line 17 */</font>    int main()
+<font color=blue>/* Line 18 */</font>    {
+<font color=blue>/* Line 19 */</font>      int i;
+<font color=blue>/* Line 20 */</font>      
+<font color=blue>/* Line 21 */</font>      i = 16;
+<font color=blue>/* Line 22 */</font>      a(3);
+<font color=blue>/* Line 23 */</font>      printf("main: %d\n", i);
+<font color=blue>/* Line 24 */</font>      return 0;
+<font color=blue>/* Line 25 */</font>    }
+</pre></td></table></center><p>
 
 To use <b>gdb</b>, we compile the program with the <b>-g</b> flag.  That
 makes the program run slower, but it also stores information that helps you

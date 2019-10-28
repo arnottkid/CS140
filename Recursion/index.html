@@ -6,8 +6,9 @@
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Recursion/index.html>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Recursion/index.html</b></a>
+<LI> Original Lecture Notes: I'm guessing the mid 2000's.
 <LI> Last modification: <i>
-Mon Apr 25 13:52:17 EDT 2011
+Mon Oct 28 16:41:06 EDT 2019
 </i>
 <hr>
 
@@ -30,15 +31,16 @@ Recursion is an extremely important programming technique -- one that
 students seem to have trouble with early.  It's a very simple concept.
 If a language supports recursion (and most of them do, Fortran being
 a notable exception), then whenever you make a procedure call, 
-the computer stores a few things:
+the computer stores a few things, which I call a <i>context</i>:
 <UL>
 <LI> All your arguments and local variables.
 <LI> Your place in the current procedure.
 </UL>
-It actually stores these things by pushing them onto a stack.
+It actually stores these things by pushing them onto a stack
+(which we will heretofore call <i>"the stack"</i>").
 Thus, whenever a procedure call returns, it knows what to do
-by popping off where you are and what your arguments and local
-variables are.
+by popping the context off the stack.  That's how it "resumes" from 
+the procedure call.
 <p>
 This lets you do something very important.  It lets you make a
 call to the same procedure that you are currently running.  This 
@@ -46,19 +48,20 @@ runs a second copy of the procedure, which will restore the first
 copy when it returns.
 <p>
 Let's take a simple example 
-(in <a href=rec1.cpp><b>rec1.cpp</b></a>):
+(in <a href=src/rec1.cpp><b>src/rec1.cpp</b></a>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
-/* 1 */     void a(int i)
-/* 2 */     {
-/* 3 */       printf("In procedure a: i = %d\n", i);
-/* 4 */       if (i == 10) a(9);
-/* 5 */     }
-/* 6 */
-/* 7 */     main()
-/* 8 */     {
-/* 9 */       a(10);
-/* 10 */    }
+<font color=blue>/* 1 */</font>     void a(int i)
+<font color=blue>/* 2 */</font>     {
+<font color=blue>/* 3 */</font>       printf("In procedure a: i = %d\n", i);
+<font color=blue>/* 4 */</font>       if (i == 10) a(9);
+<font color=blue>/* 5 */</font>     }
+<font color=blue>/* 6 */</font>
+<font color=blue>/* 7 */</font>     int main()
+<font color=blue>/* 8 */</font>     {
+<font color=blue>/* 9 */</font>       a(10);
+<font color=blue>/* 10 */</font>      return 0;
+<font color=blue>/* 11 */</font>    }
 </pre></td></table></center><p>
 
 You'll note, if <b>i</b> equals 10, then <b>a()</b> calls itself.
@@ -93,19 +96,8 @@ Then <b>a(9)</b> is executed.  It will print:
 <pre>
 In procedure a: i = 9
 </pre>
-Its context is:
-<p>
-<center>
-<table border=0>
-<tr><td><i>top --></i></td>
-<td align=left>[<b>a()</b>: line 4, <b>i</b> = 9]</td></tr>
-<tr><td></td>
-<td align=left>[<b>a()</b>: line 4, <b>i</b> = 10]</td></tr>
-<tr><td></td><td align=left>[<b>main()</b>: line 9]</td></tr></table>
-</center>
-<p>
 
-and then it will return.  When it returns, it pops where it should
+At this point, <b>a(9)</b> returns.  When it returns, it pops where it should
 return off the stack -- this is in procedure <b>a()</b> at line 4,
 with <b>i</b> equal to 10.  The stack once again looks like:
 <p>
@@ -116,10 +108,10 @@ with <b>i</b> equal to 10.  The stack once again looks like:
 </tr></table>
 </center>
 <p>
-Now, the first thing that happens is that <b>a(10)</b> returns.  
+After being returned to, <b>a(10)</b> returns.  
 Again, it pops where it should return off the stack -- 
 this is in procedure <b>main()</b> at line 9.  Of course, what
-happens is that <b>main()</b> exits, and the program ends.  Thus,
+happens is that <b>main()</b> returns, and the program ends.  Thus,
 the output is:
 <pre>
 In procedure a: i = 10
@@ -130,27 +122,28 @@ In procedure a: i = 9
 <H3>A slightly more complex example</h3>
 
 Now, look at 
-<a href=rec2.cpp><b>rec2.cpp</b></a>:
+<b><a href=src/rec2.cpp>src/rec2.cpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-/*     1 */   void a(int i)
-/*     2 */   {
-/*     3 */     int j;
-/*     4 */   
-/*     5 */     j = i*5;
-/*     6 */     printf("In procedure a: i = %d, j = %d\n", i, j);
-/*     7 */     if (i > 0) a(i-1);
-/*     8 */     printf("Later In procedure a: i = %d, j = %d\n", i, j);
-/*     9 */   }
-/*    10 */   
-/*    11 */   main()
-/*    12 */   {
-/*    13 */     int i;
-/*    14 */     
-/*    15 */     i = 16;
-/*    16 */     a(3);
-/*    17 */     printf("main: %d\n", i);
-/*    18 */   }
+<font color=blue>/* Line  1 */</font>   void a(int i)
+<font color=blue>/* Line  2 */</font>   {
+<font color=blue>/* Line  3 */</font>     int j;
+<font color=blue>/* Line  4 */</font>   
+<font color=blue>/* Line  5 */</font>     j = i*5;
+<font color=blue>/* Line  6 */</font>     printf("In procedure a: i = %d, j = %d\n", i, j);
+<font color=blue>/* Line  7 */</font>     if (i &gt; 0) a(i-1);
+<font color=blue>/* Line  8 */</font>     printf("Later In procedure a: i = %d, j = %d\n", i, j);
+<font color=blue>/* Line  9 */</font>   }
+<font color=blue>/* Line 10 */</font>   
+<font color=blue>/* Line 11 */</font>   int main()
+<font color=blue>/* Line 12 */</font>   {
+<font color=blue>/* Line 13 */</font>     int i;
+<font color=blue>/* Line 14 */</font>     
+<font color=blue>/* Line 15 */</font>     i = 16;
+<font color=blue>/* Line 16 */</font>     a(3);
+<font color=blue>/* Line 17 */</font>     printf("main: %d\n", i);
+<font color=blue>/* Line 18 */</font>     return 0;
+<font color=blue>/* Line 19 */</font>   }
 </pre></td></table></center><p>
 
 Again, let's see what happens when it is executed.  First, 
@@ -297,7 +290,7 @@ main: 16
 and exits.  Thus, the whole output is:
 
 <pre>
-UNIX> <font color=darkred><b>rec2</b></font>
+UNIX> <font color=darkred><b>bin/rec2</b></font>
 In procedure a: i = 3, j = 15
 In procedure a: i = 2, j = 10
 In procedure a: i = 1, j = 5
@@ -322,19 +315,29 @@ See <a href=debug.html>this web page</a> for an example of using
 Obviously, just like you can write a program that goes into an infinite
 <b>for()</b> loop, you can write one that goes into an infinite recursive
 loop, like 
-<a href=rec3.cpp><b>rec3.cpp</b></a>:
-<pre>
-a(int i)
+<b><a href=src/rec3.cpp>src/rec3.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This shows infinite recursion.  Unlike an infinite loop, which will
+   run forever until interrupted, infinite recursion will eventually
+   run out of stack space.  The result is usually a segmentation 
+   violation, but sometimes it is something else like an illegal 
+   instruction */</font>
+
+#include &lt;cstdio&gt;
+using namespace std;
+
+void a(int i)
 {
   printf("In procedure a: i = %d\n", i);
   a(i);
 }
 
-main()
+int main()
 {
   a(10);
 }
-</pre>
+</pre></td></table></center><p>
 When you run it, it looks like an infinite loop:
 <pre>
 UNIX> <font color=darkred><b>rec3</b></font>
@@ -346,9 +349,8 @@ In procedure a: i = 10
 </pre>
 One difference between infinite recursion and most infinite loops 
 is that you will run out of stack space eventually with infinite
-recursion and the program will exit.  On my machine, if you 
-remove the print statement from <b>rec3.cpp</b> and run it, it
-eventually seg faults.
+recursion and the program will exit.  On my macintosh (in 2019), 
+it eventually exits with a segmentation violation.
 
 <hr>
 <H3>Standard recursion examples - factorial</h3>
@@ -356,50 +358,102 @@ eventually seg faults.
 One standard recursion example is computing a factorial of
 a number.  This can be done with a simple <b>while</b> loop as
 in 
-<a href=fact1.cpp><b>fact1.cpp</b></a>:
-<pre>
-int factorial(int i)
+<b><a href=src/fact1.cpp>src/fact1.cpp</a></b>
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This is a simple example of computing a factorial with a while loop. 
+   This program reads numbers on standard input, and prints their factorials. */</font>
+
+#include &lt;iostream&gt;
+using namespace std;
+
+long long factorial(long long i)
 {
-  int f;
+  long long f;
 
   f = 1;
-  while (i > 0) {
+  while (i &gt; 0) {
     f *= i;
     i--;
   }
+  return f;
 }
+
+int main()
+{
+  long long i;
+
+  while (cin &gt;&gt; i) cout &lt;&lt; "Factorial of " &lt;&lt; i &lt;&lt; " is " &lt;&lt; factorial(i) &lt;&lt; endl;
+  return 0;
+}
+</pre></td></table></center><p>
+
+We can verify that it works: 
+
+<pre>
+UNIX> <font color=darkred><b>echo 2 3 4 5 6 7 8 9 10 | bin/fact1</b></font>
+Factorial of 2 is 2
+Factorial of 3 is 6
+Factorial of 4 is 24
+Factorial of 5 is 120
+Factorial of 6 is 720
+Factorial of 7 is 5040
+Factorial of 8 is 40320
+Factorial of 9 is 362880
+Factorial of 10 is 3628800
+UNIX> <font color=darkred><b></b></font>
 </pre>
-However, you can also do it recursively.  Remember the definition
-of factorial:  
+
+Factorial has a very clean recursive, mathematical definition:
 <UL>
 <LI> 0! = 1
 <LI> If <b>n</b> > 0, <b>n</b>! = <b>n</b> * (<b>n</b>-1)!
 </UL>
-You can write <b>factorial()</b> recursively so that it looks
+You can program <b>factorial()</b> recursively so that it looks
 just like that definition.  This is in
-<a href=fact2.cpp><b>fact2.cpp</b></a>:
-<pre>
-int factorial(int n)
-{
-  int f;
+<b><a href=src/fact2.cpp>src/fact2.cpp</a></b>:
 
-  if (n <= 0) return 1;
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* Now we write factorial recursively so that it looks just like its mathematical definition. */</font>
+
+long long factorial(long long n)
+{
+  if (n &lt;= 0) return 1;
   return n * factorial(n-1);
 }
-</pre>
+</pre></td></table></center><p>
 
+That feels elegant, doesn't it?
 Go ahead and run <b>fact1</b> and <b>fact2</b> and see that they
 return the same output.  Use <b>gdb</b> to look at the state
 of <b>fact2</b> if you're still a little leery of recursion.
+
+<pre>
+UNIX> <font color=darkred><b>echo 2 3 4 5 6 7 8 9 10 | bin/fact2</b></font>
+Factorial of 2 is 2
+Factorial of 3 is 6
+Factorial of 4 is 24
+Factorial of 5 is 120
+Factorial of 6 is 720
+Factorial of 7 is 5040
+Factorial of 8 is 40320
+Factorial of 9 is 362880
+Factorial of 10 is 3628800
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
 
 <hr>
 <H3>Efficiency</h3>
 
 You should be warned that recursion is not as efficient as using
 a <b>for()</b> (or <b>while()</b>) loop.  An extreme example is that you could
-implement integer multiplication with a <b>while()</b> loop like
-the following:
-(in <a href=mult1.cpp><b>mult1.cpp</b></a>):
+implement multiplication of integers <i>a</i> and <i>b</i> by starting with a
+sum of zero, and adding <i>a</i> to it <i>b</i> times.  I have two versions of
+this below -- the left one uses a while loop, and the right one uses recursion:
+
+<p><center><table border=3 cellpadding=3><td>
+<b><a href=src/mult1.cpp>src/mult1.cpp</a></b>:
 <pre>
 int imult(int a, int b)
 {
@@ -407,55 +461,63 @@ int imult(int a, int b)
 
   product = 0;
 
-  while (b > 0) {
+  while (b &gt; 0) {
     product += a;
     b--;
   }
   return product;
 }
-</pre>
-Try it:
-<pre>
-UNIX> <font color=darkred><b>mult1 4 10</b></font>
-40
-UNIX> <font color=darkred><b>mult1 10 4</b></font>
-40
-UNIX> 
-</pre>
-Or you could do that recursively
-(in <a href=mult2.cpp><b>mult2.cpp</b></a>):
+</pre></td><td valign=top>
+<b><a href=src/mult2.cpp>src/mult2.cpp</a></b>:
 <pre>
 int imult(int a, int b)
 {
-  int product;
-
-  if (b <= 0) return 0;
+  if (b &lt;= 0) return 0;
   return a + imult(a, b-1);
 }
+</pre></td></table></center><p>
+
+Both of them have mains that read in numbers on standard input and multiply them 
+with <b>imult()</b>:
+
+<pre>
+UNIX> <font color=darkred><b>echo 10 40 | bin/mult1</b></font>
+The Product of 10 and 40 is 400
+UNIX> <font color=darkred><b>echo 10 40 | bin/mult2</b></font>
+The Product of 10 and 40 is 400
+UNIX> <font color=darkred><b></b></font>
 </pre>
-They both work, but <b>mult1</b> runs faster because it
+
+</pre>
+As you can see, they both work; however <b>mult1</b> runs faster because it
 doesn't have to do those stack operations like <b>mult2</b>
 has to.  Unfortunately, this is hard to time because if
 you try to use large values of <b>b</b>, <b>mult2</b> will
-run out of stack space and seg fault.  One way to time it is
-to run both a lot of times.  If you look at 
-<a href=mult1.sh><b>mult1.sh</b></a> and
-<a href=mult2.sh><b>mult2.sh</b></a>, these are shell scripts
-that run <b>mult1</b> and <b>mult2</b> 20 times.  If you time
-them, you'll see that <b>mult1</b> is much faster:
+run out of stack space and seg fault: 
+
 <pre>
-UNIX> <font color=darkred><b>time sh mult1.sh</b></font>
-1000000
-...
-1000000
-0.0u 0.1s 0:00.33 54.5% 128+225k 0+0io 0pf+0w
-UNIX> <font color=darkred><b>time sh mult2.sh</b></font>
-1000000
-...
-1000000
-0.7u 0.4s 0:01.36 86.0% 28+1852k 0+0io 0pf+0w
-UNIX> 
+UNIX> <font color=darkred><b>echo 10 1000000 | bin/mult2</b></font>
+Segmentation fault
+UNIX> <font color=darkred><b></b></font>
 </pre>
+
+One way to time it is
+to run both a lot of times.  
+Here, we'll use the scripting language <b>awk</b> to run both of these 1000 times with 
+<b>a=10</b> and <b>b=100,000</b>:
+
+<pre>
+UNIX> <font color=darkred><b>time sh -c "echo '' | awk '{ for (i = 0; i < 1000; i++) print 10, 100000 }' | bin/mult1 > /dev/null"</b></font>
+0.242u 0.007s 0:00.25 96.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo '' | awk '{ for (i = 0; i < 1000; i++) print 10, 100000 }' | bin/mult2 > /dev/null"</b></font>
+0.530u 0.009s 0:00.54 98.1%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+As you can see, the non-recursive implementation is more than two times faster than the
+recursive one.
+<p>
+
 What this means is that:
 <UL>
 <LI> You shouldn't go crazy with recursion -- don't use recursion
@@ -482,31 +544,44 @@ recursive:
 </UL>
 
 This leads to a very simple recursive implementation of the fibonacci
-numbers 
-(in <a href=fib1.cpp><b>fib1.cpp</b></a>):
-<pre>
-int fibonacci(int n)
+numbers in 
+<b><a href=src/fib1.cpp>src/fib1.cpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* A recursive implementation of the fibonacci numbers.
+   The performance of this blows up exponentially. */</font>
+
+#include &lt;iostream&gt;
+using namespace std;
+
+long long fibonacci(long long n)
 {
-  if (n <= 1) return 1;
+  if (n &lt;= 1) return 1;
   return fibonacci(n-1) + fibonacci(n-2);
 }
-</pre>
+
+int main()
+{
+  long long i;
+
+  while (cin &gt;&gt; i) cout &lt;&lt; "Fibonacci of " &lt;&lt; i &lt;&lt; " is " &lt;&lt; fibonacci(i) &lt;&lt; endl;
+  return 0;
+}
+</pre></td></table></center><p>
+
 It works fine for small values of <b>n</b>:
+
 <pre>
-UNIX> <font color=darkred><b>fib1 1</b></font>
-1
-UNIX> <font color=darkred><b>fib1 2</b></font>
-2
-UNIX> <font color=darkred><b>fib1 3</b></font>
-3
-UNIX> <font color=darkred><b>fib1 4</b></font>
-5
-UNIX> <font color=darkred><b>fib1 5</b></font>
-8
-UNIX> <font color=darkred><b>fib1 6</b></font>
-13
+UNIX> <font color=darkred><b>echo 1 2 3 4 5 6 | bin/fib1</b></font>
+Fibonacci of 1 is 1
+Fibonacci of 2 is 2
+Fibonacci of 3 is 3
+Fibonacci of 4 is 5
+Fibonacci of 5 is 8
+Fibonacci of 6 is 13
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 However, if you think about it, the running time of this program 
 is brutal.  Suppose we only care about the number of times that
 <b>fibonacci()</b> is called.  Let this be <b>F(n)</b>.  
@@ -517,48 +592,95 @@ greater than <b>F(n-1)</b>+<b>F(n-2)</b>.  So, <b>F(2)</b> > 2, <b>F(3)</b>
 <b>fib(n)</b>.   As you will learn later, <b>fib(n) = O(1.6)^n</b>,
 which means that the running time of <b>fib1.cpp</b> is <i>exponential</i>,
 which is terrible.   You'll notice that when you get to values of
-<b>n</b> in the 30's, <b>fib1</b> starts slowing down incredibly.
+<b>n</b> in the 40's, <b>fib1</b> starts slowing down incredibly:
+
+<pre>
+UNIX> <font color=darkred><b>time sh -c "echo 40 | bin/fib1"</b></font>
+Fibonacci of 40 is 165580141
+0.788u 0.004s 0:00.79 98.7%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 41 | bin/fib1"</b></font>
+Fibonacci of 41 is 267914296
+1.249u 0.005s 0:01.25 99.2%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 42 | bin/fib1"</b></font>
+Fibonacci of 42 is 433494437
+1.994u 0.005s 0:02.00 99.5%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 46 | bin/fib1"</b></font>
+Fibonacci of 46 is 2971215073
+14.538u 0.021s 0:14.57 99.8%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
 <p>
-Of course, it doesn't have to be that way.  A simple <b>while</b> loop
-does it in linear time.
-This is in <a href=fib2.cpp><b>fib2.cpp</b></a>, and this one can 
-do <b>fib(40)</b>, for example, blazingly fast.
+The problem is making all of those duplicate recursive calls -- think about how many
+times <b>fibonacci(1)</b> is called in that last run.  It doesn't have to be that way
+-- for example, the implementation in
+<b><a href=src/fib2.cpp>src/fib2.cpp</a></b> uses a deque to hold <b>fib(i-1)</b> and
+<b>fib(i)</b> inside a <b>for</b> loop.  The loop then iteratively calculates
+<b>fib(i+1)</b> as the sum of 
+<b>fib(i-1)</b> and
+<b>fib(i)</b>.  It pushes the sum on the back of the deque, and then deletes the front.
+At the end, element 1 of the deque holds <b>fib(n)</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* We can implement the fibonacci numbers without recursion,
+   by keeping track of f(i-1) and f(i-2) to calculate f(i).
+   Now, calculating f(n) is O(n) instead of being exponential */</font>
+
+#include &lt;deque&gt;
 #include &lt;iostream&gt;
-#include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
 using namespace std;
 
-int fibonacci(int n)
+long long fibonacci(long long n)
 {
-  int fibim1, fibim2, fibi, i;
+  deque &lt;long long&gt; f;
+  int i;
 
   if (n &lt;= 1) return 1;
 
-  fibim1 = 1;
-  fibim2 = 1;
-  i = 1;
+  <font color=blue>/* We start with fib(0) = fib(1) = 1 */</font>
 
-  while (1) {
-    i++;
-    fibi = fibim1 + fibim2;
-    if (i == n) return fibi;
-    fibim2 = fibim1;
-    fibim1 = fibi;
+  f.push_back(1);
+  f.push_back(1);
+
+  <font color=blue>/* In the body of this for loop, f[0] holds fib(i-1), and f[1] holds fib(i).
+     We calculate fib(i+1) by adding f[0] and f[1], pushing it on the back
+     of f, and then deleting f[0].  When the loop is done, f[1] will hold fib(n). */</font>
+
+  for (i = 1; i &lt; n; i++) {
+    f.push_back(f[0] + f[1]);
+    f.pop_front();
   }
+  return f[1];
 }
 
-main(int argc, char **argv)
+int main()
 {
-  if (argc != 2) {
-    fprintf(stderr, "usage: fib1 n\n");
-    exit(1);
-  }
-  
-  printf("%d\n", fibonacci(atoi(argv[1])));
+  long long i;
+
+  while (cin &gt;&gt; i) cout &lt;&lt; "Fibonacci of " &lt;&lt; i &lt;&lt; " is " &lt;&lt; fibonacci(i) &lt;&lt; endl;
+  return 0;
 }
 </pre></td></table></center><p>
+
+Now it's a lot faster, because the implementation is <i>O(n)</i> rather than exponential:
+
+<pre>
+UNIX> <font color=darkred><b>echo 1 2 3 4 5 6 | bin/fib2</b></font>
+Fibonacci of 1 is 1
+Fibonacci of 2 is 2
+Fibonacci of 3 is 3
+Fibonacci of 4 is 5
+Fibonacci of 5 is 8
+Fibonacci of 6 is 13
+UNIX> <font color=darkred><b>time sh -c "echo 46 | bin/fib2"</b></font>
+Fibonacci of 46 is 2971215073
+0.002u 0.003s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+We'll revisit this example of exponential recursive blowup in CS302, when we 
+learn Dynamic Programming.
+
 <hr>
 <h2>The Towers of Hanoi</h2>
 
@@ -588,293 +710,401 @@ we do that, we need to actually code up the towers of Hanoi.
 <p>
 <hr>
 <h3>Implementation</h3>
-Look at <a href=towers.h><b>towers.h</b></a>:
+
+First, take a look at <b><a href=include/towers.hpp>include/towers.hpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
+#include &lt;string&gt;
 #include &lt;deque&gt;
-#include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
-using namespace std;
 
 class Towers {
   public:
-    Towers(int n);
-    void Make_Move(int from, int to);
-    void Print();
+    Towers(int n);                                  <font color=blue>// Constructor - n is the number of disks</font>
+    std::string Move(int from, int to, bool print); <font color=blue>// Move the disk from tower "from" to tower "to"</font>
+                                                    <font color=blue>// Returns "" if the move was successful.</font>
+                                                    <font color=blue>// Otherwise, it returns an error string.</font>
+    void Print() const;                             <font color=blue>// Print the towers as ASCII art.</font>
+
   protected:
-    deque &lt;int&gt; T[3];
+    std::deque &lt;int&gt; T[3];                <font color=blue>// This holds the sizes of the disks on the three towers</font>
 };
 </pre></td></table></center><p>
 
 This defines a simple <b>Towers</b> class where each tower is represented by 
 a <b>deque</b>.  We'd optimally use a stack, but we want to print the towers,
-so using a <b>deque</b> is easier.  We'll push elements on the front and pop them
-from the front too.  Thus, the constructor and <b>Make_Move</b> are pretty
+so using a <b>deque</b> ends up being easier.  We'll push elements on the front and pop them
+from the front too.  Thus, the constructor and <b>Move()</b> are pretty
 simple procedures
-(in <b><a href=towers.cpp>towers.cpp</a></b>):
+(in <b><a href=src/towers.cpp>src/towers.cpp</a></b>):
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The constructor puts all of the disks onto tower 0.
+   The front of the deque is the top of the tower */</font>
+
 Towers::Towers(int n)
 {
   int i;
 
+  if (n &lt;= 0) throw ((string) "Towers::Towers() - Bad value of n");
   for (i = 1; i &lt;= n; i++) T[0].push_back(i);
 }
 
-void Towers::Make_Move(int from, int to)
+<font color=blue>/* Moving is mostly a matter of error checking.  If all is ok,
+   we remove the disk from the front of the "from" tower and
+   add it to the front of the "to" tower. */</font>
+
+string Towers::Move(int from, int to, bool print)
 {
-  if (from &lt; 0 || from &gt; 2) {
-    printf("Bad Source Tower (%d)\n", from);
+  int disk;
+  <font color=blue>/* Error checking */</font>
 
-  } else if (to &lt; 0 || to &gt; 2) {
-    printf("Bad Destination Tower (%d)\n", to);
-
-  } else if (T[from].empty()) {
-    printf("Can't move from tower %d to %d -- tower %d is empty\n", from, to, from);
-
-  } else if (!T[to].empty() && T[from][0] &gt; T[to][0]) {
-    printf("Can't move from tower %d to %d -- piece is too big (%d can't go on top of %d)\n", 
-      from, to, T[from][0], T[to][0]);
-
-  } else {
-    printf("Moving %d from tower %d to tower %d\n", T[from][0], from, to);
-    T[to].push_front(T[from][0]);
-    T[from].pop_front();
+  if (from &lt; 0 || from &gt; 2) return "Bad source tower";
+  if (to &lt; 0 || to &gt; 2) return "Bad destiniation tower";
+  if (T[from].empty()) return "Source tower is empty";
+  if (!T[to].empty() && T[from][0] &gt; T[to][0]) {
+    return "Disk on the source tower is bigger than the top of the destination tower";
   }
+  
+  <font color=blue>/* Move the disk and return success */</font>
+
+  disk = T[from][0];
+  T[to].push_front(disk);
+  T[from].pop_front();
+  if (print) printf("Moving disk of size %d from tower %d to tower %d\n", disk, from, to);
+  return "";
 }
 </pre></td></table></center><p>
 
 To print the towers, I'm going to use ASCII art.  See if you can trace 
-through this one:
+through this one.  I'll go over it in class.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-void Towers::Print()
+<font color=blue>/* Print() creates ASCII art of the towers.  Since we want them to have their
+   bases line up, we have to put in a little effort to print the right values
+   in the right places. */</font>
+
+void Towers::Print() const
 {
-  int mx, mxe, dots, spaces;
-  int i, j, k;
+  int max_disk, dots, spaces;
+  size_t max_height, i, index;
+  int j, k;
 
-  mx = T[0].size() + T[1].size() + T[2].size();
-  mxe = T[0].size();
-  if (T[1].size() &gt; mxe) mxe = T[1].size();
-  if (T[2].size() &gt; mxe) mxe = T[2].size();
+  <font color=blue>/* Calculate the maximum size disk, and the height of the tallest tower. */</font>
 
-  for (i = mxe-1; i &gt;= 0; i--) {
+  max_disk = T[0].size() + T[1].size() + T[2].size();
+  max_height = T[0].size();
+  if (T[1].size() &gt; max_height) max_height = T[1].size();
+  if (T[2].size() &gt; max_height) max_height = T[2].size();
+
+  <font color=blue>/* Now, go from top to bottom, then left to right, and for each row and
+     tower, first figure out if you are printing a disk.  If so, you set
+     "dots" to be the size of the disk.  If there is no disk, "dots" is zero.
+     Then you'll print "dots" dots, and (max_disk-dots+1) spaces (the extra space
+     is to put spaces between the towers. */</font>
+
+  for (i = 0; i &lt; max_height; i++) {
+    index = max_height - i - 1;
     for (j = 0; j &lt; 3; j++) {
-      if (T[j].size() &gt; i) {
-        dots = T[j][T[j].size()-i-1];
+      if (T[j].size() &gt; index) {
+        dots = T[j][T[j].size()-index-1];
       } else {
         dots = 0;
       }
-      spaces = mx - dots + 1;
+      spaces = max_disk - dots + 1;
       for (k = 0; k &lt; dots; k++) printf(".");
       for (k = 0; k &lt; spaces; k++) printf(" ");
     }
     printf("\n");
   }
+
+  <font color=blue>/* Finally, print the bases of the towers */</font>
+
   for (j = 0; j &lt; 3; j++) {
-    for (i = 0; i &lt; mx; i++) printf("-");
+    for (k = 0; k &lt; max_disk; k++) printf("-");
     printf(" ");
   }
   printf("\n");
 }
 </pre></td></table></center><p>
 
+To we need a destructor, copy constructor or assignment overload?  The answer is no.
+Why?  Because the deque gets deallocated automatically, and the default copy constructor/assignment
+overload will copy the deque, which is what we want.
+<p>
+
 I have a very simple interactive tower program in 
-<b><a href=tower_play.cpp>tower_play.cpp</a></b>, which 
+<b><a href=src/towers_play.cpp>src/towers_play.cpp</a></b>, which 
 starts with all the rings on tower zero, and then allows
 you to move a ring at a time by entering the source and
 destination towers.  It prints the towers at the beginning
 and after each move:
 
-<p><center><table border=3 cellpadding=3><td><pre>
-#include "towers.h"
+<b><a href=src/towers_play.cpp>src/towers_play.cpp</a></b>
 
-main(int argc, char **argv)
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This is a simple command-line player of the towers of Hanoi */</font>
+
+#include "towers.hpp"
+#include &lt;iostream&gt;
+using namespace std;
+
+int main()
 {
   Towers *t;
   int npieces;
   int from, to;
+  string rv;
 
-  if (argc != 2) {
-    fprintf(stderr, "usage: tower_play size\n");
-    exit(1);
+  <font color=blue>/* Get the number of disks and create the instance of the Towers class. */</font>
+
+  cout &lt;&lt; "Enter the number of disks: ";
+  cout.flush();
+  if (!(cin &gt;&gt; npieces)) return 0;
+
+  try {
+    t = new Towers(npieces);
+  } catch (const string s) {
+    cout &lt;&lt; s; &lt;&lt; endl;
+    return 0;
   }
 
-  npieces = atoi(argv[1]);
-
-  t = new Towers(npieces);
-  t-&gt;Print();
-
-  while (cin &gt;&gt; from &gt;&gt; to) {
-    t-&gt;Make_Move(from, to);
-    printf("\n");
+  <font color=blue>/* Print the board, prompt the user, and make the move. */</font>
+    
+  while (1) {
     t-&gt;Print();
-    printf("\n");
+    cout &lt;&lt; "Enter source and destination: ";
+    cout.flush();
+    if (!(cin &gt;&gt; from &gt;&gt; to)) return 0;
+    rv = t-&gt;Move(from, to, false);
+    if (rv != "") cout &lt;&lt; endl &lt;&lt; rv &lt;&lt; endl &lt;&lt; endl;
   }
 }
 </pre></td></table></center><p>
-
-Here's a simple example with four rings:
+Here's a simple example with three rings.  You'll note that I make a few mistakes
+to test my error checking:
 
 <pre>
-UNIX> <font color=darkred><b>tower_play 4</b></font>
-.              
-..             
-...            
-....           
----- ---- ---- 
-<font color=darkred><b>0 1</b></font>
-Moving 1 from tower 0 to tower 1
+UNIX> <font color=darkred><b>bin/towers_play</b></font>
+Enter the number of disks: <font color=darkred><b>3</b></font>
+.           
+..          
+...         
+--- --- --- 
+Enter source and destination: <font color=darkred><b>0 1</b></font>
+..          
+... .       
+--- --- --- 
+Enter source and destination: <font color=darkred><b>0 1</b></font>
 
-..             
-...            
-.... .         
----- ---- ---- 
+Disk on the source tower is bigger than the top of the destination tower
 
-<font color=darkred><b>0 2</b></font>
-Moving 2 from tower 0 to tower 2
+..          
+... .       
+--- --- --- 
+Enter source and destination: <font color=darkred><b>0 2</b></font>
+... .   ..  
+--- --- --- 
+Enter source and destination: <font color=darkred><b>1 2</b></font>
+        .   
+...     ..  
+--- --- --- 
+Enter source and destination: <font color=darkred><b>0 1</b></font>
+        .   
+    ... ..  
+--- --- --- 
+Enter source and destination: <font color=darkred><b>2 0</b></font>
+.   ... ..  
+--- --- --- 
+Enter source and destination: <font color=darkred><b>015 6</b></font>
 
-...            
-.... .    ..   
----- ---- ---- 
+Bad source tower
 
-<font color=darkred><b>1 2</b></font>
-Moving 1 from tower 1 to tower 2
+.   ... ..  
+--- --- --- 
+Enter source and destination: <font color=darkred><b>2 1</b></font>
+    ..      
+.   ...     
+--- --- --- 
+Enter source and destination: <font color=darkred><b>0 1</b></font>
+    .       
+    ..      
+    ...     
+--- --- --- 
+Enter source and destination: <font color=darkred><b>0 1</b></font>
 
-...       .    
-....      ..   
----- ---- ---- 
+Source tower is empty
 
-<font color=darkred><b>0 2</b></font>
-Can't move from tower 0 to 2 -- piece is too big (3 can't go on top of 1)
-
-...       .    
-....      ..   
----- ---- ---- 
-<font color=darkred><b>&lt;CNTL-D&gt;</b></font>
+    .       
+    ..      
+    ...     
+--- --- --- 
+Enter source and destination: <font color=darkred><b>bye</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 <hr>
 <h3>The recursive solution</h3>
 
 In  
-<b><a href=tower_solution.cpp>tower_solution.cpp</a></b>, we solve an 
-instance of the Towers of Hanoi recursively:
+<b><a href=src/towers_solution.cpp>src/towers_solution.cpp</a></b>
+we code up the recursive solution in the <b>Solve()</b> procedure.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;stdio.h&gt;
-#include "towers.h"
+#include "towers.hpp"
+#include &lt;iostream&gt;
+using namespace std;
 
-void Solve(Towers *t, int from, int to, int npieces)
+void Solve(Towers *t, int from, int to, int num_disks)
 {
   int i, other;
 
-  if (npieces == 1) {
-    t-&gt;Make_Move(from, to);
+  <font color=blue>/* If there's just one disk on the pile to move, then move it and return. */</font> 
+
+  if (num_disks == 1) {
+    t-&gt;Move(from, to, true);
     t-&gt;Print();
     return;
   }
 
-  for (i = 0; i &lt; 3; i++) if (i != from && i != to) other = i;
-  Solve(t, from, other, npieces-1);
-  t-&gt;Make_Move(from, to);
-  t-&gt;Print();
-  Solve(t, other, to, npieces-1);
-}
+  <font color=blue>/* Otherwise, figure out which tower is neither "from" nor "to".  Move the
+     top (num_disks-1) disks to that tower recursively, move the bottom disk
+     to the destination tower, and then move the (num_disks-1) disks from the
+     temporary tower to the destination one. */</font>
 
-main(int argc, char **argv)
+  for (i = 0; i &lt; 3; i++) if (i != from && i != to) other = i;
+  Solve(t, from, other, num_disks-1);
+  t-&gt;Move(from, to, true);
+  t-&gt;Print();
+  Solve(t, other, to, num_disks-1);
+}
+</pre></td></table></center><p>
+
+That's a pretty elegant solution, isn't it?
+<p>
+The <b>main()</b> repeatedly reads in the number of disks, creates an instance of the
+<b>Towers</b> class, and then solves it recursively:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+int main()
 {
   int npieces;
   Towers *t;
 
-  if (argc != 2) {
-    fprintf(stderr, "usage: tower_solution size\n");
-    exit(1);
+  while (1) {
+    cout &lt;&lt; "Enter the number of towers: ";
+    cout.flush();
+    if (!(cin &gt;&gt; npieces)) return 0;
+    try {
+      t = new Towers(npieces);
+      t-&gt;Print();
+      Solve(t, 0, 1, npieces);
+      delete t;
+      
+    } catch (const string s) {
+      cout &lt;&lt; s &lt;&lt; endl;
+    }
   }
-
-  npieces = atoi(argv[1]);
-  if (npieces &lt;= 0) exit(1);
-  t = new Towers(npieces);
-
-  t-&gt;Print();
-  Solve(t, 0, 1, npieces);
 }
 </pre></td></table></center><p>
 
-That's pretty elegant, isn't it?  Here it is on a 3-piece tower:
+Let's use it to solve the problem on 1, 2 and 3 disk towers:
 
 <pre>
-UNIX> <font color=darkred><b>tower_solution 3</b></font>
+UNIX> <font color=darkred><b>bin/towers_solution</b></font>
+Enter the number of towers: <font color=darkred><b>1</b></font>
+.     
+- - - 
+Moving disk of size 1 from tower 0 to tower 1
+  .   
+- - - 
+Enter the number of towers: <font color=darkred><b>2</b></font>
+.        
+..       
+-- -- -- 
+Moving disk of size 1 from tower 0 to tower 2
+..    .  
+-- -- -- 
+Moving disk of size 2 from tower 0 to tower 1
+   .. .  
+-- -- -- 
+Moving disk of size 1 from tower 2 to tower 1
+   .     
+   ..    
+-- -- -- 
+Enter the number of towers: <font color=darkred><b>3</b></font>
 .           
 ..          
 ...         
 --- --- --- 
-Moving 1 from tower 0 to tower 1
+Moving disk of size 1 from tower 0 to tower 1
 ..          
 ... .       
 --- --- --- 
-Moving 2 from tower 0 to tower 2
+Moving disk of size 2 from tower 0 to tower 2
 ... .   ..  
 --- --- --- 
-Moving 1 from tower 1 to tower 2
+Moving disk of size 1 from tower 1 to tower 2
         .   
 ...     ..  
 --- --- --- 
-Moving 3 from tower 0 to tower 1
+Moving disk of size 3 from tower 0 to tower 1
         .   
     ... ..  
 --- --- --- 
-Moving 1 from tower 2 to tower 0
+Moving disk of size 1 from tower 2 to tower 0
 .   ... ..  
 --- --- --- 
-Moving 2 from tower 2 to tower 1
+Moving disk of size 2 from tower 2 to tower 1
     ..      
 .   ...     
 --- --- --- 
-Moving 1 from tower 0 to tower 1
+Moving disk of size 1 from tower 0 to tower 1
     .       
     ..      
     ...     
 --- --- --- 
+Enter the number of towers: <font color=darkred><b>bye</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
+
+
+
 One of the things that I love about the Towers of Hanoi is that once you 
 figure out the recursion, the solution nearly writes itself.  You don't have
-to think about where you are moving the pieces -- the recursion takes care
-of it automatically.  
+to think about where you are moving the pieces, and more specifically, where you move
+the very first disk -- the recursion takes care of it automatically!  
 <p>
 Can you figure out the number of calls to <b>Make_Move()</b> as a function of <b>n</b>?
 Let's use those great Unix programs <b>grep</b> and <b>wc</b> to help us:
 
-
 <pre>
-UNIX> <font color=darkred><b>tower_solution 1 | grep Moving</b></font>
-Moving 1 from tower 0 to tower 1
-UNIX> <font color=darkred><b>tower_solution 2 | grep Moving</b></font>
-Moving 1 from tower 0 to tower 2
-Moving 2 from tower 0 to tower 1
-Moving 1 from tower 2 to tower 1
-UNIX> <font color=darkred><b>tower_solution 3 | grep Moving</b></font>
-Moving 1 from tower 0 to tower 1
-Moving 2 from tower 0 to tower 2
-Moving 1 from tower 1 to tower 2
-Moving 3 from tower 0 to tower 1
-Moving 1 from tower 2 to tower 0
-Moving 2 from tower 2 to tower 1
-Moving 1 from tower 0 to tower 1
-UNIX> <font color=darkred><b>tower_solution 3 | grep Moving | wc</b></font>
-       7      56     231
-UNIX> <font color=darkred><b>tower_solution 4 | grep Moving | wc</b></font>
-      15     120     495
-UNIX> <font color=darkred><b>tower_solution 5 | grep Moving | wc</b></font>
-      31     248    1023
-UNIX> <font color=darkred><b>tower_solution 6 | grep Moving | wc</b></font>
-      63     504    2079
+UNIX> <font color=darkred><b>echo 1 | bin/towers_solution | grep Moving</b></font>
+Moving disk of size 1 from tower 0 to tower 1
+UNIX> <font color=darkred><b>echo 2 | bin/towers_solution | grep Moving</b></font>
+Moving disk of size 1 from tower 0 to tower 2
+Moving disk of size 2 from tower 0 to tower 1
+Moving disk of size 1 from tower 2 to tower 1
+UNIX> <font color=darkred><b>echo 3 | bin/towers_solution | grep Moving</b></font>
+Moving disk of size 1 from tower 0 to tower 1
+Moving disk of size 2 from tower 0 to tower 2
+Moving disk of size 1 from tower 1 to tower 2
+Moving disk of size 3 from tower 0 to tower 1
+Moving disk of size 1 from tower 2 to tower 0
+Moving disk of size 2 from tower 2 to tower 1
+Moving disk of size 1 from tower 0 to tower 1
+UNIX> <font color=darkred><b>echo 3 | bin/towers_solution | grep Moving | wc</b></font>
+       7      77     322
+UNIX> <font color=darkred><b>echo 4 | bin/towers_solution | grep Moving | wc</b></font>
+      15     165     690
+UNIX> <font color=darkred><b>echo 5 | bin/towers_solution | grep Moving | wc</b></font>
+      31     341    1426
+UNIX> <font color=darkred><b>echo 6 | bin/towers_solution | grep Moving | wc</b></font>
+      63     693    2898
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 Let <b>MM(n)</b> be the number of calls to <b>Make_Move()</b> as a function of <b><i>n</i></b>.
 It looks as though:
