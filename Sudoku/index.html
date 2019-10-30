@@ -1,14 +1,14 @@
 <title>CS140 Lecture notes -- Recursion - Sudoku Solver</title>
 <body bgcolor=ffffff>
 <h1>CS140 Lecture notes -- Sudoku</h1>
-<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
-<LI>Directory: <b>~cs140/www-home/Notes/Sudoku</b>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>/home/plank/cs140/Notes/Sudoku</b>
 <LI>Lecture notes:
     <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Sudoku>
     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Sudoku</b></a>
 <LI> Original notes: Fall, 2006
 <LI> Last modified: <i> 
-Tue Apr  3 07:57:39 EDT 2012
+Wed Oct 30 01:25:04 EDT 2019
 </i>
 <hr>
 One great use of recursion is to solve problems using exhaustive search 
@@ -23,6 +23,12 @@ done.  However, if solving the rest of the problem is unsuccessful, then you'll
 be alerted to this fact when the recursive call returns.  You then remove the 
 value that you have assigned, and assign the next value.
 <p>
+(BTW, the general technique in play here is Dynamic Programming, which we'll
+explore in detail in CS302.  It improves upon the technique employed here, by 
+utilizing a cache to store duplicate recursive calls.  The lecture notes
+are in <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs302/Notes/DynamicProgramming/>
+http://web.eecs.utk.edu/~jplank/plank/classes/cs302/Notes/DynamicProgramming/</a>).
+<p>
 The example problem that we'll work on is Sudoku.  A Sudoku puzzle is a 9x9
 grid of numbers between 1 and 9.  You are given a grid that is partially 
 filled in, and your job is to fill the rest of the grid in so that:
@@ -36,54 +42,55 @@ No 3x3 panel may contain the same number twice.
 Here's an example problem on the left, and an example solution on the 
 right.
 <p><center><table border=0>
-<td align=center><img src=example3-problem.jpg><p>Example Problem
+<td align=center><img src=jpg/example3-problem.jpg><p>Example Problem
 <td width=100></td>
-<td align=center><img src=example3-solution.jpg><p>Example Solution
+<td align=center><img src=jpg/example3-solution.jpg><p>Example Solution
 </td></table></center><p>
+
 <hr>
 <h3>Program structure</h3>
-C++ allows you to have a very nice structure to problems like this.  We'll
-have a Sudoku class defined in 
-<b><a href=sudoku.h>sudoku.h</a></b>:
+To solve this problem, we'll define a <b>Sudoku</b> class, which has a familiar structure.
+It is in <b><a href=include/sudoku.hpp>include/sudoku.hpp</a></b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* This class lets you store, print and solve Sudoku problems. */</font>
+
 #include &lt;vector&gt;
-#include &lt;iostream&gt;
-using namespace std;
 
 class Sudoku {
+
+  <font color=blue>// There is no nead for a constructor, destructor, copy constructor or assignment overload.</font>
+
   public:
-    Sudoku();
-    void Print_Screen();
-    void Print_Convert();
-    int Solve();
+    void Clear();                        <font color=blue>// Clear the current puzzle</font>
+    std::string Read_From_Stdin();       <font color=blue>// Read a puzzle from standard input.  Return "" on </font>
+                                         <font color=blue>// success, "EOF" on EOF, or an error string on failure.
+    void Print_Screen() const;           <font color=blue>// Print the puzzle to the screen</font>
+    void Print_Convert() const;          <font color=blue>// Print commands for convert to make Sudoku.jpg</font>
+    bool Solve();                        <font color=blue>// Solve the puzzle - returns false if unsolvable</font>
+
+  <font color=blue>// These are helper methods for both reading in the puzzle, and solving the puzzle,</font>
+  <font color=blue>// plus a vector of strings to store the puzzle. </font>
+
   protected:
-    int Is_Row_Valid(int r);
-    int Is_Col_Valid(int c);
-    int Is_Panel_Valid(int sr, int sc);
-    int Recursive_Solve(int r, int c);
-    vector &lt;string&gt; Grid;
-    vector &lt;int&gt; checker;
+    bool Is_Row_Valid(int r) const;
+    bool Is_Col_Valid(int c) const;
+    bool Is_Panel_Valid(int sr, int sc) const;
+    bool Recursive_Solve(int r, int c);
+
+    std::vector &lt;std::string&gt; Grid;
 };
 </pre></td></table></center><p>
 
-Let's define the public methods:
-
-<UL>
-<LI> The constructor reads a problem from standard input.
-<LI> <b>Print_Screen()</b> prints the problem to the screen.
-<LI> <b>Print_Convert()</b> prints the problem so that the <b>convert</b> program
-     can turn it into a pretty JPG file.  
-<LI> <b>Solve()</b> solves the problem, returning 1 if solving it was successful,
-     and 0 otherwise.
-</UL>
-
-And the protected methods:
+The public methods are described in the header comments.  My personal opinion is that
+the protected definitions shouldn't even be in the header, but they have to be, so they
+are.  However, I don't feel the need to document them.  My documentation is here:
 
 <UL>
 <LI> <b>Is_Row_Valid()</b> returns whether the given row is legal.
 <LI> <b>Is_Col_Valid()</b> returns whether the given column is legal.
-<LI> <b>Is_Panel_Valid()</b> returns whether the given 3x3 panel is legal.
+<LI> <b>Is_Panel_Valid()</b> returns whether the given 3x3 panel is legal.  It
+     takes the starting row and starting column of the panel.
 <LI> <b>Recursive_Solve()</b> is the recursive part of the solver.  It takes
      a row <i>r</i> and a column <i>c</i>, and assumes that all cells before
      <i>r</i> and <i>c</i> have been filled in.  It will find the next empty
@@ -91,42 +98,65 @@ And the protected methods:
      that cell, and then calling <b>Recursive_Solve()</b> recursively.
 </UL>
 
-Finally, the protected dat:
+Finally, the protected data is a vector of strings called <b>Grid</b>.  
+Each element of the string is either '-' or a digit.
 
-<UL>
-<LI> <b>Grid</b> stores the 9x9 grid.  Each row is a string, and each element is
-     a character that is either '-' or a digit.
-<LI> <b>Checker</b> is an array used by <b>Is_Row_Valid()</b>, 
-<b>Is_Col_Valid()</b> and
-<b>Is_Panel_Valid()</b>.  We'll see how it's used when we write them. 
-</UL>
+<p>
+The comments state that there is no nead for a constructor, destructor, 
+copy constructor or assignment overload.  That means that an "empty" puzzle
+can exist, and will be a cleared <b>Grid</b> vector.  Since vectors and 
+strings destroy themselves, you don't need to probe any further to understand
+that you don't need a destructor.  You'll need to understand the code to reason
+about the copy constructor and assignment overload, but it is straightforward -- 
+the only state of the data structure is the <b>Grid</b>, and there are no pointers
+in the grid.  So, if you copy the grid, you have copied the puzzle.  The defaults
+work fine.
 
 <hr>
 <h3>Sudoku_main.cpp</h3>
 
 The file
-<b><a href=sudoku_main.cpp>sudoku_main.cpp</a></b>
+<b><a href=src/sudoku_main.cpp>src/sudoku_main.cpp</a></b>
 defines a <b>main()</b> routine that uses the <b>Sudoku</b> class.  It is straightforward --
 you call the program with two command line arguments.  The first is "yes" or "no", specifying
 whether you want to solve the problem or just print it out.  The second is "screen"
-or "convert", specifying the output format.  You put the puzzle on standard input.
+or "convert", specifying the output format.  You put the puzzles on standard input.
+This is straightforward code: 
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
-#include "sudoku.h"
+<font color=blue>/* This is a main() routine that lets you solve sudoku puzzles on standard input.
+   It will read puzzles on standard input, and then let you:
 
-void usage(string s)
+     - Either solve the puzzles or not.
+     - Print the puzzle (solved or not).
+         - You can print on the screen, or
+         - You can print commands for the convert program to make Sudoku.jpg
+ */</font>
+
+#include &lt;iostream&gt;
+#include &lt;cstdlib&gt;
+#include "sudoku.hpp"
+using namespace std;
+
+<font color=blue>/* Sometimes it's convenient to have a helper procedure to handle errors
+   on the command line.  We could, of course, have used try/catch, but
+   the usage() command makes for cleaner code, in my opinion. */</font>
+
+void usage(const string &s)
 {
-  cerr &lt;&lt; "usage: sudoku solve(yes|no) output-type(screen|convert) - puzzle on stdin\n";
+  cerr &lt;&lt; "usage: sudoku solve(yes|no) output-type(screen|convert) - puzzles on stdin\n";
   if (s != "") cerr &lt;&lt; s &lt;&lt; endl;
-  exit(0);
+  exit(1);
 }
   
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  string solve, output;
-  Sudoku *sud;
+  string solve;         <font color=blue>// The first command line argument -- yes or no for whether to solve.</font>
+  string output;        <font color=blue>// The second command line argument - "screen" or "convert"</font>
+  Sudoku sud;           <font color=blue>// The puzzle.  </font>
+  string r;             <font color=blue>// The return value from Read_From_Stdin().</font>
+
+  <font color=blue>/* Parse the command line. */</font>
 
   if (argc != 3) usage("");
   solve = argv[1];
@@ -134,20 +164,40 @@ main(int argc, char **argv)
   if (solve != "yes" && solve != "no") usage("bad solve");
   if (output != "screen" && output != "convert") usage("bad output");
 
-  sud = new Sudoku;
-  if (solve == "yes") {
-    if (!sud-&gt;Solve()) {
-      printf("Cannot solve puzzle\n");
-      exit(0);
-    }
-  }
+  if (output == "screen") cout &lt;&lt; "-------------------" &lt;&lt; endl;
 
-  if (output == "screen") {
-    sud-&gt;Print_Screen();
-  } else {
-    sud-&gt;Print_Convert();
+  while (1) {
+
+    <font color=blue>/* Read the puzzle and handle EOF/errors */</font>
+
+    r = sud.Read_From_Stdin();
+    if (r != "") {
+      if (r == "EOF") return 0;
+      cout &lt;&lt; r &lt;&lt; endl;
+      return 1;
+    }
+
+    <font color=blue>/* Solve the puzzle if desired. **/</font>
+
+    if (solve == "yes") {
+      if (!sud.Solve()) {
+        printf("Cannot solve puzzle\n");
+      }
+    }
+  
+    <font color=blue>/* Print the puzzle. */</font>
+
+    if (output == "screen") {
+      sud.Print_Screen();
+      cout &lt;&lt; "-------------------" &lt;&lt; endl;
+    } else {
+      sud.Print_Convert();
+    }
+
+    <font color=blue>/* Clear the puzzle and try again. (Clearing is unnecessary, but may as well test it.) */</font>
+
+    sud.Clear();
   }
-  exit(0);
 }
 </pre></td></table></center><p>
 
@@ -160,209 +210,260 @@ I have a
 use it in my examples.
 <p>
 We start with 
-<b><a href=sudoku1.cpp>sudoku1.cpp</a></b>, which simply defines dummy implementations
-for all the methods.   It compiles, but doesn't do anything.  If you try to "solve"
-the puzzle, it will say that there is no solution:
+<b><a href=src/sudoku1.cpp>src/sudoku1.cpp</a></b>, which simply defines dummy implementations
+for all the methods.   It compiles, but doesn't do anything:
 
 <pre>
-UNIX> <font color=darkred><b>sudoku1</b></font>
-usage: sudoku solve(yes|no) output-type(screen|convert) - puzzle on stdin
-UNIX> <font color=darkred><b>sudoku1 no screen</b></font>
-UNIX> <font color=darkred><b>sudoku1 yes convert</b></font>
-Cannot solve puzzle
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make bin/sudoku1</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku1.o src/sudoku1.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku_main.o src/sudoku_main.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/sudoku1 obj/sudoku1.o obj/sudoku_main.o
+UNIX> <font color=darkred><b>bin/sudoku1</b></font>
+usage: sudoku solve(yes|no) output-type(screen|convert) - puzzles on stdin
+UNIX> <font color=darkred><b>bin/sudoku1 no screen</b></font>
+Read_From_Stdin is not implemented yet
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 <hr>
 <h3>Reading input: Sudoku2.cpp</h3>
 
 Our next program, 
 <b><a href=sudoku2.cpp>sudoku2.cpp</a></b>,
-implements the constructor and <b>Print_Screen()</b>.  The constructor 
+implements <b>Read_From_Stdin()</b> and <b>Print_Screen()</b>.  <b>Read_From_Stdin()</b>
 reads the grid from standard input, doing a little error checking along
-the way.  <b>Print_Screen()</b> is also straightforward:
+the way.  It simply reads characters, not caring about line or file formatting.
+<b>Print_Screen()</b> is also straightforward.  (BTW, I implement <b>Clear()</b> here, too,
+but don't show it):
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;cstdio&gt;
-#include &lt;cstdlib&gt;
-#include "sudoku.h"
-
-Sudoku::Sudoku()
+string Sudoku::Read_From_Stdin()
 {
   int i, j;
   char c;
+  ostringstream oss;        <font color=blue>// This is to build an error string.</font>
 
+  <font color=blue>/* Read 81 characters, error checking for legal characters, and EOF.
+     The try/catch is nice because you want to clear the grid on all errors. */</font>
+
+  Grid.clear();
   Grid.resize(9);
-  for (i = 0; i &lt; 9; i++) {
-    for (j = 0; j &lt; 9; j++) {
-      if (!(cin &gt;&gt; c)) {
-        cerr &lt;&lt; "Bad Sudoku File -- not enough entries\n";
-        exit(1);
-      } 
-      if (c == '-' || (c &gt;= '0' && c &lt;= '9')) {
-        Grid[i].push_back(c);
-      } else {
-        cerr &lt;&lt; "Bad Sudoku File -- entry: " &lt;&lt; c &lt;&lt; endl;
-        exit(1);
-      } 
+  
+  try {
+    for (i = 0; i &lt; 9; i++) {
+      for (j = 0; j &lt; 9; j++) {
+
+        <font color=blue>/* Handle EOF -- if nothing was read, return "EOF"; otherwise return an error. */</font>
+
+        if (!(cin &gt;&gt; c)) {
+          if (i == 0 && j == 0 && cin.eof()) throw((string) "EOF");
+          throw((string) "Bad Sudoku File -- not enough entries");
+        }
+
+        <font color=blue>/* Error check the digit. */</font>
+
+        if (c == '-' || (c &gt;= '0' && c &lt;= '9')) {
+          Grid[i].push_back(c);
+        } else {
+          oss &lt;&lt; "Bad character at row " &lt;&lt; i &lt;&lt; ", column " &lt;&lt; j &lt;&lt; ": " &lt;&lt; c ;
+          throw(oss.str());
+        } 
+      }
     }
+ 
+  <font color=blue>/* Clear the grid when you get an error. */</font>
+
+  } catch (const string s) {
+    Grid.clear();
+    return s;
   }
+
+  <font color=blue>/* Otherwise, return "" on success. */</font>
+
+  return "";
 }
 
-void Sudoku::Print_Screen()
+<font color=blue>/* Print_Screen() prints the grid, putting a space between characters, an extra 
+   space between panel columns, and an extra line between panel rows. */</font>
+
+void Sudoku::Print_Screen() const
 {
-  int i, j;
+  size_t i, j;
 
   for (i = 0; i &lt; Grid.size(); i++) {
     for (j = 0; j &lt; Grid[i].size(); j++) {
-      if (j != 0) printf(" ");
-      printf("%c ", Grid[i][j]);
-      if (j == 2 || j == 5) printf("  ");
+      if (j != 0) cout &lt;&lt; " ";
+      cout &lt;&lt; Grid[i][j];
+      if (j == 2 || j == 5) cout &lt;&lt; " ";
     }
-    printf("\n");
-    if (i == 2 || i == 5) printf("\n");
+    cout &lt;&lt; endl;
+    if (i == 2 || i == 5) cout &lt;&lt; endl;
   }
 }
 </pre></td></table></center><p>
 
 I have three example puzzles in 
-<b><a href=example1.txt>example1.txt</a></b>,
-<b><a href=example2.txt>example2.txt</a></b> and
-<b><a href=example3.txt>example3.txt</a></b>.  The last one is the one pictured above.
+<b><a href=txt/example1.txt>txt/example1.txt</a></b>,
+<b><a href=txt/example2.txt>txt/example2.txt</a></b> and
+<b><a href=txt/example3.txt>txt/example3.txt</a></b>.  The last one is the one pictured above.
 <p>
 I also have some bad input files:
 <UL>
-<LI> <b><a href=bad1.txt>bad1.txt</a></b> has a bad character in it.
-<LI> <b><a href=bad2.txt>bad1.txt</a></b> has a row with duplicate entries.
-<LI> <b><a href=bad3.txt>bad1.txt</a></b>  has a column with duplicate entries.
-<LI> <b><a href=bad4.txt>bad1.txt</a></b>  has a panel with duplicate entries.
+<LI> <b><a href=txt/bad1.txt>txt/bad1.txt</a></b> has a bad character in it.
+<LI> <b><a href=txt/bad2.txt>txt/bad2.txt</a></b> has a row with duplicate entries.
+<LI> <b><a href=txt/bad3.txt>txt/bad3.txt</a></b>  has a column with duplicate entries.
+<LI> <b><a href=txt/bad4.txt>txt/bad4.txt</a></b>  has a panel with duplicate entries.
 </UL>
 
-As you can see, <b>sudoku2</b> correctly reads an example, and identifies that <b>bad1.txt</b>
-is bad.  It doesn't identify that <b>bad2.txt</b> is bad, though:
+As you can see, <b>bin/sudoku2</b> correctly reads two examples, and identifies that <b>txt/bad1.txt</b>
+is bad.  It doesn't identify that <b>txt/bad2.txt</b> is bad, though, because it doesn't do that
+kind of checking yet:
 
 <pre>
-UNIX> <font color=darkred><b>make sudoku2</b></font>
-g++    -c -o sudoku2.o sudoku2.cpp
-g++  -o sudoku2 sudoku_main.o sudoku2.o 
-UNIX> <font color=darkred><b>sudoku2 no screen < example1.txt</b></font>
--  6  -    1  -  4    -  5  - 
--  -  8    3  -  5    6  -  - 
-2  -  -    -  -  -    -  -  1 
+UNIX> <font color=darkred><b>make bin/sudoku2</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku2.o src/sudoku2.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku_main.o src/sudoku_main.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/sudoku2 obj/sudoku2.o obj/sudoku_main.o
+UNIX> <font color=darkred><b>cat txt/example1.txt txt/example2.txt | bin/sudoku2 no screen</b></font>
+-------------------
+- 6 -  1 - 4  - 5 -
+- - 8  3 - 5  6 - -
+2 - -  - - -  - - 1
 
-8  -  -    4  -  7    -  -  6 
--  -  6    -  -  -    3  -  - 
-7  -  -    9  -  1    -  -  4 
+8 - -  4 - 7  - - 6
+- - 6  - - -  3 - -
+7 - -  9 - 1  - - 4
 
-5  -  -    -  -  -    -  -  2 
--  -  7    2  -  6    9  -  - 
--  4  -    5  -  8    -  7  - 
-UNIX> <font color=darkred><b>sudoku2 no screen < bad1.txt</b></font>
-Bad Sudoku File -- entry: x
-UNIX> <font color=darkred><b>sudoku2 no screen < bad2.txt</b></font>
--  6  -    1  -  4    -  5  - 
--  -  8    3  -  5    6  -  - 
-2  -  -    -  -  -    -  -  1 
+5 - -  - - -  - - 2
+- - 7  2 - 6  9 - -
+- 4 -  5 - 8  - 7 -
+-------------------
+4 - 6  7 - -  - - 9
+- 2 5  - - -  - 7 -
+- - -  5 9 -  - 3 4
 
-8  -  -    4  -  7    -  -  6 
--  -  6    -  -  -    3  -  - 
-7  -  -    9  -  1    -  -  7    <font color=darkred><b>This is the bad row</b></font>
+- - -  - - -  3 - 2
+- - 2  - 4 -  1 - -
+7 - 1  - - -  - - -
 
-5  -  -    -  -  -    -  -  2 
--  -  7    2  -  6    9  -  - 
--  4  -    5  -  8    -  7  - 
+6 1 -  - 3 2  - - -
+- 8 -  - - -  4 2 -
+2 - -  - - 5  8 - 1
+-------------------
+UNIX> <font color=darkred><b>bin/sudoku2 no screen < txt/bad1.txt</b></font>
+-------------------
+Bad character at row 0, column 1: x
+UNIX> <font color=darkred><b>bin/sudoku2 no screen < txt/bad2.txt | sed -n 8p   </b></font> <font color=blue># I know that the bad row will be printed on line 8</font>
+7 - -  9 - 1  - - 7
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 <hr>
 <h3>Sudoku3 - Checking the input</h3>
 
 In
-<b><a href=sudoku3.cpp>sudoku3.cpp</a></b>, we write <b>Is_Row_Valid()</b> and
-<b>Is_Col_Valid()</b> to test whether rows and columns are valid.  They make use
-of the <b>checker</b> array by setting elements '0' through '9' of <b>checker</b> to 
-zero.  Then, whenever they encounter a digit, they check to see if its value in <b>checker</b>
-is one.  If so, then it's a duplicate.  Otherwise, they set its value in <b>checker</b> to
-one and continue.
-<p>
-I could have not put <b>checker</b> into the class, and instead have used a temporary 
-vector.  However, this is more efficient.  The constructor now checks the input's
-rows and columns for validity.  I only include the code for <b>Is_Row_Valid()</b>.
-<b>Is_Col_Valid()</b> is similar.
+<b><a href=src/sudoku3.cpp>src/sudoku3.cpp</a></b>,
+we write <b>Is_Row_Valid()</b> and
+<b>Is_Col_Valid()</b> to test whether rows and columns are valid.  Go ahead and read
+the comment to see how <b>Is_Row_Valid()</b> works:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-int Sudoku::Is_Row_Valid(int r)
+<font color=blue>/* I use a boolean vector called check to check for row validity.  For each digit i,
+   check[i] is false if I haven't seen the digit, and true if I have.  That way,
+   I can identify when I have seen a digit twice. */</font>
+
+bool Sudoku::Is_Row_Valid(int r) const
 {
-  int i;
+  size_t i;
+  vector &lt;bool&gt; check;
+  char c;
 
-  for (i = '0'; i &lt;= '9'; i++) checker[i] = 0;
-
+  check.resize(9, false);
   for (i = 0; i &lt; 9; i++) {
-    if (Grid[r][i] != '-') {
-      if (checker[Grid[r][i]]) return 0;
-      checker[Grid[r][i]] = 1;
+    c = Grid[r][i];
+    if (c != '-') {
+      c -= '1';
+      if (check[c]) return false;
+      check[c] = true;
     }
   }
-  return 1;
+  return true;
 }
 </pre></td></table></center><p>
 
+I don't show <b>Is_Col_Valid()</b>, because it works in the exact same way.
+I also put code into <b>Read_From_Stdin()</b> to test that every row and column is valid.
 We can now identify that
-<b><a href=bad2.txt>bad2.txt</a></b>
-and <b><a href=bad3.txt>bad3.txt</a></b> are indeed bad:
+<b><a href=txt/bad2.txt>txt/bad2.txt</a></b>
+and <b><a href=txt/bad3.txt>txt/bad3.txt</a></b> are indeed bad:
 
 <pre>
-UNIX> <font color=darkred><b>make sudoku3</b></font>
-g++    -c -o sudoku3.o sudoku3.cpp
-g++  -o sudoku3 sudoku_main.o sudoku3.o 
-UNIX> <font color=darkred><b>sudoku3 no screen < bad2.txt</b></font>
-Bad Sudoku File -- Bad row 5
-UNIX> <font color=darkred><b>sudoku3 no screen < bad3.txt</b></font>
-Bad Sudoku File -- Bad col 6
+UNIX> <font color=darkred><b>make bin/sudoku3</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku3.o src/sudoku3.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku_main.o src/sudoku_main.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/sudoku3 obj/sudoku3.o obj/sudoku_main.o
+UNIX> <font color=darkred><b>bin/sudoku3 no screen < txt/bad2.txt</b></font>
+-------------------
+Duplicate entry in row 5
+UNIX> <font color=darkred><b>bin/sudoku3 no screen < txt/bad3.txt</b></font>
+-------------------
+Duplicate entry in column 6
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 <hr>
 <h3>Sudoku4 - Checking the input further</h3>
 
-<b><a href=sudoku4.cpp>sudoku4.cpp</a></b> implements <b>Is_Panel_Valid()</b>.
+<b><a href=src/sudoku4.cpp>src/sudoku4.cpp</a></b>
+implements <b>Is_Panel_Valid()</b>.
 This is similar enough to <b>Is_Row_Valid()</b> to need no further comment:
 
-<p><center><table border=3 cellpadding=3><td><pre>
-int Sudoku::Is_Panel_Valid(int sr, int sc)
-{
-  int r, c, i;
-  for (i = '0'; i &lt;= '9'; i++) checker[i] = 0;
 
+<p><center><table border=3 cellpadding=3><td><pre>
+bool Sudoku::Is_Panel_Valid(int sr, int sc) const
+{
+  int r;
+  int c;
+  vector &lt;bool&gt; check;
+  char ch;
+
+  check.resize(9, false);
   for (r = sr; r &lt; sr+3; r++) {
     for (c = sc; c &lt; sc+3; c++) {
-      if (Grid[r][c] != '-') {
-        if (checker[Grid[r][c]]) return 0;
-        checker[Grid[r][c]] = 1;
+      ch = Grid[r][c];
+      if (ch != '-') {
+        ch -= '1';
+        if (check[ch]) return false;
+        check[ch] = true;
       }
     }
   }
-  return 1;
+  return true;
 }
 </pre></td></table></center><p>
-
 Now we can identify that 
-<b><a href=bad4.txt>bad4.txt</a></b> is bad:
+<b><a href=txt/bad4.txt>txt/bad4.txt</a></b> is bad:
 
 <pre>
-UNIX> <font color=darkred><b>make sudoku4</b></font>
-g++    -c -o sudoku4.o sudoku4.cpp
-g++  -o sudoku4 sudoku_main.o sudoku4.o 
-UNIX> <font color=darkred><b>sudoku4 no screen < bad4.txt</b></font>
-Bad Sudoku File -- Bad panel starting at row 6 col 6
-UNIX> <font color=darkred><b></b></font>
+UNIX> <font color=darkred><b>ma make bin/sudoku4</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku4.o src/sudoku4.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/sudoku4 obj/sudoku4.o obj/sudoku_main.o
+UNIX> <font color=darkred><b>bin/sudoku4 no screen < txt/bad4.txt</b></font>
+-------------------
+Duplicate entry in panel starting at row 6 and column 6
+UNIX> 
 </pre>
 
 <hr>
 <h3>Sudoku5 - Solving the puzzle</h3>
 
 Now that we have our methods and error-checking in place, writing the solver
-(<b><a href=sudoku5.cpp>sudoku5.cpp</a></b>)
+(<b><a href=src/sudoku5.cpp>src/sudoku5.cpp</a></b>)
 is relatively straightforward.  The <b>Solve()</b> method simply calls
 <b>Recursive_Solve(0, 0)</b>:
 
@@ -384,7 +485,8 @@ int Sudoku::Recursive_Solve(int r, int c)
 {
   int i;
   
-  /* Skip all non-dash characters */
+  <font color=blue>/* Skip all non-dash characters */</font>
+
   while (r &lt; 9 && Grid[r][c] != '-') {
     c++;
     if (c == 9) {
@@ -393,8 +495,9 @@ int Sudoku::Recursive_Solve(int r, int c)
     }
   }
 
-  /* Base case -- we're done */
-  if (r == 9) return 1;
+  <font color=blue>/* Base case -- we're done.  Return success! */</font>
+
+  if (r == 9) return true;
 </pre></td></table></center><p>
 
 Next comes the recursive part.  Once we've found a dash, we try to insert
@@ -405,15 +508,15 @@ solver will skip over that element, now that it is no longer a dash.
 If the recursive solver returns 1, then we have found a solution, and we
 return one:
 <p><center><table border=3 cellpadding=3><td><pre>
+  <font color=blue>/* Try each value.  If successful, then return true. */</font>
 
-  /* Try each value.  If successful, then return true. */
   for (i = '1'; i &lt;= '9'; i++) {
     Grid[r][c] = i;
     if (Is_Row_Valid(r) && 
         Is_Col_Valid(c) && 
         Is_Panel_Valid(r-r%3, c-c%3) &&
         Recursive_Solve(r, c)) {
-      return 1;
+      return true;
     }
   }
 </pre></td></table></center><p>
@@ -425,10 +528,10 @@ are zero, the calling function is <b>Solve()</b>, and it will return that there
 is no solution to the puzzle:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-  /* If unsuccessful, reset the element and return false. */
+  <font color=blue>/* If unsuccessful, reset the element and return false. */</font>
   
   Grid[r][c] = '-';
-  return 0;
+  return false;
 }
 </pre></td></table></center><p>
 
@@ -440,42 +543,44 @@ was called, so that the caller can try something new.
 When we run this, it solves the puzzles:
 
 <pre>
-UNIX> <font color=darkred><b>sudoku5 yes screen < example1.txt</b></font>
-9  6  3    1  7  4    2  5  8 
-1  7  8    3  2  5    6  4  9 
-2  5  4    6  8  9    7  3  1 
+UNIX> <font color=darkred><b>cat txt/example*.txt | bin/sudoku5 yes screen</b></font>
+-------------------
+9 6 3  1 7 4  2 5 8
+1 7 8  3 2 5  6 4 9
+2 5 4  6 8 9  7 3 1
 
-8  2  1    4  3  7    5  9  6 
-4  9  6    8  5  2    3  1  7 
-7  3  5    9  6  1    8  2  4 
+8 2 1  4 3 7  5 9 6
+4 9 6  8 5 2  3 1 7
+7 3 5  9 6 1  8 2 4
 
-5  8  9    7  1  3    4  6  2 
-3  1  7    2  4  6    9  8  5 
-6  4  2    5  9  8    1  7  3 
-UNIX> <font color=darkred><b>sudoku5 yes screen < example2.txt</b></font>
-4  3  6    7  2  8    5  1  9 
-9  2  5    3  1  4    6  7  8 
-1  7  8    5  9  6    2  3  4 
+5 8 9  7 1 3  4 6 2
+3 1 7  2 4 6  9 8 5
+6 4 2  5 9 8  1 7 3
+-------------------
+4 3 6  7 2 8  5 1 9
+9 2 5  3 1 4  6 7 8
+1 7 8  5 9 6  2 3 4
 
-8  6  9    1  5  7    3  4  2 
-3  5  2    6  4  9    1  8  7 
-7  4  1    2  8  3    9  5  6 
+8 6 9  1 5 7  3 4 2
+3 5 2  6 4 9  1 8 7
+7 4 1  2 8 3  9 5 6
 
-6  1  4    8  3  2    7  9  5 
-5  8  7    9  6  1    4  2  3 
-2  9  3    4  7  5    8  6  1 
-UNIX> <font color=darkred><b>sudoku5 yes screen < example3.txt</b></font>
-1  3  7    8  9  4    6  5  2 
-5  8  2    6  7  1    3  9  4 
-4  6  9    3  5  2    1  8  7 
+6 1 4  8 3 2  7 9 5
+5 8 7  9 6 1  4 2 3
+2 9 3  4 7 5  8 6 1
+-------------------
+1 3 7  8 9 4  6 5 2
+5 8 2  6 7 1  3 9 4
+4 6 9  3 5 2  1 8 7
 
-8  5  6    7  3  9    4  2  1 
-7  9  4    2  1  6    5  3  8 
-3  2  1    5  4  8    7  6  9 
+8 5 6  7 3 9  4 2 1
+7 9 4  2 1 6  5 3 8
+3 2 1  5 4 8  7 6 9
 
-2  7  8    1  6  3    9  4  5 
-9  1  3    4  2  5    8  7  6 
-6  4  5    9  8  7    2  1  3 
+2 7 8  1 6 3  9 4 5
+9 1 3  4 2 5  8 7 6
+6 4 5  9 8 7  2 1 3
+-------------------
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -489,20 +594,20 @@ very well.
 <h3>Sudoku.cpp - The final version</h3>
 
 The final version of the program is in
-<b><a href=sudoku.cpp>sudoku.cpp</a></b>.
+<b><a href=src/sudoku.cpp>src/sudoku.cpp</a></b>.
 It implements
 <b>Print_Convert()</b>, which puts the output into a format that the <b>convert</b>
 program can understand.  When you pipe it to the shell, it creates the file <b>Sudoku.jpg</b>,
 which is a picture of the puzzle.  That's how I made
-<b><a href=example3-problem.jpg>example3-problem.jpg</a></b> and
-<b><a href=example3-solution.jpg>example3-solution.jpg</a></b>, which are pictured above:
+<b><a href=jpg/example3-problem.jpg>jpg/example3-problem.jpg</a></b> and
+<b><a href=jpg/example3-solution.jpg>jpg/example3-solution.jpg</a></b>, which are pictured above:
 
 <pre>
-UNIX> <font color=darkred><b>make sudoku</b></font>
-g++    -c -o sudoku_main.o sudoku_main.cpp
-g++    -c -o sudoku.o sudoku.cpp
-g++  -o sudoku sudoku_main.o sudoku.o 
-UNIX> <font color=darkred><b>sudoku no convert < example3.txt | head</b></font>
+UNIX> <font color=darkred><b>make bin/sudoku</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku.o src/sudoku.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/sudoku_main.o src/sudoku_main.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/sudoku obj/sudoku.o obj/sudoku_main.o
+UNIX> <font color=darkred><b>bin/sudoku no convert < txt/example3.txt | head</b></font>
 convert -size 234x234 xc:Black \
   -background White -fill Black \
 \( -size 24x24 -gravity Center label:- \) -geometry 24x24+3+3 -gravity NorthWest -composite \
@@ -513,12 +618,13 @@ convert -size 234x234 xc:Black \
 \( -size 24x24 -gravity Center label:- \) -geometry 24x24+3+130 -gravity NorthWest -composite \
 \( -size 24x24 -gravity Center label:- \) -geometry 24x24+3+157 -gravity NorthWest -composite \
 \( -size 24x24 -gravity Center label:- \) -geometry 24x24+3+182 -gravity NorthWest -composite \
-UNIX> <font color=darkred><b>sudoku no convert < example3.txt | sh</b></font>
-UNIX> <font color=darkred><b>mv Sudoku.jpg example3-problem.jpg </b></font>
-UNIX> <font color=darkred><b>sudoku yes convert < example3.txt | sh</b></font>
-UNIX> <font color=darkred><b>mv Sudoku.jpg example3-solution.jpg</b></font>
+UNIX> <font color=darkred><b>bin/sudoku no convert < txt/example3.txt | sh</b></font>
+UNIX> <font color=darkred><b>mv Sudoku.jpg jpg/example3-problem.jpg </b></font>
+UNIX> <font color=darkred><b>bin/sudoku yes convert < txt/example3.txt | sh</b></font>
+UNIX> <font color=darkred><b>mv Sudoku.jpg jpg/example3-solution.jpg</b></font>
 UNIX> <font color=darkred><b></b></font>
 </pre>
+
 
 I won't explain <b>convert</b>.  However, the mechanics of <b>Print_Convert()</b> are not
 that bad.  I create a big black square, and then I plot white squares with the contents of
@@ -536,8 +642,9 @@ at <b>Border</b>.  After plotting a square, I update <i>x</i> by <b>PPS+CW</b>, 
 the square is the end of a panel, I also update it by <b>PW</b>.  The same thing works for
 the <i>y</i> values. Since my background square was black, the lines between squares show
 up as black.  
+
 <p><center><table border=3 cellpadding=3><td><pre>
-void Sudoku::Print_Convert()
+void Sudoku::Print_Convert() const
 {
   int PPS = 24;
   int Border = 3;
@@ -545,12 +652,17 @@ void Sudoku::Print_Convert()
   int PW = 2;
   int i, j, x, y;
 
+  if (Grid.size() == 0) return;
+
+  <font color=blue>/* Make a big square, filled in with black. */</font>
+
   printf("convert -size %dx%d xc:Black \\\n", PPS*9+Border*2+CW*8+PW*2, PPS*9+Border*2+CW*8+PW*2);
   printf("  -background White -fill Black \\\n");
   x = Border;
   for (i = 0; i &lt; 9; i++) {
     y = Border;
     for (j = 0; j &lt; 9; j++) {
+      <font color=blue>/* This plots each small square, with the label inside. */</font>
       printf("\\( -size %dx%d -gravity Center label:%c \\)", PPS, PPS, Grid[i][j]);
       printf(" -geometry %dx%d+%d+%d -gravity NorthWest -composite \\\n", PPS, PPS, x, y);
       y += (PPS+CW);
