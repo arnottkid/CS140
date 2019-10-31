@@ -485,6 +485,8 @@ int Sudoku::Recursive_Solve(int r, int c)
 {
   int i;
   
+  if (Grid.size()) return false;    <font color=blue>// If there's no puzzle, return false.</font>
+
   <font color=blue>/* Skip all non-dash characters */</font>
 
   while (r &lt; 9 && Grid[r][c] != '-') {

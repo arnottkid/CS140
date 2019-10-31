@@ -178,6 +178,8 @@ bool Sudoku::Recursive_Solve(int r, int c)
 {
   int i;
 
+  if (Grid.size() == 0) return false;
+
   /* Skip all non-dash characters */
 
   while (r < 9 && Grid[r][c] != '-') {
