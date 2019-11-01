@@ -1,0 +1,373 @@
+<title>CS140 Lecture notes -- Binary Search Trees</title>
+<body bgcolor=ffffff>
+<a href=http://web.eecs.utk.edu/~cs140><img src=http://www.cs.utk.edu/~cs140/logo.gif></a>
+<h1>CS140 Lecture notes -- Binary Search Trees</h1>
+<LI><a href=http://web.eecs.utk.edu/~jplank>Jim Plank</a>
+<LI>Directory: 
+<b>/home/plank/cs140/Fall-2005/notes/Bstrees</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Fall-2005/notes/Bstrees/>
+  http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Fall-2005/notes/Bstrees/</a>
+<LI>
+Tue Nov  8 12:37:26 EST 2005
+<hr>
+
+
+<hr>
+<h2>Binary Search Trees</h2>
+
+The book has a very nice description of binary search trees in
+section 4.3.
+Please read it.  These lecture notes simply concern the 
+implementation.  The implementation of binary search trees
+that I've made is in the files
+<b>/home/plank/cs140/Fall-2005/objs/bstree.o</b>
+<a href=bstree.h><b>/home/plank/cs140/Fall-2005/include/bstree.h</b></a>
+and
+<a href=bstree.c><b>/home/plank/cs140/Fall-2005/notes/Bstrees/bstree.c</b></a>.
+<p>
+
+Our search trees will use character strings as keys and use
+<b>strcmp()</b> as our comparison function.  This is not
+totally general, but it will serve as a nice introduction to 
+search trees.
+<p>
+
+First, look at <a href=bstree.h><b>bstree.h</b></a>.  This 
+defines two typedefs.  The first is a node of the binary search 
+tree.  This has a search key, a value and pointers to left and
+right children:
+<pre>
+typedef struct bstreenode {
+  char *key;
+  Jval val;
+  struct bstreenode *left;
+  struct bstreenode *right;
+} BstreeNode;
+</pre>
+The second typedef is for the tree header structure.  All it
+is is a pointer to the root of the tree:
+<pre>
+typedef struct {
+  BstreeNode *root;
+} Bstree;
+</pre>
+
+<p>
+Now the invariant in a binary search tree is that given node
+<b>n</b>, all nodes reachable
+from <b>n->left</b> will have keys less than <b>n->key</b>, and
+that all nodes reachable from <b>n->right</b> will have keys
+greater than <b>n->key</b>.  In this implementation, we will
+not allow two nodes to have the same key.
+
+<p>
+<b>Bstree.h</b> defines the following procedures:
+<UL>
+<LI> <b>Bstree *new_bstree()</b>: create a new empty tree.
+<LI> <b>void free_bstree(Bstree *b)</b>: delete all nodes in the tree and
+     delete the tree.
+<LI> <b>BstreeNode *bstree_insert(Bstree *b, char *key, Jval val)</b>: 
+      create a new node with key <b>key</b> and value <b>val</b>, and
+      insert it into the correct place in the tree.  If <b>key</b> 
+      already exists, then it replaces the <b>key</b> and <b>val</b>
+      of the node that was there.
+<LI> <b>BstreeNode *bstree_find(Bstree *b, char *key)</b>: find the
+      node in the tree with the given <b>key</b>.  If there is no
+      such node, it returns <b>NULL</b>.
+<LI> <b>void bstree_delete_node(Bstree *b, BstreeNode *bn)</b>:
+     delete the given node from the tree.
+<LI> <b>BstreeNode *bstree_find_max(Bstree *)</b>:
+     return the node in the tree with the maximum key.
+<LI> <b>BstreeNode *bstree_find_min(Bstree *)</b>:
+     return the node in the tree with the minimum key.
+</UL>
+
+<p>
+I am not going to go over the implementation in detail.  Look
+at the code yourself.  <b>New_bstree()</b>, 
+<b>bstree_insert()</b>,  
+<b>bstree_find()</b>,  
+<b>bstree_find_max()</b> and
+<b>bstree_find_min()</b> are all straightforward code that you
+should be able to look over and understand rather quickly.
+The only two tricky ones are <b>free_bstree()</b> and
+<b>bstree_delete_node()</b>. 
+<p>
+<b>Free_bstree()</b> is recursive -- it simply frees its left
+and right children, and then frees itself.  Note, 
+<b>recursive_free_bstree()</b> is defined to be <b>static</b> -- 
+this means that it may only be used by procedures in
+<b>bstree.c</b>.  This is a convenient thing to do when you 
+need a procedure like <b>recursive_free_bstree()</b> in an implementation ,
+but you don't want anyone else to call it.
+Here is the code for <b>free_bstree()</b>:
+<pre>
+static void recursive_free_bstree(BstreeNode *bn)
+{
+  if (bn == NULL) return;
+  if (bn->left != NULL) recursive_free_bstree(bn->left);
+  if (bn->right != NULL) recursive_free_bstree(bn->right);
+  free(bn);
+  return;
+}
+
+void free_bstree(Bstree *b)
+{
+  BstreeNode *bn;
+
+  recursive_free_bstree(b->root);
+  free(b);
+  return;
+}
+</pre>
+
+Node deletion is pretty complex.  Read over the book's description --
+this is exactly how I have implemented it.  I find the node's parent
+with the <b>find_parent()</b> routine, figure out how I will delete
+the node, and then delete it.  If both children of the node are
+non-<b>NULL</b>, then I find the smallest node in the subtree rooted
+by the right child and use it to replace the node that is to be
+deleted.  I do this by saving its <b>key</b> and <b>val</b>, deleting
+it recursively, and then replacing the <b>key</b> and <b>val</b> 
+of the specified node.  
+<p>
+Note, I also need special code for when the node to be deleted
+is the root of the tree.
+Here is the code:
+<pre>
+static BstreeNode *find_parent(Bstree *t, BstreeNode *bn)
+{
+  int cmp;
+  BstreeNode *tmp;
+
+  tmp = t->root;
+
+  if (tmp == bn) return NULL;
+
+  while(1) {
+    cmp = strcmp(tmp->key, bn->key);
+    if (cmp == 0) {
+      fprintf(stderr, "Internal Error: two nodes with the same key (%s)\n",
+                       tmp->key);
+      exit(1);
+    }
+    if (cmp > 0) {
+      if (tmp->left == NULL) {
+        fprintf(stderr, "Internal Error finding parent -- left child empty\n");
+        exit(1);
+      } else if (tmp->left == bn) {
+        return tmp;
+      } else {
+        tmp = tmp->left;
+      }
+    } else {
+      if (tmp->right == NULL) {
+        fprintf(stderr, "Internal Error finding parent -- right child empty\n");
+        exit(1);
+      } else if (tmp->right == bn) {
+        return tmp;
+      } else {
+        tmp = tmp->right;
+      }
+    }
+  }
+}
+
+void bstree_delete_node(Bstree *b, BstreeNode *bn)
+{
+  BstreeNode *parent, *replacement;
+  int cmp;
+  char *key;
+  Jval val;
+
+  parent = find_parent(b, bn);
+
+  if (bn->left != NULL && bn->right != NULL) {
+    replacement = bn->right;
+    while (replacement->left != NULL) {
+      replacement = replacement->left;
+    }
+    key = replacement->key;
+    val = replacement->val;
+    bstree_delete_node(b, replacement);
+    bn->key = key;
+    bn->val = val;
+    return;
+  } else {
+    if (bn->left == NULL && bn->right == NULL) {
+      replacement = NULL;
+    } else if (bn->left == NULL) {
+      replacement = bn->right;
+    } else {
+      replacement = bn->left;
+    }
+    if (parent == NULL) {
+      b->root = replacement;
+    } else if (parent->left == bn) {
+      parent->left = replacement;
+    } else {
+      parent->right = replacement;
+    }
+    free(bn);
+    return;
+  }
+}
+</pre>
+<hr>
+<h2>A simple application</h2>
+
+<a href=bstree_test.c><b>Bstree_test.c</b></a> contains a simple
+tree editor which lets you manage a tree of words as keys and
+doubles as values.  You can insert, delete, print the max and min,
+and do one of three traversals, preorder, postorder or inorder. 
+Note the inorder traversal will print the tree in sorted order.
+The pre and post-order traversals use indentation to show you
+what the tree looks like.
+<p>
+Here are some examples.  First, we'll create a tree that looks
+just like the left tree in figure 4.21 (note, even though 
+our search trees are character strings, we can use them 
+to sort single digit numbers.  Below, I will use values of 
+zero for everything):
+<pre>
+UNIX> <b>bstree_test</b>
+BSTREE> <b>INSERT 6 0</b>
+BSTREE> <b>INSERT 2 0</b>
+BSTREE> <b>INSERT 1 0</b>
+BSTREE> <b>INSERT 4 0</b>
+BSTREE> <b>INSERT 3 0</b>
+BSTREE> <b>INSERT 8 0</b>
+BSTREE> <b>INORDER</b>
+1                                    0.00
+2                                    0.00
+3                                    0.00
+4                                    0.00
+6                                    0.00
+8                                    0.00
+BSTREE> <b>PREORDER</b>
+6 0.00
+  2 0.00
+    1 0.00
+    4 0.00
+      3 0.00
+  8 0.00
+BSTREE> 
+</pre>
+Note, the preorder traversal shows that the tree is just as
+depicted in the left side of figure 4.21.  We could also do
+the same with a post-order traversal.  Frankly, I find the
+preorder traversal easier to understand:
+<pre>
+BSTREE> <b>POSTORDER</b>
+    1 0.00
+      3 0.00
+    4 0.00
+  2 0.00
+  8 0.00
+6 0.00
+BSTREE> 
+</pre>
+
+Now, as in figure 4.21, we insert 5 into the tree.  Note
+again that it looks like figure 4.21:
+<pre>
+BSTREE> <b>INSERT 5 0</b>
+BSTREE> <b>PREORDER</b>
+6 0.00
+  2 0.00
+    1 0.00
+    4 0.00
+      3 0.00
+      5 0.00
+  8 0.00
+</pre>
+
+If we delete node 5, then again we have the left side of figure
+4.21.  This is also the same as the left side of figure 4.23:
+
+<pre>
+BSTREE> <b>DELETE 5</b>
+BSTREE> <b>PREORDER</b>
+6 0.00
+  2 0.00
+    1 0.00
+    4 0.00
+      3 0.00
+  8 0.00
+</pre>
+When we delete node 4, it will replace the right child of node
+2 with node three, as depicted in the picture:
+<pre>
+BSTREE> <b>DELETE 4</b>
+BSTREE> <b>PREORDER</b>
+6 0.00
+  2 0.00
+    1 0.00
+    3 0.00
+  8 0.00
+</pre>
+
+Now, to show deletion of a node with two children, I'll delete
+node 3 and then add nodes 5, 3 and 4.  This will give us
+the tree in the left side of figure 4.24:
+
+<pre>
+BSTREE> <b>DELETE 3</b>
+BSTREE> <b>INSERT 5 0</b>
+BSTREE> <b>INSERT 3 0</b>
+BSTREE> <b>INSERT 4 0</b>
+BSTREE> <b>PREORDER</b>
+6 0.00
+  2 0.00
+    1 0.00
+    5 0.00
+      3 0.00
+        4 0.00
+  8 0.00
+</pre>
+
+Now, we delete node 2.  This will replace node 2 with node
+3, and delete node three.  We're left will the tree 
+depicted on the right side of figure 4.24:
+
+<pre>
+BSTREE> <b>DELETE 2</b>
+BSTREE> <b>PREORDER</b>
+6 0.00
+  3 0.00
+    1 0.00
+    5 0.00
+      4 0.00
+  8 0.00
+BSTREE> <b></b>
+</pre>
+
+Finally, note that binary search trees can be bad if they are
+created with the keys already sorted.  For example, look at the
+following tree:
+
+<pre>
+UNIX> <b>bstree_test</b>
+BSTREE> <b>INSERT Cindy 1955</b>
+BSTREE> <b>INSERT Dave 1923</b>
+BSTREE> <b>INSERT Jim 1966</b>
+BSTREE> <b>INSERT Peg 1929    </b>
+BSTREE> <b>INSERT Terry 1963</b>
+BSTREE> <b>INORDER</b>
+Cindy                             1955.00
+Dave                              1923.00
+Jim                               1966.00
+Peg                               1929.00
+Terry                             1963.00
+BSTREE> <b>PREORDER</b>
+Cindy 1955.00
+  Dave 1923.00
+    Jim 1966.00
+      Peg 1929.00
+        Terry 1963.00
+BSTREE> <b></b>
+</pre>
+As you see, the tree is unbalanced, and finding keys in this tree
+is as inefficient as find keys in a linked list: <i>O(n)</i>.
+We'll talk more about this later.
