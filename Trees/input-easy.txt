@@ -1,0 +1,9 @@
+INSERT Binky                                      944-867-2246   165-79-8849
+INSERT Fred                                       026-631-5520   826-96-9094
+INSERT Luther                                     462-055-3150   827-30-6292
+INSERT Waluigi                                    193-149-4333   106-62-2934
+INSERT Daisy                                      257-554-8530   481-12-6340
+INSERT Luigi                                      018-992-9715   512-23-5507
+INSERT Ernie                                      808-602-6582   702-11-9340
+INSERT Calista                                    457-440-4397   076-91-9105
+PRINT
