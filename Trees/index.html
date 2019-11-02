@@ -40,7 +40,7 @@ expression:
 </center>
 is very clearly represented by the following tree:
 
-<p><center><table border=0><td><img src=Arith-Tree.jpg width=450></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Arith-Tree.jpg width=450></td></table></center><p>
 
 Using tree terminology, the external, (or leaf) 
 nodes are either variables or values, and the 
@@ -174,10 +174,10 @@ node's value.
 Here are some examples of binary search trees that hold strings:
 
 <p><center><table border=3 cellpadding=4>
-<td><img src=BST-1.jpg align=center valign=center width=50></td>
-<td><img src=BST-2.jpg align=center valign=center width=150></td>
-<td><img src=BST-3.jpg align=center valign=center width=150></td>
-<td><img src=BST-4.jpg align=center valign=center width=180></td>
+<td><img src=jpg/BST-1.jpg align=center valign=center width=50></td>
+<td><img src=jpg/BST-2.jpg align=center valign=center width=150></td>
+<td><img src=jpg/BST-3.jpg align=center valign=center width=150></td>
+<td><img src=jpg/BST-4.jpg align=center valign=center width=180></td>
 </table></center><p>
 
 As demonstrated by the second two trees above, there can be more than one
@@ -186,9 +186,9 @@ binary search tree that corresponds to the same data.
 Here are two examples of trees that are not binary search trees:
 
 <p><center><table border=3 cellpadding=4>
-<td align=center><img src=NBST-1.jpg align=center valign=center width=230><hr>
+<td align=center><img src=jpg/NBST-1.jpg align=center valign=center width=230><hr>
 <i>Daisy</i>, <i>Luigi</i> and <i>Luther</i> are all greater than <i>Binky</i>.</td>
-<td align=center><img src=NBST-2.jpg align=center valign=center width=230><hr>
+<td align=center><img src=jpg/NBST-2.jpg align=center valign=center width=230><hr>
 The tree is not binary.</td>
 </table></center><p>
 
@@ -197,7 +197,7 @@ data by performing an in-order traversal.  You can also find a piece of
 data simply by traversing a single path from the root to the data, or
 to where the data would be.  For example, in the tree:
 
-<p><center><table border=0><td><img src=BST-4.jpg width=180></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-4.jpg width=180></td></table></center><p>
 
 If I want to find <i>Luigi</i>, what I do is start at the root of the tree,
 and compare it to <i>Luigi.</i>  If it equals <i>Luigi</i>, then I'm done.  
@@ -236,15 +236,16 @@ is not in the search tree.
 
 I have just described how to find a value in a binary search tree.  
 Insertion is a pretty simple matter too.  To insert a value <b>s</b>, 
-assume that <b>s</b> is not int the tree, and find where <b>s</b> should be.
+assume that <b>s</b> is not in the tree, and find where <b>s</b> should be.
 Create the node and put it there.
 <p>
-For example, were we to insert <i>Calista</i> into the above tree, we try to 
-find the string.  We fail at <i>Daisy</i>'s left child, which doesn't exist.
+For example, suppose that we want to insert <i>Calista</i> into the above tree. 
+We try to find the string as we did above.  
+We fail at <i>Daisy</i>'s left child, which doesn't exist.
 Therefore, we create a node for <i>Calista</i> and insert it as <i>Daisy</i>'s 
 left child:
 
-<p><center><table border=0><td><img src=BST-5.jpg width=200></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-5.jpg width=200></td></table></center><p>
 
 To insert duplicate values, do the same procedure, only if you find the 
 value, you continue searching either on the left or the right child, as 
@@ -252,13 +253,13 @@ if you didn't find the key.
 For example, if you wanted to insert <i>Binky</i> into the tree again, 
 you would either put it as <i>Binky</i>'s left child or <i>Calista</i>'s left child:
 
-<p><center><table border=3 cellpadding=4><td><img src=BST-6.jpg width=200></td>
-<td><img src=BST-7.jpg width=240></td></table></center><p>
+<p><center><table border=3 cellpadding=4><td><img src=jpg/BST-6.jpg width=200></td>
+<td><img src=jpg/BST-7.jpg width=240></td></table></center><p>
 
 Deletion is the trickiest.  To delete a node, you must consider three cases.  Let's
 consider the tree below as an example:
 
-<p><center><table border=0><td><img src=BST-5.jpg width=200></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-5.jpg width=200></td></table></center><p>
 
 <b>Case 1</b>: The node has no children (it's a leaf node).  You can simply
 delete it.  I won't draw an example, but you should see very easily that deleting
@@ -269,9 +270,9 @@ with that child.  I draw two examples below:
 
 
 <p><center><table border=3 cellpadding=4>
-<td align=center><img src=BST-8.jpg align=center valign=center width=200><hr>
+<td align=center><img src=jpg/BST-8.jpg align=center valign=center width=200><hr>
 After deleting <i>Binky</i>.</td>
-<td align=center><img src=BST-9.jpg align=center valign=center width=150><hr>
+<td align=center><img src=jpg/BST-9.jpg align=center valign=center width=150><hr>
 After deleting <i>Daisy</i>.</td>
 </table></center><p>
 
@@ -285,76 +286,149 @@ Alternatively, you can replace it with the leftmost node in the tree rooted by
 the node's right child.  Both will work.
 <p>
 For example, let's delete <i>Fred</i> from the tree below:
-<p><center><table border=0><td><img src=BST-A.jpg width=250></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-A.jpg width=250></td></table></center><p>
 
 Since <i>Fred</i> has two children, we find the rightmost node in the tree rooted
 by <i>Fred</i>'s left child.  That is the node <i>Fiona</i>.  We first delete
 <i>Fiona</i>:
 
-<p><center><table border=0><td><img src=BST-B.jpg width=250></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-B.jpg width=250></td></table></center><p>
 
 And then we replace <i>Fred</i> with <i>Fiona</i>:
 
-<p><center><table border=0><td><img src=BST-C.jpg width=250></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-C.jpg width=250></td></table></center><p>
 
 A second example is easier, but sometimes confusing -- suppose we want to delete <i>Luther</I>.
 Since <i>Luther</i> has two children, we find the rightmost 
 node in the tree rooted
 by <i>Luther</i>'s left child.  Since there is only one node in that tree, that's the one we delete: <i>Luigi</i>.  We then replace <i>Luther</i> with <i>Luigi</i>:
 
-<p><center><table border=0><td><img src=BST-D.jpg width=250></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/BST-D.jpg width=250></td></table></center><p>
 <hr>
-<h3>Implementation -- API and tester</h3>
+<h3>Implementation -- API and overview</h3>
 
 The file 
-<b><a href=bstree.h>bstree.h</a></b> contains a fairly simple binary search tree API:
+<b><a href=include/bstree.hpp>include/bstree.hpp</a></b>
+contains a simple binary search tree API.  Scan it quickly, but don't go into to much
+detail.  I'll do that with you after the specification:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-#include &lt;iostream&gt;
 #include &lt;vector&gt;
-using namespace std;
+#include &lt;string&gt;
+
+namespace CS140 {
+
+<font color=blue>/* These are the nodes of a tree. The keys are strings, and the vals are generic pointers.
+   Please see the lecture notes for a more thorough explanation of what a (void *)</font> is. */</font>
 
 class BSTNode {
   public:
     BSTNode *left;
     BSTNode *right;
     BSTNode *parent;
-    string key;
+    std::string key;
     void *val;
 };
 
 class BSTree {
   public:
+
+    <font color=blue>/* Constructor, copy constructor, assignment overlead, destructor.
+       I am only implementing the constructor and destructor here in the notes.
+       You will implement the other two in your lab. */</font>
+
     BSTree();
+    BSTree(const BSTree &t);
+    BSTree& operator= (const BSTree &t);
     ~BSTree();
-    int Insert(string key, void *val);
-    void *Find(string key);
-    int Delete(string key);
-    void Print();
-    int Size();
-    int Empty();
-    vector &lt;void *&gt; Sorted_Vector();
+
+    void Clear();                                      <font color=blue>// Turns the tree into an empty tree.</font>
+ 
+    bool Insert(const std::string &key, void *val);    <font color=blue>// Insert the key and val.  Returns success (duplicates are not allowed.</font>
+    void *Find(const std::string &key) const;          <font color=blue>// Return the val associated with the key.  Returns NULL if key not found.</font>
+    bool Delete(const std::string &key);               <font color=blue>// Delete the node with the key.  Returns whether there was such a node.</font>
+
+    void Print() const;                                <font color=blue>// These are obvious.</font>
+    size_t Size() const;
+    bool Empty() const;
+
+    std::vector &lt;std::string&gt; Ordered_Keys() const;    <font color=blue>// Return a vector of sorted keys</font>
+    std::vector &lt;void *&gt; Ordered_Vals() const;         <font color=blue>// Return a vector of the vals, sorted by the keys.</font>
+
+    <font color=blue>/* You'll write these as part of your lab. */</font>
+
+    int Depth(const std::string &key) const;           <font color=blue>// Distance from a node to the root.  Returns -1 if the key is not in the tree.</font>
+    int Height() const;                                <font color=blue>// Returns the depth of the node with maximum depth, plus one.</font>
+
   protected:
-    BSTNode *sentinel;
-    int size;
-    vector &lt;void *&gt; array;
+    BSTNode *sentinel;                                 <font color=blue>// Like the dlists, there is a sentinel.  Its right points to the root.</font>
+    size_t size;                                       <font color=blue>// Size of the tree</font>
    
-    void recursive_inorder_print(int level, BSTNode *n);
-    void recursive_make_array(BSTNode *n);
-    void recursive_destroy(BSTNode *n);
+    void recursive_inorder_print(int level, const BSTNode *n) const;          <font color=blue>// A helper for Print()</font>
+    void recursive_destroy(BSTNode *n);                                       <font color=blue>// A helper for Clear()</font>
+    void make_val_vector(const BSTNode *n, std::vector&lt;void *&gt; &v) const;     <font color=blue>// A helper for Ordered_Vals()</font>
+
+    <font color=blue>/* You'll write these as part of your lab. */</font>
+
+    int recursive_find_height(const BSTNode *n) const;                        <font color=blue>// A helper for Height()</font>
+    void make_key_vector(const BSTNode *n, std::vector&lt;std::string&gt; &v) const; <font color=blue>// A helper for Ordered_Keys()</font>
+    BSTNode *make_balanced_tree(const std::vector&lt;std::string&gt; &sorted_keys,   <font color=blue>// A helper for the copy constructor and assignment overload.</font>
+                                const std::vector&lt;void *&gt; &vals,
+                                size_t first_index,
+                                size_t num_indices) const;
+};
+
 };
 </pre></td></table></center><p>
 
-This is a little like the Dlist API in the previous lecture, with some extra bells
+First off, you'll note I'm using a "namespace".  It's about time that I introduce you to namespaces.
+They are pretty simple -- when you define a class (or struct), global variable, or procedure within a 
+namespace, then when someone else wants to use it, they need to either:
+
+<UL>
+<LI> State that they are using the namespace.
+<LI> State that they are using the class, variable or procedure from the namespace.
+<LI> Prepend the namespace and two colons whenever they use a class, variable or procedure.
+</UL>
+
+In this instance, I'm defining the classes <b>BSTNode</b> and <b>BSTree</b> within the namespace <b>CS140</b>.
+If I want to use, for example, the <b>BSTree</b> class, then I must do one of the following:
+
+<UL>
+<LI> Put "using namespace CS140" at the top of my code.
+<LI> Put "using CS140::BSTree" at the top of my code.
+<LI> Use "CS140::BSTree" wherever I would normally just use "BSTree".
+</UL>
+
+For example, in 
+<b><a href=src/bstree_tester.cpp>src/bstree_tester.cpp</a></b>, I say 
+"using CS140::BSTree", and then when I declare pointers to the variables, I say
+
+<p><center><table border=3 cellpadding=3><td><pre>
+BSTree *t1, *t2, *tmp;
+</pre></td></table></center><p>
+
+If I didn't put the "using" statement in there, I'd have to declare the pointers as:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+CS140::BSTree *t1, *t2, *tmp;
+</pre></td></table></center><p>
+
+Namespaces are nice because they help you avoid conflicts in naming.  I won't go 
+crazy with them, but I do think they are something you should see an know about at
+this point in your programming careers.
+<p>
+Now, the BSTree API is a little like the Dlist API in the previous lecture, with some extra bells
 and whistles.  Let's first go over the methods:
 <p>
 <UL>
-<LI> The constructor and destructor, <b>Size()</b> and <b>Empty()</b> are
+<LI> The constructor, destructor, and methods <b>Size()</b> and <b>Empty()</b> are
 straightforward enough not to need explanation.
 <p>
 <LI> <b>Insert(key, val)</b> inserts the given key and val pair into the tree.  The
-<b>val</b> is of type <b>(void *)</b>, which you probably haven't seen before and
-is used extensively in C.  It is basically a catch-all that stands for "any pointer type."  
+<b>val</b> is of type <b>(void *)</b>, which you probably haven't seen before.
+It is used extensively in C (and I use it a lot in C++ too, but I suspect I'm in the minority).  
+It is basically a catch-all that stands for "any pointer type."  
 You can store any pointer into the tree by "casting" it to a <b>(void *)</b>.  For example,
 let's suppose you have a pointer <b>p</b> that you have declared as:
 <p>
@@ -378,30 +452,60 @@ the <b>val</b> field.  The STL of course, does this in a different and more type
 way.  Using a <b>(void *)</b> is an "old school" C trick.
 <p>
 <b>Insert()</b> returns whether the key was inserted.  We're going to disallow
-inserting duplicate keys.
+inserting duplicate keys, so <b>Insert()</b> will return <b>false</b> if it gets a duplicate key.
 
 <p>
 <LI> <b>Find(key)</b> returns the <b>val</b> associated with the key, if it's in the
-tree.  If not, it returns <b>NULL</b>.  Does that mean that you can't store <b>NULL</b>
-in the tree?  You tell me.
+tree.  The <b>val</b> is a <b>(void *)</b>, and to use it, you cast it back to a pointer
+of the type that you inserted.   For example, if you inserted a <b>(Person *)</b> 
+with the <b>Insert()</b> command above, you'd use <b>Find()</b> as follows:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+p = (Person *) Find("Fred");
+</pre></td></table></center><p>
+
+If the key is not found, then <b>Find()</b> returns <b>NULL</b>.
+Does that mean that you can't store <b>NULL</b> in the tree?  You tell me.
 
 <p>
-<LI> <b>Delete(key)</b> deletes the node with the given key.  It returns 1 or 0, 
-depending on whether the key was in the tree.
+<LI> <b>Depth(key)</b> returns the distance that a key is from the root of the tree.
+It returns -1 if the key is not in the tree.
+<p>
+<LI> <b>Height()</b> returns the depth of the ndoe with the maximum depth in the tree, plus 1.
+An empty tree has a height of zero.  A tree with one node has a height of one.
+<p>
+<LI> <b>Delete(key)</b> deletes the node with the given key.  It returns <b>true</b> or
+<b>false</b>, depending on whether the key was in the tree.
 <p>
 <LI> <b>Print()</b> prints all the keys by using a reverse inorder traversal.  Each key is
 preceded by two spaces times the key's depth in the tree so that you can see the structure
-of the tree.
+of the tree.  I'll go over these calls in the examples below.
 <p>
-<LI> <b>Sorted_Vector()</b> returns a vector of the <b>val</b>'s sorted by the keys.
-The keys are not in the vector, just the vals.  This is created with another inorder
-traversal.
+<LI> <b>Ordered_Keys()</b> returns a sorted vector of the keys in the tree.
+<p>
+<LI> <b>Ordered_Vals()</b> returns a vector of the vals in the tree, in the same order as
+<b>Ordered_Keys()</b>.
+<p>
+<LI> The copy constructor and assignment overload are special.  Not only do they make a copy
+     of the tree, but the copy will be <i>balanced</i>.  In other words, the middle key will
+     be the root of the tree.  The middle key of the left subtree will be the key of the 
+     left child of the root, and the 
+     The middle key of the right subtree will be the key of the right child of the root.
+     An so on.  If a tree has an even number of elements, the "middle" element is (number-of-elements)/2.
+    So, if a tree has four keys, the "middle" one is key #2 in <b>Ordered_Keys()</b>.  Again, I'll go over examples below.
+<p>
+<LI> There are helper methods in the protected part of the class.  You'll see them in use below.
 </UL>
 
+In this explanation, I do not implement <b>Height()</b> <b>Depth()</b>, <b>Ordered_Keys()</b>, 
+the copy constructor or the assignment overload.  Those tasks are for you in your lab.
+
+<hr>
+<h3>The testing program: Overview and simple commands</h3>
 <p>
-I have an example program in 
-<b><a href=bstree_test.cpp>bstree_test.cpp</a></b>.  This is a program 
-that gives you a command line tool for managing a tree of <b>Person</b>s:
+There is a testing program in
+<b><a href=bstree_test.cpp>bstree_test.cpp</a></b>.  It's a standard command line tool
+for managing a tree of <b>Person</b>s:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 class Person {
@@ -409,147 +513,207 @@ class Person {
     string name;
     string phone;
     string ssn; 
+    void Print() const;
 };
 </pre></td></table></center><p>
 
 You run it with a prompt on the command line ("-" for no prompt), and it accepts
-lines of commands on standard input.  The commands are 
-<b>INSERT</b>,
-<b>FIND</b>,
-<b>DELETE</b>,
-<b>PRINT</b>,
-<b>EMPTY</b>,
-<b>SIZE</b> and 
-<b>SORT</b>.
-<p>
-Take a look at how the code that inserts people into the tree.  Each line of input is
-put into the vector <b>sv</b> of the individual words on a line:
+lines of commands on standard input.  You can see the commands when you enter a question mark:
+
+<pre>
+UNIX> <font color=darkred><b>echo '?' | bin/bstree_tester </b></font>
+usage: bstree_tester prompt(- for empty) -- commands on stdin.
+
+commands:
+  INSERT name phone ssn  - Insert the person into the tree.
+  FIND name              - Find the person and print them out.
+  DELETE person          - Delete the person.
+  PRINT                  - Print the keys using the Print() method.
+  EMPTY                  - Print whether the tree is empty.
+  SIZE                   - Print the tree's size.
+  HEIGHT                 - Print the tree's height.
+  DEPTH name             - Print the depth of the node whose key is name (-1 if not there).
+  KEYS                   - Print the keys using the Ordered_Keys() method.
+  VALS                   - Print the vals using the Ordered_Vals() method.
+  PRINT_COPY             - Call the copy constructor and call its Print() method.
+  REBALANCE              - Turn the tree into a balanced tree by calling the assignment overload.
+  CLEAR                  - Clear the tree back to an empty tree.
+  DESTROY                - Call the destructor and remake an empty tree.
+  QUIT                   - Quit.
+  ?                      - Print commands.
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Here I'll show some INSERT, FIND, DELETE, KEYS and VALS commands:
+
+<pre>
+UNIX> <font color=darkred><b>bin/bstree_tester 'BST>'</b></font>
+BST> <font color=darkred><b>INSERT Jim-Plank 865-123-4567 111-11-1111          <font color=blue> # I'll insert three people</b></font></font>
+BST> <font color=darkred><b>INSERT Harvey-Plank 026-631-5520   826-96-9094</b></font>
+BST> <font color=darkred><b>INSERT Abba 462-055-3150   827-30-6292</b></font>
+BST> <font color=darkred><b>FIND Abba                                          <font color=blue> # Find returns the Person, which we print.</b></font></font>
+Abba                           462-055-3150 827-30-6292
+BST> <font color=darkred><b>KEYS                                               <font color=blue> # KEYS returns a vector of sorted keys, which we print</b></font></font>
+Abba
+Harvey-Plank
+Jim-Plank
+BST> <font color=darkred><b>VALS                                               <font color=blue> # VALS returns the vals pointers, in the order of the keys.</b></font></font>
+Abba                           462-055-3150 827-30-6292 <b><font color=blue> # bstree_tester.cpp prints these vals.</font></b>
+Harvey-Plank                   026-631-5520 826-96-9094
+Jim-Plank                      865-123-4567 111-11-1111
+BST> <font color=darkred><b>FIND Fred                                          <font color=blue> # FIND returns NULL when you can't find something.</b></font></font>
+Not found.                                              <b><font color=blue> # bstree_tester.cpp prints "Not found." when this happpens.</font></b>
+BST> <font color=darkred><b>DELETE Abba                                        <font color=blue> # Here, we delete "Abba".</b></font></font>
+BST> <font color=darkred><b>VALS</b></font>
+Harvey-Plank                   026-631-5520 826-96-9094
+Jim-Plank                      865-123-4567 111-11-1111
+BST> <font color=darkred><b>FIND Abba</b></font>
+Not found.
+BST> <font color=darkred><b>QUIT</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Take a look at how the code that inserts people into the tree.  
+Each line of input is put into the vector <b>sv</b> of the individual words on a line.  This shows
+how we cast to a <b>(void *)</b> when we call <b>Insert()</b>:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-    } else if (sv[0] == "INSERT") {
-      if (sv.size() &lt; 4) {
-        printf("usage: INSERT name phone ssn\n");
-      } else {
-        p = new Person;
-        p-&gt;name = sv[1];
-        for (i = 2; i &lt; sv.size()-2; i++) {
-          p-&gt;name += " ";
-          p-&gt;name += sv[i];
-        }
-        p-&gt;phone = sv[i];
-        p-&gt;ssn = sv[i+1];
-        if (!t.Insert(p-&gt;name, (void *) p)) {
-          printf("%s not inserted.\n", p-&gt;name.c_str());
-          delete p;
-        }
-      }
+<font color=blue>/* With the INSERT command, we create a Person, and then insert it into the tree with
+   the name as its key, and a pointer to the person (cast as a (void *)</font>) as its val. */</font>
+
+} else if (sv[0] == "INSERT") {
+  if (sv.size() != 4) {
+    cout &lt;&lt; "usage: INSERT name phone ssn" &lt;&lt; endl;
+  } else {
+    p = new Person;
+    p-&gt;name = sv[1];
+    p-&gt;phone = sv[2];
+    p-&gt;ssn = sv[3];
+    if (!t1-&gt;Insert(p-&gt;name, (void *)</font> p)) {              <font color=blue>/* Here's where we cast to a (void *) */</font>
+      cout &lt;&lt; "Insert " &lt;&lt; p-&gt;name &lt;&lt; " failed." &lt;&lt; endl;
+      delete p;
     }
+  }
 </pre></td></table></center><p>
 
-The people are inserted with their names as keys and the <b>Person *</b> as vals.
-Below is an example of eight <b>INSERT</b> calls and a <b>PRINT</b>:
+And below, I show how <b>Find()</b> returns a <b>(void *)</b>, but it is cast to a <b>(Person *)</b> for printing.
 
-<pre>
-UNIX> <font color=darkred><b>cat input-easy.txt</b></font>
-INSERT Binky                                      944-867-2246   165-79-8849
-INSERT Fred                                       026-631-5520   826-96-9094
-INSERT Luther                                     462-055-3150   827-30-6292
-INSERT Waluigi                                    193-149-4333   106-62-2934
-INSERT Daisy                                      257-554-8530   481-12-6340
-INSERT Luigi                                      018-992-9715   512-23-5507
-INSERT Ernie                                      808-602-6582   702-11-9340
-INSERT Calista                                    457-440-4397   076-91-9105
-PRINT
-UNIX> <font color=darkred><b>bstree_test - < input-easy.txt</b></font>
-      Waluigi
-    Luther
-      Luigi
-  Fred
-      Ernie
-    Daisy
-      Calista
-Binky
-UNIX> <font color=darkred><b></b></font>
-</pre>
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The Find() method returns a (void *)</font>, so I must typecast it to a (Person *) */</font>
 
-The indentation of the <b>PRINT</b> helps you visualize the tree.  If you do a screen
-shot and rotate it 90 degrees clockwise, you can turn it into a tree:
+} else if (sv[0] == "FIND") {
+  if (sv.size() != 2) {
+    cout &lt;&lt; "usage: FIND key" &lt;&lt; endl;
+  } else {
+    p = (Person *)</font></font> t1-&gt;Find(sv[1]);   <font color=blue>/* Here is where we typecast the (void *) to a (Person *). */</font>
+    if (p == NULL) {
+      cout &lt;&lt; "Not found.\n";
+    } else {
+      p-&gt;Print();
+    }
+  }
+</pre></td></table></center><p>
 
-<p><center>
-<table>
-<td valign=center width=140><img src=ss-annotated.jpg width=125></td>
-<td valign=center>which is equal to</td>
-<td><img src=BST-B.jpg width=250 valign=center></td>
-</table></center><p>
+And finally, take a look at how 
+<b><a href=src/bstree_tester.cpp>src/bstree_tester.cpp</a></b>
+gets all of the <b>vals</b> in the tree by calling <b>Ordered_Vals()</b>.  This is an array
+of <b>(void *)'s</b>, so each of these must be typecast to a <b>(Person *)</b> to print:
 
-Given the description of insertion and deletion above, make sure that you understand
-the output of the following sequence of calls:
+<p><center><table border=3 cellpadding=3><td><pre>
+<font color=blue>/* The VALS command calls Ordered_Vals() to get a vector of (void *)</font>'s.
+   We typecast each to a (Person *)</font> and then print the person. */</font>
 
-<pre>
-UNIX> <font color=darkred><b>bstree_test -</b></font>
-<font color=darkred><b>INSERT Binky                                      944-867-2246   165-79-8849</b></font>
-<font color=darkred><b>INSERT Fred                                       026-631-5520   826-96-9094</b></font>
-<font color=darkred><b>INSERT Luther                                     462-055-3150   827-30-6292</b></font>
-<font color=darkred><b>INSERT Waluigi                                    193-149-4333   106-62-2934</b></font>
-<font color=darkred><b>INSERT Daisy                                      257-554-8530   481-12-6340</b></font>
-<font color=darkred><b>INSERT Luigi                                      018-992-9715   512-23-5507</b></font>
-<font color=darkred><b>INSERT Ernie                                      808-602-6582   702-11-9340</b></font>
-<font color=darkred><b>INSERT Calista                                    457-440-4397   076-91-9105</b></font>
-<font color=darkred><b>PRINT     </b></font>
-      Waluigi
-    Luther
-      Luigi
-  Fred
-      Ernie
-    Daisy
-      Calista
-Binky
-<font color=darkred><b>INSERT Alvin                                       345-654-3434   242-55-4444</b></font>
-<font color=darkred><b>PRINT</b></font>
-      Waluigi
-    Luther
-      Luigi
-  Fred
-      Ernie
-    Daisy
-      Calista
-Binky
-  Alvin
-<font color=darkred><b>DELETE Luther</b></font>
-<font color=darkred><b>PRINT</b></font>
-      Waluigi
-    Luigi
-  Fred
-      Ernie
-    Daisy
-      Calista
-Binky
-  Alvin
-<font color=darkred><b>DELETE Luigi</b></font>
-<font color=darkred><b>PRINT</b></font>
-    Waluigi
-  Fred
-      Ernie
-    Daisy
-      Calista
-Binky
-  Alvin
-<font color=darkred><b>DELETE Fred</b></font>
-<font color=darkred><b>PRINT</b></font>
-    Waluigi
-  Ernie
-    Daisy
-      Calista
-Binky
-  Alvin
-<font color=darkred><b>QUIT</b></font>
-UNIX> <font color=darkred><b></b></font>
-</pre>
+} else if (sv[0] == "VALS") {
+  vals = t1-&gt;Ordered_Vals();
+  for (i = 0; i &lt; vals.size(); i++) {
+    p = (Person *)</font> vals[i];
+    p-&gt;Print();
+  }
+</pre></td></table></center><p>
 
 <hr>
-<h3>Implementation -- The code</h3>
+<h3>The Print() method and the PRINT command</h3>
 
-Ok, let's look at the code.  Each node of our tree is a <b>BSTNode</b>:
+The <b>Print()</b> method prints the tree with a special format.  The tree is printed in a 
+reverse inorder traversal, and each node of the tree is indented with <i>2d</i> spaces, if
+the node's depth is <i>d</i>.  Here's an example:
+
+<pre>
+UNIX> <font color=darkred><b>bin/bstree_tester '--------->'</b></font>
+---------> <font color=darkred><b>INSERT Binky     944-867-2246   165-79-8849</b></font>
+---------> <font color=darkred><b>INSERT Fred      026-631-5520   826-96-9094</b></font>
+---------> <font color=darkred><b>INSERT Luther    462-055-3150   827-30-6292</b></font>
+---------> <font color=darkred><b>INSERT Waluigi   193-149-4333   106-62-2934</b></font>
+---------> <font color=darkred><b>INSERT Daisy     257-554-8530   481-12-6340</b></font>
+---------> <font color=darkred><b>INSERT Luigi     018-992-9715   512-23-5507</b></font>
+---------> <font color=darkred><b>INSERT Ernie     808-602-6582   702-11-9340</b></font>
+---------> <font color=darkred><b>INSERT Calista   457-440-4397   076-91-9105</b></font>
+---------> <font color=darkred><b>PRINT</b></font>                                        <font color=blue> # This is the same tree as above</font>
+      Waluigi
+    Luther
+      Luigi
+  Fred
+      Ernie
+    Daisy
+      Calista
+Binky
+---------> <font color=darkred><b>INSERT Alvin 345-654-3434   242-55-4444</b></font>
+---------> <font color=darkred><b>PRINT</b></font>                                        <font color=blue> # Alvin will be inserted as Binky's left child.</font>
+      Waluigi
+    Luther
+      Luigi
+  Fred
+      Ernie
+    Daisy
+      Calista
+Binky
+  Alvin
+---------> <font color=darkred><b>DELETE Luigi</b></font>                 <font color=blue> # Luigi has no children, so deleting him is easy</font>
+---------> <font color=darkred><b>PRINT</b></font>
+      Waluigi
+    Luther
+  Fred
+      Ernie
+    Daisy
+      Calista
+Binky
+  Alvin
+---------> <font color=darkred><b>DELETE Luther</b></font>                <font color=blue> #  Luther has one child, so we replace him with his child (Waluigi)</font>
+---------> <font color=darkred><b>PRINT</b></font>
+    Waluigi
+  Fred
+      Ernie
+    Daisy
+      Calista
+Binky
+  Alvin
+---------> <font color=darkred><b>DELETE Fred</b></font>                  <font color=blue> # Fred has two children, so we find the node with the</font>
+---------> <font color=darkred><b>PRINT</b></font>                        <font color=blue> # greatest key in his left subtree, which is Ernie, </font>
+    Waluigi                             <font color=blue> # replace Fred's key and val with Ernie's key and val,</font>
+  Ernie                                 <font color=blue> # and delete Ernie.</font>
+    Daisy
+      Calista
+Binky
+  Alvin
+---------> <font color=darkred><b>DEPTH Binky</b></font>                  <font color=blue> # Binky is the root, which has a depth of 0</font>
+0
+---------> <font color=darkred><b>DEPTH Daisy</b></font>                  <font color=blue> # Daisy is two edges from the root.</font>
+2
+---------> <font color=darkred><b>DEPTH Calista</b></font>                <font color=blue> # And Caliste is three.</font>
+3
+---------> <font color=darkred><b>HEIGHT      </b></font>                 <font color=blue> # Calista has the greatest depth in the tree, so the</font>
+4                                       <font color=blue> # height of the tree is Calista's depth plus one.</font>
+---------> <font color=darkred><b>QUIT</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+
+<hr>
+<h3>The implementation in src/bstree.cpp</h3>
+
+Ok, let's look at the interesting parts of the code that is in 
+<b><a href=src/bstree.cpp>src/bstree.cpp</a></b>.  First, here's the definition of a node of the tree:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 class BSTNode {
@@ -571,16 +735,16 @@ to the sentinel.  Thus, when we create the following tree:
 
 <pre>
 UNIX> <font color=darkred><b>bstree_test -</b></font>
-<font color=darkred><b>INSERT Fred                                       026-631-5520   826-96-9094</b></font>
-<font color=darkred><b>INSERT Binky                                      944-867-2246   165-79-8849</b></font>
-<font color=darkred><b>INSERT Luigi                                      462-055-3150   827-30-6292</b></font>
+<font color=darkred><b>INSERT Fred         026-631-5520   826-96-9094</b></font>
+<font color=darkred><b>INSERT Binky        944-867-2246   165-79-8849</b></font>
+<font color=darkred><b>INSERT Luigi        462-055-3150   827-30-6292</b></font>
 <font color=darkred><b>QUIT</b></font>
 UNIX> 
 </pre>
 
 It is going to have the following representation:
 
-<p><center><table border=3><td><img src=Big-BST.jpg width=600></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/Big-BST.jpg width=800></td></table></center><p>
 
 The constructor, <b>size()</b> and <b>Empty()</b> are straightforward as usual.  The empty
 tree has <b>sentinel->right</b> point to <b>sentinel</b>:
@@ -592,15 +756,17 @@ BSTree::BSTree()
   sentinel-&gt;parent = NULL;
   sentinel-&gt;left = NULL;
   sentinel-&gt;right = sentinel;
+  sentinel-&gt;key = "---SENTINEL---";  <font color=blue>// This helps with debugging.</font>
+  sentinel-&gt;val = NULL;
   size = 0;
 }
 </pre></td><td valign=top><pre>
-int BSTree::Size()
+bool BSTree::Size() const
 {
   return size;
 }
 </pre></td><td valign=top><pre>
-int BSTree::Empty()
+bool BSTree::Empty() const
 {
   return (size == 0);
 }
@@ -610,33 +776,32 @@ The implementation of <b>Find()</b> is a simple <b>while</b> loop that either fi
 the key or returns <b>NULL</b> when the sentinel has been reached:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-void *BSTree::Find(string s)
+<font color=blue>/* This is a standard search on a binary search tree. */</font>
+
+void *BSTree::Find(const string &key) const
 {
   BSTNode *n;
 
   n = sentinel-&gt;right;
   while (1) {
     if (n == sentinel) return NULL;
-    if (s == n-&gt;key) return n-&gt;val;
-    if (s &lt; n-&gt;key) {
-      n = n-&gt;left;
-    } else {
-      n = n-&gt;right;
-    }
+    if (key == n-&gt;key) return n-&gt;val;
+    n = (key &lt; n-&gt;key) ? n-&gt;left : n-&gt;right;
   }
 }
 </pre></td></table></center><p>
 
 <b>Insert()</b> starts similarly to <b>Find()</b>.  If it actually finds the key,
-then it returns zero.  Otherwise, the important thing is finding the parent of the
+then it returns false.  Otherwise, the important thing is finding the parent of the
 newly created node.  Once the parent is found, the new node is created, its
 <b>left</b> and <b>right</b> pointers are set to be the sentinel, and its <b>parent</b>
 pointer is set to be its parent.  At this point, all of its pointers are correct --
-the only thing that needs to be fixed is the parent -- either the new node is the left
-or the right child.  Once that is figured out, the pointer is set, and we return one:
+the only thing that needs to be fixed is the parent -- the new node is either 
+the parent's left or right child.  Once that is figured out, the pointer is set, 
+and we return true:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-int BSTree::Insert(string s, void *val)
+bool BSTree::Insert(const string &key, void *val)
 {
   BSTNode *parent;
   BSTNode *n;
@@ -644,32 +809,38 @@ int BSTree::Insert(string s, void *val)
   parent = sentinel;
   n = sentinel-&gt;right;
 
-  while (n != sentinel) {         <font color=darkred><b>// This loop finds the parent.</b></font>
-    if (n-&gt;key == s) return 0;
+  <font color=blue>/* Find where the key should go.  If you find the key, return false. */</font>
+
+  while (n != sentinel) {
+    if (n-&gt;key == key) return false;
     parent = n;
-    if (s &lt; n-&gt;key) {
-      n = n-&gt;left;
-    } else {
-      n = n-&gt;right;
-    }
+    n = (key &lt; n-&gt;key) ? n-&gt;left : n-&gt;right;
   }
 
-  n = new BSTNode;                <font color=darkred><b>// Create the new node and set all of its pointers.</b></font>
-  n-&gt;key = s;
+  <font color=blue>/* At this point, parent is the node that will be the parent of the new node.
+     Create the new node, and hook it in. */</font>
+
+  n = new BSTNode;
+  n-&gt;key = key;
   n-&gt;val = val;
   n-&gt;parent = parent;
   n-&gt;left = sentinel;
   n-&gt;right = sentinel;
 
-  if (parent == sentinel) {       <font color=darkred><b>// Set the parent's left/right pointer.</b></font>
+  <font color=blue>/* Use the correct pointer in the parent to point to the new node. */</font>
+
+  if (parent == sentinel) {
     sentinel-&gt;right = n;
-  } else if (s &lt; parent-&gt;key) {
+  } else if (key &lt; parent-&gt;key) {
     parent-&gt;left = n;
   } else {
     parent-&gt;right = n;
   }
-  size++;                         <font color=darkred><b>// All done.</b></font>
-  return 1;
+
+  <font color=blue>/* Increment the size and return success. */</font>
+
+  size++;
+  return true;
 }
 </pre></td></table></center><p>
 
@@ -682,40 +853,46 @@ it with its left child.
 <p>
 Those are the easy cases.  The hard case is when the node has two children.  In that
 case, we find the maximum node whose key is less than the node's key (There are no
-duplicates, which simplifies matters).  This node is in <b>mlc</b>.  Now, we recursively
-delete <b>mlc</b>, and then replace <b>n</b> with <b>mlc</b>'s key and val:
+duplicates, which simplifies matters).  This node is in the 
+variable <b>mlc</b>.  We recursively
+delete <b>mlc</b>, and then replace <b>n</b>'s key and val with <b>mlc</b>'s key and val:
 
 <p><center><table border=3 cellpadding=3><td><pre>
-int BSTree::Delete(string s)
+bool BSTree::Delete(const string &key)
 {
   BSTNode *n, *parent, *mlc;
   string tmpkey;
   void *tmpval;
 
-  n = sentinel-&gt;right;                     <font color=darkred><b>// Find the node.</b></font>
-  while (n != sentinel && s != n-&gt;key) {
-    if (s &lt; n-&gt;key) {
-      n = n-&gt;left;
-    } else {
-      n = n-&gt;right;
-    }
-  }
+  <font color=blue>/* Try to find the key -- if you can't, return false. */</font>
 
-  if (n == sentinel) return 0;
+  n = sentinel-&gt;right;
+  while (n != sentinel && key != n-&gt;key) {
+    n = (key &lt; n-&gt;key) ? n-&gt;left : n-&gt;right;
+  }
+  if (n == sentinel) return false;
+
+  <font color=blue>/* We go through three cases for deletion. */</font>
+
   parent = n-&gt;parent;
 
-  if (n-&gt;left == sentinel) {               <font color=darkred><b>// If the node has no left child, then</b></font>
-    if (n == parent-&gt;left) {               <font color=darkred><b>// replace it with its right child.</b></font>
+  <font color=blue>/* Case 1 - I have no left child.  Replace me with my right child.
+     Note that this handles the case of having no children, too. */</font>
+
+  if (n-&gt;left == sentinel) {
+    if (n == parent-&gt;left) {
       parent-&gt;left = n-&gt;right;
     } else {
       parent-&gt;right = n-&gt;right;
     }
-    n-&gt;right-&gt;parent = parent;
+    if (n-&gt;right != sentinel) n-&gt;right-&gt;parent = parent;
     delete n;
     size--;
 
-  } else if (n-&gt;right == sentinel) {       <font color=darkred><b>// If the node has no right child, then</b></font>
-    if (n == parent-&gt;left) {               <font color=darkred><b>// replace it with its left child.</b></font>
+  <font color=blue>/* Case 2 - I have no right child.  Replace me with my left child. */</font>
+
+  } else if (n-&gt;right == sentinel) {
+    if (n == parent-&gt;left) {
       parent-&gt;left = n-&gt;left;
     } else {
       parent-&gt;right = n-&gt;left;
@@ -724,7 +901,12 @@ int BSTree::Delete(string s)
     delete n;
     size--;
 
-                                           <font color=darkred><b>// Otherwise, do case 3, as explained above.</b></font>
+  <font color=blue>/* If I have two children, then find the node "before" me in the tree.
+     That node will have no right child, so I can recursively delete it.
+     When I'm done, I'll replace the key and val of n with the key and
+     val of the deleted node.  You'll note that the recursive call 
+     updates the size, so you don't have to do it here. */</font>
+
   } else {
     for (mlc = n-&gt;left; mlc-&gt;right != sentinel; mlc = mlc-&gt;right) ;
     tmpkey = mlc-&gt;key;
@@ -733,7 +915,8 @@ int BSTree::Delete(string s)
     n-&gt;key = tmpkey;
     n-&gt;val = tmpval;
   }
-  return 1;
+
+  return true;
 }
 </pre></td></table></center><p>
 
@@ -751,12 +934,17 @@ itself recursively on its <i>right</i> child, then it prints the node, and final
 it calls recursively on its left child.  It always stops when it reaches the sentinel.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-void BSTree::Print()
+<font color=blue>/* Print() simply calls recursive_inorder_print() on the root node of the tree. */</font>
+
+void BSTree::Print() const
 {
   recursive_inorder_print(0, sentinel-&gt;right);
 }
+                                
+<font color=blue>/* This does an inorder traversal in reverse order.  The "Action" is printing "level" spaces,
+   and then the key.  You increment the level by two when you make recursive calls. */</font>
 
-void BSTree::recursive_inorder_print(int level, BSTNode *n)
+void BSTree::recursive_inorder_print(int level, const BSTNode *n) const
 {
   if (n == sentinel) return;
   recursive_inorder_print(level+2, n-&gt;right);
@@ -765,21 +953,53 @@ void BSTree::recursive_inorder_print(int level, BSTNode *n)
 }
 </pre></td></table></center><p>
 
-The other two recursive traversals are creating the sorted vector and the destructor.
-The first performs an in-order traversal, while the second preforms a post-order 
-traversal.  That is necessary, because we can't use <b>n->left</b> or <b>n->right</b>
+The other two recursive traversals are <b>Ordered_Vals</b> and <b>Clear()</b>.
+The first performs an in-order traversal, pushing vals onto a vector,
+while the second preforms a post-order traversal, deleting nodes of the tree.  
+The post-order traversal is necessary, because we can't use <b>n->left</b> or <b>n->right</b>
 after we've deleted <b>n</b>.  Granted, we could store them in temporary pointers,
 delete <b>n</b> and then recursively delete the temporary pointers, but the post-order
 traversal is easier.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-BSTree::~BSTree()
+<font color=blue>/* This simply calls make_val_vector() on the root.
+   That creates the vector rv, so return it. */</font>
+
+vector &lt;void *&gt; BSTree::Ordered_Vals() const
 {
-  recursive_destroy(sentinel-&gt;right);
-  delete sentinel;
+  vector &lt;void *&gt; rv;
+  make_val_vector(sentinel-&gt;right, rv);
+  return rv;
 }
 
-void BSTree::recursive_destroy(BSTNode *n)      <font color=darkred><b>// Post-order traversal.</b></font>
+<font color=blue>/* This does an inorder traversal, which of course visits the nodes
+   in sorted order of the keys.  The "action" is pushing the val onto the vector.
+   That means that the vals get pushed in the correct order. */</font>
+                                       
+void BSTree::make_val_vector(const BSTNode *n, vector&lt;void *&gt; &v) const
+{
+  if (n == sentinel) return;
+  make_val_vector(n-&gt;left, v);
+  v.push_back(n-&gt;val);
+  make_val_vector(n-&gt;right, v);
+}
+
+<font color=blue>/* Clear simply calls recursive_destroy on the root of the tree.
+   That deletes all of the nodes but the sentinel.  It then sets
+   the root of the tree to the sentinel and the size to 0. */</font>
+
+void BSTree::Clear()
+{
+  recursive_destroy(sentinel-&gt;right);
+  sentinel-&gt;right = sentinel;
+  size = 0;
+}
+                                      
+<font color=blue>/* Recursive destroy deletes all of the nodes of a tree.
+   It does this with a postorder traversal -- deleting the
+   children before deleting the node. */</font>
+
+void BSTree::recursive_destroy(BSTNode *n)
 {
   if (n == sentinel) return;
   recursive_destroy(n-&gt;left);
@@ -787,25 +1007,193 @@ void BSTree::recursive_destroy(BSTNode *n)      <font color=darkred><b>// Post-o
   delete n;
 }
 
-vector &lt;void *&gt;BSTree::Sorted_Vector()
-{
-  array.clear();
-  recursive_make_vector(sentinel-&gt;right);
-  return array;
-}
+<font color=blue>/* The destructor calls Clear(), which deletes all of the tree but
+   the sentinel node.  Therefore, it must also delete the sentinel node. */</font>
 
-void BSTree::recursive_make_vector(BSTNode *n)  <font color=darkred><b>// In-order traversal.</b></font>
+BSTree::~BSTree()
 {
-  if (n == sentinel) return;
-  recursive_make_vector(n-&gt;left);
-  array.push_back(n-&gt;val);
-  recursive_make_vector(n-&gt;right);
+  Clear();
+  delete sentinel;
 }
 </pre></td></table></center><p>
-
 
 A final comment on the destructor.  Should it also delete the <b>val</b>'s?  
 The answer is no -- it's good form only to delete what you create with <b>new</b>.
 What if the user of this data structure didn't create the <b>val</b>'s with 
 <b>new</b>, or what if the user is holding them in a second data structure?  Then
 it would be really bad form for the destructor to delete it!
+
+<hr>
+<h3>The Assignment Overload and Copy Constructor</h3>
+
+The assignment overload and copy constructor are necessary.
+The reason is that without them, you'd simply copy the <b>size</b> and
+<b>sentinel</b> pointer, and now you'd have two trees pointing to the same
+<b>sentinel</b>.  When one of them calls its destructor, then the second one
+will be pointing to deleted memory - a disaster!
+<p>
+With this data structure, we are making the assignment overload and copy constructor
+special.  Not only do they make a copy of the tree, but they make the new copy
+<i>balanced</i>.  The reason is that it will improve the performance of subsequent
+<b>Insert()</b>, 
+<b>Find()</b> and <b>Delete()</b> operations.  Let's take an example -- in 
+<b><a href=src/bstree_tester.cpp>src/bstree_tester.cpp</a></b>, the PRINT_COPY
+command calls a procedure called <b>print_copy()</b> with the tree as a parameter.
+This will call the copy constructor, so that <b>print_copy()</b> gets a copy of
+the original tree.  This copy will be balanced (the original tree will remain 
+unchanged) -- read the inline comments:
+
+<pre>
+UNIX> <font color=darkred><b>bin/bstree_tester '--------->'</b></font>   <font color=blue> # We insert 0 through 6 in order,</font>
+---------> <font color=darkred><b>INSERT 0 0 0</b></font>                <font color=blue> # which means that our tree is a big line.</font>
+---------> <font color=darkred><b>INSERT 1 0 0</b></font>
+---------> <font color=darkred><b>INSERT 2 0 0</b></font>
+---------> <font color=darkred><b>INSERT 3 0 0</b></font>
+---------> <font color=darkred><b>INSERT 4 0 0</b></font>
+---------> <font color=darkred><b>INSERT 5 0 0</b></font>
+---------> <font color=darkred><b>INSERT 6 0 0</b></font>
+---------> <font color=darkred><b>PRINT</b></font>
+            6
+          5
+        4
+      3
+    2
+  1
+0
+---------> <font color=darkred><b>PRINT_COPY</b></font>        <font color=blue> # PRINT_COPY calls the copy constructor,</font>
+    6                        <font color=blue> # which creates a balanced version of the tree. </font>
+  5                          <font color=blue> # Since 3 is the middle key, it becomes the root</font>
+    4                        <font color=blue> # of the tree.  Its left subtree has the values</font>
+3                            <font color=blue> # 0, 1 and 2.  Since 1 is the middle of these,</font>
+    2                        <font color=blue> # it is the root of the subtree.  Similarly, the</font>
+  1                          <font color=blue> # right subtree has the values 4, 5, and 6, so </font>
+    0                        <font color=blue> # 5 is the root of the subtree.</font>
+---------> <font color=darkred><b>PRINT</b></font>
+            6                <font color=blue> # I'm doing this to show you that the original</font>
+          5                  <font color=blue> # tree is unmodified.  Only the copy was balanced.</font>
+        4
+      3
+    2
+  1
+0
+---------> <font color=darkred><b>QUIT</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+The assignment overload also balances.  In 
+<b><a href=src/bstree_tester.cpp>src/bstree_tester.cpp</a></b>, the command "REBALANCE"
+calls the assignment overload and sets the main tree pointer to be this new tree.
+That way, it balances the tree.  I'm going to show that below.  Also, make note of the
+fact that when a tree has an even number of elements, then there are two potential "middle"
+elements.  The code here chooses the higher of the two elements.  I'll show that below.
+Your code will have to do this:
+
+<pre>
+UNIX> <font color=darkred><b>bin/bstree_tester '--------->'</b></font>
+---------> <font color=darkred><b>INSERT 0 0 0</b></font>    <font color=blue> # I make a big line again, this time with 8 elements</font>
+---------> <font color=darkred><b>INSERT 1 0 0</b></font>
+---------> <font color=darkred><b>INSERT 2 0 0</b></font>
+---------> <font color=darkred><b>INSERT 3 0 0</b></font>
+---------> <font color=darkred><b>INSERT 4 0 0</b></font>
+---------> <font color=darkred><b>INSERT 5 0 0</b></font>
+---------> <font color=darkred><b>INSERT 6 0 0</b></font>
+---------> <font color=darkred><b>INSERT 7 0 0</b></font>
+---------> <font color=darkred><b>PRINT</b></font>
+              7
+            6
+          5
+        4
+      3
+    2
+  1
+0
+---------> <font color=darkred><b>REBALANCE</b></font>
+---------> <font color=darkred><b>PRINT</b></font>
+    7
+  6
+    5
+4             <font color=blue> # Since there are 8 elements in the tree, there are two potential middles.  We choose the larger: 4</font>
+    3
+  2           <font color=blue> # This subtree has four elements, so there are two potential middles.  We choose the larger: 2</font>
+    1         <font color=blue> # This subtree has two elements, so there are two potential middles.  We choose the larger: 1</font>
+      0
+---------> <font color=darkred><b>QUIT</b></font>
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Your Lab</h3>
+
+Your lab is simple -- implement the following methods:
+
+<UL>
+<LI> <b>Depth()</b>
+<LI> <b>Height()</b>
+<LI> <b>Ordered_Keys()</b>
+<LI> The assignment overload.
+<LI> The copy contstructor.
+</UL>
+
+Some notes here:  
+<UL>
+<LI> <b>Height()</b> should use the protected method 
+<b>recursive_find_height()</b>, which you'll write.
+<LI> <b>Ordered_Keys()</b> should use the protected method 
+<b>make_key_vector()</b>, which you'll write.
+<LI> The assignment overload should call <b>Ordered_Keys()</b> to get a vector of keys in
+sorted order, and 
+<b>Ordered_Vals()</b> to get a vector of vals that correspond to the keys.  It should then
+call <b>make_balanced_tree()</b> to create a subtree of the given region of the keys/vals.
+<b>make_balanced_tree()</b> should be recursive, and should work by creating the tree in
+a postorder manner.  
+<p>
+I'll give an example.  Suppose the keys are "0" through "6" as above.  Then here are the 
+calls to <b>make_balanced_tree()</b>:
+
+<UL>
+<LI> The first call will be <b>make_balanced_tree(keys, vals, 0, 7).</b>
+<LI> That will call <b>make_balanced_tree(keys, vals, 0, 3)</b> and <b>make_balanced_tree(keys, vals, 4, 3)</b>.
+<LI> <b>make_balanced_tree(keys, vals, 0, 3)</b> will call <b>make_balanced_tree(keys, vals, 0, 0)</b> and <b>make_balanced_tree(keys, vals, 2, 0)</b>.
+<LI> <b>make_balanced_tree(keys, vals, 4, 3)</b> will call <b>make_balanced_tree(keys, vals, 4, 0)</b> and <b>make_balanced_tree(keys, vals, 6, 0)</b>.
+<LI> The rest of the <b>make_balanced_tree()</b> calls won't make recursive calls, because they 
+     won't have any subtrees.
+</UL>
+<p>
+<LI> The copy constructor should call the assignment overload (see the copy constructor for
+     stacks in the  <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Linked/index.html>Linkd Data Structures</a> lecture.
+</UL>
+
+<hr>
+<h3>Running times</h3>
+
+I know that this has been a long lecture -- this is the last section!
+<p>
+For general trees, you should know the following things:
+
+<UL>
+<LI> A tree with <i>n</i> nodes has <i>n-1</i> edges.
+<LI> Therefore the number of edges is <i>O(n)</i>.
+<LI> All tree traversals are <i>O(n)</i>.
+</UL>
+
+For binary search trees, you should know the following things:
+
+<UL>
+<LI> The running times of <b>Find()</b>, <b>Insert()</b>, <b>Delete()</b> and <b>Depth()</b> 
+     are all <i>O(h)</i>, where <i>h</i> is the height of the tree.
+<LI> Binary search trees do not have to be balanced (the see example with the copy constructor above).  That means that a binary search tree can easily have a height <i>h</i> which is <i>O(n)</i>.
+<LI> Therefore the worst case running times of <b>Find()</b>, <b>Insert()</b>, <b>Delete()</b> 
+     and <b>Depth()</b> are <i>O(n)</i>.
+<LI> The worst case of creating a binary search tree with <i>n</i> elements is 
+     <i>O(n<sup>2</sup>)</i>.  One way to do that is to insert all of the keys in sorted order.
+<LI> When a tree is balanced, its height is <i>O(log(n))</i>.
+<LI> So on a balanced binary search tree, 
+the running times of <b>Find()</b>, <b>Insert()</b>, <b>Delete()</b> 
+     and <b>Depth()</b> are <i>O(log(n))</i>.
+<LI> All of the traversals are still <i>O(n)</i>, so <b>Height()</b>, <b>Print()</b>, 
+<b>Ordered_Keys()</b>, <b>Ordered_Vals()</b>, <b>Clear()</b>, 
+the destructor, the copy constructor and the
+assignment overload are all <i>O(n)</i>.
+</UL>
+
+

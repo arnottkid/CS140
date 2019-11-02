@@ -1,9 +1,0 @@
-#1: Nomenclature, parents, children, ancestors, descendants
-    Binary trees, full trees, complete trees.
-    Size. Depth.
-
-Arithmetic example
-
-Traversals -- Examples.
-
-Move onto Binary Search Trees.
