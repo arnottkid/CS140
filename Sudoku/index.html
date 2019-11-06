@@ -477,7 +477,7 @@ int Sudoku::Solve()
 We will go over each part of <b>Recursive_Solve()</b> separately.  The first
 part of it checks successive elements of the grid until it gets to the end 
 of the grid, or it gets to a dash character.  If it reaches the end of
-the grid, then the puzzle is solved, and it returns 1.  
+the grid, then the puzzle is solved, and it returns true.  
 
 <p><center><table border=3 cellpadding=3><td><pre>
 int Sudoku::Recursive_Solve(int r, int c)
@@ -506,7 +506,7 @@ each value from '1' to '9'.  When we insert a value, we test to see if the
 value's row, column and panel are valid.  If so, then we call the solver
 recursively.  We do that on <i>r</i> and <i>c</i>, because the recursive
 solver will skip over that element, now that it is no longer a dash.
-If the recursive solver returns 1, then we have found a solution, and we
+If the recursive solver returns true, then we have found a solution, and we
 return one:
 <p><center><table border=3 cellpadding=3><td><pre>
   <font color=blue>/* Try each value.  If successful, then return true. */</font>
