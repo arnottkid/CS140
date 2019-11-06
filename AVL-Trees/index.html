@@ -74,7 +74,7 @@ A central operation with AVL Trees is a <i>rotation</i>.  It is a way of
 changing a binary search tree so that it remains a binary search tree,
 but changes how it is balanced.  The concept is illustrated below:
 
-<p><center><table border=0><td><img src=Balance.jpg width=450></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Balance.jpg width=450></td></table></center><p>
 
 <b>B</b> and <b>D</b> are nodes in a binary search tree.  They can occur anywhere
 a tree, but we don't worry about what's above them -- just what's below them.
@@ -103,23 +103,23 @@ employ rotations to ensure that the trees are balanced.
 <p>
 Below are some example rotations. Make sure you understand all of them:
 
-<p><center><table border=3><tr><td><img src=B1.jpg width=450></td></tr>
-                           <tr><td><img src=B2.jpg width=500></td></tr>
-                           <tr><td><img src=B3.jpg width=500></td></tr>
-                           <tr><td><img src=B4.jpg width=500></td></tr></table></center><p>
+<p><center><table border=3><tr><td><img src=jpg/B1.jpg width=450></td></tr>
+                           <tr><td><img src=jpg/B2.jpg width=500></td></tr>
+                           <tr><td><img src=jpg/B3.jpg width=500></td></tr>
+                           <tr><td><img src=jpg/B4.jpg width=500></td></tr></table></center><p>
 
 
 <hr>
 <h3>AVL Trees</h3>
 
 An AVL Tree is a binary search tree that has conditions on the <i>height</i> of each 
-node.  The height is defined to be the length of the longest path from that node
+node.  The height is defined to be the number of nodes in the longest path from that node
 to a leaf node.  Thus, in the left tree in the last diagram, <i>Eunice's</i>
-height is three and <i>Binky's</i> height is two.  In the right tree, 
+height is four and <i>Binky's</i> height is three.  In the right tree, 
 <i>Eunice's</i> 
-height is still three, but <i>Binky's</i> height is now one.  Leaf nodes have
-a height of zero.  Since each node roots a subtree, we say that the height of 
-a subtree is the height of its root. An empty tree has a height of -1.
+height is still four, but <i>Binky's</i> height is now two.  Leaf nodes have
+a height of one.  Since each node roots a subtree, we say that the height of 
+a subtree is the height of its root. An empty tree has a height of 0.
 <p>
 The definition of an AVL tree is follows:
 <p>
@@ -128,19 +128,24 @@ The definition of an AVL tree is follows:
 <LI> For each node, the difference between the heights of its left and right subtrees is 
 at most one.
 </UL>
+That's a pretty simple definition.  However, the constraint on the heights of each node's
+children is what makes the trees balanced, and makes insertion, finding, and deletion
+<i>O(log n)</i>.
+<p>
+
 Below are some AVL trees:
 
-<p><center><table border=3><td><img src=AVL-1.jpg width=40 valign=center align=center></td>
-<td><img src=AVL-2.jpg width=80 valign=center align=center></td>
-<td><img src=AVL-3.jpg width=120 valign=center align=center></td>
-<td><img src=AVL-4.jpg width=160 valign=center align=center></td>
-<td><img src=AVL-5.jpg width=180 valign=center align=center></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/AVL-1.jpg width=40 valign=center align=center></td>
+<td><img src=jpg/AVL-2.jpg width=80 valign=center align=center></td>
+<td><img src=jpg/AVL-3.jpg width=120 valign=center align=center></td>
+<td><img src=jpg/AVL-4.jpg width=160 valign=center align=center></td>
+<td><img src=jpg/AVL-5.jpg width=180 valign=center align=center></td></table></center><p>
 
 And below are two trees that are binary search trees, but are not AVL
 trees.
-<p><center><table border=3><td valign=bottom align=center><img src=Non-AVL-1.jpg width=80>
+<p><center><table border=3><td valign=bottom align=center><img src=jpg/Non-AVL-1.jpg width=80>
 <br><i>Binky</i> violates the definition</td>
-<td valign=bottom align=center><img src=Non-AVL-2.jpg width=180>
+<td valign=bottom align=center><img src=jpg/Non-AVL-2.jpg width=180>
 <br><i>Fred</i> violates the definition</td></table></center><p>
 
 <hr>
@@ -165,11 +170,11 @@ fix the problem, and then you are done.
 Let's try some examples.  Suppose I have the following AVL tree -- I now annotate
 the nodes with their heights:
 
-<p><center><table border=0><td><img src=AVL-6.jpg width=200></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/AVL-6.jpg width=200></td></table></center><p>
 
 If I insert <i>Ahmad</i>, take a look at the resulting tree:
 
-<p><center><table border=0><td><img src=AVL-7.jpg width=200></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/AVL-7.jpg width=200></td></table></center><p>
 
 The new node <i>Ahmad</i> has a height of zero, and when I travel the path up to
 the root, I change <i>Baby Daisy's</i> height to one.  However, her node is not
@@ -179,10 +184,11 @@ height is unchanged, so we can stop -- the resulting tree is indeed an AVL tree.
 However, suppose I now try to insert <i>Waluigi</i>.  I get the following
 tree:
 
-<p><center><table border=0><td><img src=AVL-8.jpg width=240></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/AVL-8.jpg width=240></td></table></center><p>
 
 Traveling from the new node to the root, I see that <i>Fred</i> violates the balance
-condition.  Its left child has a height of -1 and its right child has a height of 1.
+condition.  Its left child is an empty tree, and as such has a height of 0. 
+Its right child has a height of 2.
 I have to <i>rebalance</i> the tree.
 
 <hr>
@@ -196,51 +202,51 @@ We'll start with the Zig-Zig case.  This happens when you have a tree of the fol
 general form:
 
 <p><center><table border=0 cellpadding=10>
-<td><img src=AVL-ZZ-Ex1A.jpg width=200></td>
+<td><img src=jpg/AVL-ZZ-Ex1A.jpg width=200></td>
 <td align=center valign=center width=200> And you insert a node into tree <b>F</b>, which changes
 <b>F</b>'s height from <i>h-3</i> to <i>h-2</i>.  Let's assume that <b>F</b>
 is still an AVL tree, so we have this tree, where 
 <b>A</b>
 <b>C</b> and
 <b>F</b> are all AVL trees:</td>
-<td><img src=AVL-ZZ-Ex1B.jpg width=200></td>
+<td><img src=jpg/AVL-ZZ-Ex1B.jpg width=200></td>
 </table></center><p>
 
 You'll note that the tree is imbalanced, and it is imbalanced at node <b>B</b>.  Let's 
 give some concrete examples:
 
 <p><center><table border=3 cellpadding=10>
-<tr><td><img src=AVL-ZZ-Ex2A.jpg width=120></td>
+<tr><td><img src=jpg/AVL-ZZ-Ex2A.jpg width=120></td>
 <td align=center valign=center width=200> You insert <b>F</b> into the tree:
 <p>
 Make sure you can match this example up with its general form above.
-In this case, <i>h=2</i>, both before and after.</td>
-<td><img src=AVL-ZZ-Ex2B.jpg width=180></td></tr>
-<tr><td><img src=AVL-ZZ-Ex4A.jpg width=300></td>
+In this case, <i>h=3</i>.</td>
+<td><img src=jpg/AVL-ZZ-Ex2B.jpg width=180></td></tr>
+<tr><td><img src=jpg/AVL-ZZ-Ex4A.jpg width=300></td>
 <td align=center valign=center width=200> You insert "Jasper" into the tree:
 <p>
 Make sure you can match this example up with its general form above.
-In this case, <i>h=4</i>, both before and after.</td>
-<td><img src=AVL-ZZ-Ex4B.jpg width=300></td><tr>
-<tr><td><img src=AVL-ZZ-Ex3A.jpg width=250></td>
+In this case, <i>h=5</i>.</td>
+<td><img src=jpg/AVL-ZZ-Ex4B.jpg width=300></td><tr>
+<tr><td><img src=jpg/AVL-ZZ-Ex3A.jpg width=250></td>
 <td align=center valign=center width=200> 
 You insert an element into either <b>E</b> or <b>G</b>, changing its height,
 but not violating the AVL property:
 <p>
 Make sure you can match this example up with its general form above.
-<td><img src=AVL-ZZ-Ex3B.jpg width=250></td><tr>
+<td><img src=jpg/AVL-ZZ-Ex3B.jpg width=250></td><tr>
 </table></center><p>
 
 Let's take that last example as the general form of a Zig-Zig insertion:
 
-<p><center><table border=0><td><img src=Zig-Zig-1.jpg width=400></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Zig-Zig-1.jpg width=400></td></table></center><p>
 
 In this case, the path from the imbalanced node (<b>B</b>) to the newly added node
 starts with two right children.  That's what makes it "Zig-Zig".
 To rebalance the tree, you perform a rotation about
 node <b>D</b>:
 
-<p><center><table border=0><td><img src=Zig-Zig-2.jpg width=250></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Zig-Zig-2.jpg width=250></td></table></center><p>
 
 Node <b>D</b> is the new root of the subtree.  Before the insertion, node <b>B</b>'s
 height was <i>h-1</i>, so the height of the subtree has not changed because of the
@@ -256,16 +262,16 @@ to the tree being imbalanced around <i>Daisy</i>.  We can identify this as a
 Zig-Zig case, so we can fix it by rotating about <i>Garth</i>:
 
 <p><center><table border=3>
-<td align=center valign=top><u>Before</u><br><img src=AVL-ZZ-Ex4B.jpg width=300></td>
-<td align=center valign=top><u>After</u><br><img src=AVL-ZZ-Ex4C.jpg width=350></td>
+<td align=center valign=top><u>Before</u><br><img src=jpg/AVL-ZZ-Ex4B.jpg width=300></td>
+<td align=center valign=top><u>After</u><br><img src=jpg/AVL-ZZ-Ex4C.jpg width=350></td>
 </table></center><p>
 
 Here's another example, where we inserted <i>Waluigi</i> and that made the tree imbalanced
 at <i>Fred</i>:
 
 <p><center><table border=3>
-<td align=center valign=top><u>Before</u><br><img src=Zig-Zig-3.jpg width=350></td>
-<td align=center valign=top><u>After</u><br><img src=Zig-Zig-4.jpg width=266></td>
+<td align=center valign=top><u>Before</u><br><img src=jpg/Zig-Zig-3.jpg width=350></td>
+<td align=center valign=top><u>After</u><br><img src=jpg/Zig-Zig-4.jpg width=266></td>
 </table></center><p>
 
 
@@ -273,16 +279,16 @@ at <i>Fred</i>:
 <h3>Rebalancing: Zig-Zag</h3>
 
 The other rebalancing case is the Zig-Zag case, pictured below.  I'm starting with the
-general form, so try to invision an example of how this happens:
+general form, so try to envision an example of how this happens:
 
-<p><center><table border=0><td><img src=Zig-Zag-1.jpg width=320></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Zig-Zag-1.jpg width=320></td></table></center><p>
 
 To fix this, you perform two rotations.  You rotate about node <b>D</b>, and then
 you rotate about node <b>D</b> again.  This is called a <i>double rotation</i> about
 node <b>D</b>.  Here are the two rotations:
 
-<p><center><table border=3><td><img src=Zig-Zag-2.jpg width=220>
-                           <td><img src=Zig-Zag-3.jpg width=237></td></table></center><p>
+<p><center><table border=3><td><img src=jpg/Zig-Zag-2.jpg width=220>
+                           <td><img src=jpg/Zig-Zag-3.jpg width=237></td></table></center><p>
 
 Once again, the height of the subtree before deletion was <i>h-1</i>, so when you're
 done with the double rotation, you are done -- your tree is balanced.  Again, the
@@ -290,11 +296,11 @@ mirror image case is treated in the exact same manner.
 <p>
 Here's an example.  Suppose our tree is the following, rather large tree:
 
-<p><center><table border=0><td><img src=AVL-9.jpg width=300></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/AVL-9.jpg width=300></td></table></center><p>
 
 And suppose we insert <i>Boo</i> into the tree:
 
-<p><center><table border=0><td><img src=Zig-Zag-4.jpg width=300></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Zig-Zag-4.jpg width=300></td></table></center><p>
 
 Checking for balancing, we have to increment every height up to the root, and 
 the root node <i>Eunice</i> is imbalanced.  Since the path to the new node starts
@@ -302,7 +308,7 @@ with a left child and a right child, this is a Zig-Zag case, and we need to perf
 a double rotation about the grandchild of the imbalanced node -- <i>Daisy</i>.  
 Below is the result.  We have a nicely balanced AVL tree!
 
-<p><center><table border=0><td><img src=Zig-Zag-5.jpg width=400></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Zig-Zag-5.jpg width=400></td></table></center><p>
 
 <hr>
 <h3>Deletion</h3>
@@ -342,110 +348,110 @@ To rebalance, you need to identify whether you are in a zig-zig situation or
 a zig-zag situation and rebalance accordingly.  How do you do this?  Look
 at the following picture:
 
-<p><center><table border=3><td align=center><img src=Identify.jpg width=220 align=center><hr>
+<p><center><table border=3><td align=center><img src=jpg/Identify.jpg width=220 align=center><hr>
 Imbalanced Identification Picture</td></table></center><p>
 
-The imbalanced node is <b>B</b>.  If the height of subtree <b>C</b> is <i>h-3</i>, then
-the height of <b>E</b> will be <i>h-2</i> and the tree is a Zig-Zig
--- you can rebalance by rotating about node <b>D</b>.  If the
-height of subtree <b>E</b> is <i>h-3</i>, then the height of <b>C</b> is <i>h-2</i> and
-the tree is a Zig-Zag -- you rebalance
-by doing a double rotation about the root of <b>C</b>.  If both <b>C</b> and <b>E</b> have
-heights of <i>h-2</i>, then you treat it as either a Zig-Zig or a Zig-Zag.  Both work.
-For the purposes of your lab, treat this case like a Zig-Zig.
+The imbalanced node is <b>B</b>.  We use the following two cases to identify what to do:
+
+<UL>
+<LI> If <b>E</b> is of height <i>h-2</i>, then it is a Zig-Zig.  Rotate about <b>D</b>.
+<LI> If <b>E</b> is of height <i>h-3</i>, then <b>C</b>'s height must be <i>h-2</i>. 
+it is a Zig-Zag.  Double-rotate about the root of <b>C</b>.
+</UL>
 <p>
-The mirror image works the same way.  
+The mirror image works the same way.    And you should also note that the imbalances that result
+from insertion also fit these cases.  So when you write your lab, you can simply concentrate
+on these cases, and use the same code for insertion and deletion.
 <p>
 Let's look at some examples.  First, suppose we delete <i>Calista</i> from the
 following tree:
 
-<p><center><table border=0><td><img src=Delete-1.jpg width=170></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-1.jpg width=170></td></table></center><p>
 
 You're left with:
 
-<p><center><table border=0><td><img src=Delete-2.jpg width=140></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-2.jpg width=140></td></table></center><p>
 
 You check <i>Calista's</i> old parent -- <i>Binky</i> and although <i>Binky's</i> 
 height hasn't changed, the node is imbalanced.  It's clearly a Zig-Zig tree, so
 you rotate about <i>Baby Daisy</i> to yield the following tree:
 
-<p><center><table border=0><td><img src=Delete-3.jpg width=140></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-3.jpg width=140></td></table></center><p>
 
 Since <i>Baby Daisy</i> is the root, we're done.
 <p>
 Let's try a more complex example -- deleting <i>Eunice</i> from the following
 tree:
 
-<p><center><table border=0><td><img src=Delete-4.jpg width=360></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-4.jpg width=360></td></table></center><p>
 
 First, <i>Eunice</i> has two children.  So, we find the child with the greatest 
 key in <i>Eunice's</i> left subtree, which is <i>Dontonio</i>, delete it, and
 replace <i>Eunice</i> with <i>Dontonio</i>.  We start by deleting <i>Dontonio</i>:
 
-<p><center><table border=0><td><img src=Delete-5.jpg width=360></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-5.jpg width=360></td></table></center><p>
 
 And we start checking at <i>Eunice</i>.  It is imbalanced.  Looking at it, we see that
 it's a Zig-Zag, so we have to double-rotate about <i>Fred</i>:
 
-<p><center><table border=0><td><img src=Delete-6.jpg width=360></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-6.jpg width=360></td></table></center><p>
 
 Now, the subtree rooted by <i>Fred</i> is balanced, but the subtree's height is one
 less than it used to be, so we need to move to its parent and check it.  Its
 height is unchanged, and it is balanced, so we're done -- as a last step, we
 replace <i>Eunice</i> with <i>Dontonio</i>:  
 
-<p><center><table border=0><td><img src=Delete-7.jpg width=360></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-7.jpg width=360></td></table></center><p>
 
 <hr>
 Here's a larger example.  We're going to delete <i>Daisy</i> from the following
 AVL tree:
 
-<p><center><table border=0><td><img src=Delete-8.jpg width=420></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-8.jpg width=420></td></table></center><p>
 
 As in the previous example, <i>Daisy</i> has two children, so we find the node with
 the largest key in <i>Daisy's</i> left subtree: <i>Calista</i>.  We are going to 
 delete <i>Calista</i> and then replace <i>Daisy</i> with <i>Calista</i>.  So, we
 first delete <i>Calista</i>:
 
-<p><center><table border=0><td><img src=Delete-9.jpg width=420></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-9.jpg width=420></td></table></center><p>
 
 We start our checking with <i>Calista's</i> old parent: <i>Binky</i>.  The node is
 imbalanced, so we have to determine whether it is Zig-Zig or Zig-Zag.  I'll redraw it
 so it fits the Imbalanced Identification Picture:
 
-<p><center><table border=0><td><img src=Delete-A.jpg width=420></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-A.jpg width=420></td></table></center><p>
 
 In this example, <i>h</i> is three, and we're looking at the mirror image of the 
 Imbalanced Identification Picture.  
 You can see from the picture that the tree
 is Zig-Zig, so we do a single rotation about <i>Baby Daisy</i>:
 
-<p><center><table border=0><td><img src=Delete-B.jpg width=440></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-B.jpg width=440></td></table></center><p>
 
 Since the tree rooted at <i>Baby Daisy</i> has a smaller height, we need to check
 its parent (<i>Daisy</i>).  <i>Daisy's</i> height is too high, so it needs to be
 decremented, and since it's the root of the tree, we're done.  We replace <i>Daisy</i>
 with <i>Calista</i>, and return.
 
-<p><center><table border=0><td><img src=Delete-C.jpg width=440></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-C.jpg width=440></td></table></center><p>
 
 <hr>
 One final example.  Let's delete <i>Frenchy</i> from the following tree:
 
-<p><center><table border=0><td><img src=Delete-D.jpg width=440></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-D.jpg width=440></td></table></center><p>
 
 We're left with the following tree, and when we start checking <i>Frenchy's</i> old
 parent, <i>Galois</i>, it is imbalanced:
 
-<p><center><table border=0><td><img src=Delete-E.jpg width=440></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-E.jpg width=440></td></table></center><p>
 
 I've drawn the subtrees for the Imbalanced Identification picture.  <i>h</i> is two, and the
 <b>C</b> and <b>E</b> subtrees are both of height <i>h-2</i>.  Thus, we can treat it
-either as a Zig-Zig or a Zig-Zag.  We will treat it as a Zig-Zig (which you should do 
-in your lab) and do a single rotation about <i>Xavier</i>.
+as a Zig-Zig, and do a single rotation about <i>Xavier</i>.
 
 
-<p><center><table border=0><td><img src=Delete-F.jpg width=440></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-F.jpg width=440></td></table></center><p>
 
 Since the subtree's height is the same as it was before, we can return.
 
@@ -455,6 +461,17 @@ Since the subtree's height is the same as it was before, we can return.
 What is the tree that results when you delete <i>Xerxes</i> from the above tree?  I'm not going to work through this in 
 steps for you.  Convince yourself that it will be the following tree:
 
-<p><center><table border=0><td><img src=Delete-G.jpg width=440></td></table></center><p>
+<p><center><table border=0><td><img src=jpg/Delete-G.jpg width=440></td></table></center><p>
 
 To get that, you had to do a Zig-Zag balancing, and a Zig-Zig balancing.
+
+<hr>
+<h3>Running Times</h3>
+
+<UL>
+<LI> Inserting into an AVL tree with <i>n</i> nodes: <i>O(log n)</i>.
+<LI> Finding an item in an AVL tree with <i>n</i> nodes: <i>O(log n)</i>.
+<LI> Deleting from AVL tree with <i>n</i> nodes: <i>O(log n)</i>.
+<LI> Creating an AVL tree that has <i>n</i> nodes: <i>O(n log n)</i>.
+<LI> Performing any of those recursive traversals on an AVL tree with <i>n</i> nodes: <i>O(n)</i>.
+</UL>
