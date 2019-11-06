@@ -712,8 +712,18 @@ UNIX> <font color=darkred><b></b></font>
 <hr>
 <h3>The implementation in src/bstree.cpp</h3>
 
-Ok, let's look at the interesting parts of the code that is in 
-<b><a href=src/bstree.cpp>src/bstree.cpp</a></b>.  First, here's the definition of a node of the tree:
+The code that implements the <b>BSTree</b> class is split into two files:
+
+<OL>
+<LI>
+<b><a href=src/bstree_notes.cpp>src/bstree_notes.cpp</a></b> implements a lot of the methods of the
+class.
+<LI> <b><a href=src/bstree_lab.cpp>src/bstree_lab.cpp</a></b> has dummy implementations.  You are
+to write these implementations in Lab A.
+</OL>
+
+Ok, let's look at the interesting parts of the code is in 
+<b><a href=src/bstree_notes.cpp>src/bstree_notes.cpp</a></b>.  First, here's the definition of a node of the tree:
 
 <p><center><table border=3 cellpadding=3><td><pre>
 class BSTNode {
@@ -1026,8 +1036,13 @@ it would be really bad form for the destructor to delete it!
 <hr>
 <h3>The Assignment Overload and Copy Constructor</h3>
 
+<i>Note: You are going to implement the assignment overload and copy constructor
+in the lab.  The program below assumes that it is implemented correctly, as it
+is in the lab directory.</i>
+<p>
+
 The assignment overload and copy constructor are necessary.
-The reason is that without them, you'd simply copy the <b>size</b> and
+The reason is that without them, you'd simply copy the <b>size</b> and the
 <b>sentinel</b> pointer, and now you'd have two trees pointing to the same
 <b>sentinel</b>.  When one of them calls its destructor, then the second one
 will be pointing to deleted memory - a disaster!
