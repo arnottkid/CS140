@@ -4,8 +4,10 @@
 <UL>
 <LI> James S. Plank
 <LI> Directory: <b>/home/plank/cs140/Notes/AVLTree</b>
+<LI> Original Notes: <i>
+Mid 2000's.
 <LI> Last Revision: <i>
-Tue Apr 22 09:11:20 EDT 2014
+Wed Nov  6 14:04:09 EST 2019
 </i>
 </UL>
 
@@ -21,7 +23,9 @@ insert into a regular binary search tree, and the input is already
 sorted.  The tree becomes a gigantic line, and if the size of the tree
 is <i>n</i> elements, then performing each insertion
 takes <i>n</i> operations.  Performing all <i>n</i> insertions takes
-roughly <i>n<sup>2</sup></i> operations.  For example (do this 
+roughly <i>n<sup>2</sup></i> operations.  For example, go into the lecture
+note directory for binary search trees, and take a look at the file 
+txt/input.txt
 in the binary search tree directory):
 <p>
 <pre>
@@ -356,7 +360,7 @@ The imbalanced node is <b>B</b>.  We use the following two cases to identify wha
 <UL>
 <LI> If <b>E</b> is of height <i>h-2</i>, then it is a Zig-Zig.  Rotate about <b>D</b>.
 <LI> If <b>E</b> is of height <i>h-3</i>, then <b>C</b>'s height must be <i>h-2</i>. 
-it is a Zig-Zag.  Double-rotate about the root of <b>C</b>.
+It is a Zig-Zag.  Double-rotate about the root of <b>C</b>.
 </UL>
 <p>
 The mirror image works the same way.    And you should also note that the imbalances that result
