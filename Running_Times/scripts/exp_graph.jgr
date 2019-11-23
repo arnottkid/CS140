@@ -1,0 +1,55 @@
+newgraph
+xaxis size 2.5 min 0 max 40000 label fontsize 12 : Number of bins
+yaxis size 2 min 0 max 10 label fontsize 12 : Running Time (s)
+  grid_lines grid_gray .7 
+
+legend defaults fontsize 12
+
+newline clip linethickness 2 color 0 0 0 label : Vector
+  pts shell : grep vector txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 1 0 0 label : Map
+  pts shell : grep map txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 0 0 1 label : Multiset
+  pts shell : grep multiset txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 1 0 0 linetype longdash label : List
+  pts shell : grep list txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 0 0 0 linetype longdash label : Bad_Vec
+  pts shell : grep bad_vec txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 0 0 1 linetype longdash label : Deque
+  pts shell : grep deque txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 1 0 0 linetype dotdash label : Hash
+  pts shell : grep hash txt/experiment.txt | bin/show_line
+
+newline clip pts 0 0 100000 0
+
+copygraph x_translate -3.2 legend off
+xaxis min 0 max 100
+yaxis min 0 max 20 
+newline clip pts 0 0 100000 0
+newline clip linethickness 2 color 0 0 0 label : Vector
+  pts shell : grep vector txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 1 0 0 label : Map
+  pts shell : grep map txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 0 0 1 label : Multiset
+  pts shell : grep multiset txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 1 0 0 linetype longdash label : List
+  pts shell : grep list txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 0 0 0 linetype longdash label : Bad_Vec
+  pts shell : grep bad_vec txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 0 0 1 linetype longdash label : Deque
+  pts shell : grep deque txt/experiment.txt | bin/show_line
+
+newline clip linethickness 2 color 1 0 0 linetype dotdash label : Hash
+  pts shell : grep hash txt/experiment.txt | bin/show_line
+

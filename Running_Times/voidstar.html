@@ -1,0 +1,375 @@
+<title>CS140 Lecture notes -- Implementing a class with a void *</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Implementing a class with a void *</h1>
+<UL>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>/home/plank/cs140/Notes/Running_Time</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Running_Time/voidstar.html>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Running_Time/voidstar.html</b></a>
+<LI> Original notes: Fall, 2019
+<LI> Last modified: <i> 
+Wed Nov 20 15:31:13 EST 2019
+</i>
+</UL>
+<hr>
+
+<h2>Before you read</h2>
+
+This is not an "industry-standard" way to program in C++.  In fact, it circumvents many
+of the nice features of C++, the most important of which is using the type-checking
+abilities of your compilers.  When you learn inheritance and interfaces next semester,
+you may well feel that what I'm teaching here is wrong.
+<p>
+However, I don't believe it's wrong, and this is indeed how my research group's classes
+work.  Hiding information behind a <b>(void *)</b> is, in my opinion, a valuable thing to
+do, so I teach it to you.  
+
+<hr>
+<h2>A motivating example: Implementing a histogram data structure</h2>
+
+We're going to define and implement a C++ class to help us generate histograms from
+data.  This class has three important methods:
+
+<OL>
+<LI> <b>Set_Bin_Size()</b> -- our histogram will organize data by "bins", which represent
+regions of data.  For example, if our bin size is 10, then bin 0 will represent all data values
+between 0 and 10 (not including 10), bin 1 will represent all data values between 10 and 20 (not
+including 20), etc.
+<LI> <b>Add_Value()</b> -- this adds a value to our histogram.  Basically, our data structure
+will figure out which bin it belongs to, and then it will add one to the bin.
+<LI> <b>Get_Data()</b> -- this gives us our histogram data: what the bins are and how many data
+items are in each bin.  You could use this information to make graphs (like the ones that I
+make to show how students have done on an exam.)
+</OL>
+
+Here's the entire class definition, in 
+<b><a href=include/histogram.hpp>include/histogram.hpp</a></b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#pragma once
+
+#include &lt;vector&gt;
+
+class Histogram {
+  public:
+
+    <font color=blue>/* Constructors, destructor, assignment overload. */</font>
+
+    Histogram();
+    ~Histogram();
+    Histogram(const Histogram &h);
+    Histogram& operator= (const Histogram &h);
+
+    void Clear();                   <font color=blue>// This clears the histogram's data</font>
+                                    <font color=blue>// but retains the bin size if one has been set.</font>
+
+    bool   Set_Bin_Size(double bs); <font color=blue>// Returns false if bs is &lt;= 0, or if histogram is non empty.</font>
+    double Get_Bin_Size() const;    <font color=blue>// Return -1 if the bin size has not been sent.</font>
+    bool   Add_Value(double d);     <font color=blue>// Add a new value to the histogram.  Returns false if</font>
+                                    <font color=blue>// the bin size has not been set.</font>
+
+    <font color=blue>/* Get_Data() creates these two vectors.  There will be an element in each
+       vector for every non-empty bin in the histogram.  bin_ids[i] will contain
+       the "id" of the bin, where an id of 0 corresponds to values between [0 and
+       Bin_Size), an id of 1 corresponds to values between [Bin_Size and Bin_Size*2),
+       etc.  bin_ids will be sorted.  num_elts[i] contains the number of data points
+       in bin i.
+     */</font>
+
+    bool Get_Data(std::vector &lt;int&gt; &bin_ids, std::vector &lt;int&gt; &num_elts) const;
+
+  protected:
+    void *state;                  <font color=blue>// This is so that whoever uses the data structure</font>
+                                  <font color=blue>// does not know how it is implemented.</font>
+};
+</pre></td></table></center><p>
+
+Everything is straightforward, with the exception of the one protected variable, <b>state</b>.
+You'll note it's a <b>(void *)</b>.  A <b>(void *)</b> is a pointer, where you don't know what
+it points to.  This is a good thing, because the person who is reading the class definition
+does not know  what it 
+contains.  Therefore, if you use this class, and are not privy to the source code that implements
+it, you don't know how it's implemented.  Why is this nice?  Because those who use the class 
+cannot mess it up.  And it's not really important how it's implemented, so long as the implementation is correct and efficient.
+<p>
+
+<hr>
+<h3>Three programs that use the class</h3>
+
+I have three programs that use the <b>Histogram</b> class:
+
+<OL>
+<LI> <b><a href=src/histogram_tester.cpp>src/histogram_tester.cpp</a></b> -- this is one
+of my standard line-based testers that lets you make sure that the data structure is working
+as it should.
+<LI> <b><a href=src/data_to_histogram.cpp>src/data_to_histogram.cpp</a></b> -- this takes a 
+bin size on the command line, and then reads words from standard input.  Every word that
+is a number is inserted into the histogram, and then the histogram is printed at the end.
+<LI> <b><a href=src/range_tester.cpp>src/range_tester.cpp</a></b> -- this generates random
+numbers and inserts them into the histogram.  It times this activity.  It then calls
+<b>Get_Data()</b>, and times that.  It prints the timings, and if you want, it will also
+print the histogram.
+</OL>
+
+For this lecture, we will only concentrate on <b>histogram_tester</b>.  
+I have compiled it with an implementation of the class which is in 
+<b><a href=src/histogram_vector.cpp>src/histogram_vector.cpp</a></b> into
+the binary 
+<b>bin/ht_vector</b>.
+Let's walk through how it works:
+
+<pre>
+UNIX> <font color=darkred><b>make clean</b></font>
+rm -f obj/* bin/*
+UNIX> <font color=darkred><b>make bin/ht_vector</b></font>
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/histogram_tester.o src/histogram_tester.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -c -o obj/histogram_vector.o src/histogram_vector.cpp
+g++ -std=c++98 -Wall -Wextra -Iinclude -o bin/ht_vector obj/histogram_tester.o obj/histogram_vector.o
+UNIX> <font color=darkred><b>bin/ht_vector                                             <font color=blue> # Take a look at the commands</b></font></font>
+usage: histo_tester prompt(- for empty) -- commands on stdin.
+
+commands:
+  SET_BIN bin_size       - Call Set_Bin(bin_size).
+  ADD_VALUES v1 v2 ...   - Call Add_Value(v) for each vi.
+  PRINT                  - Get Get_Data() and print.
+
+  CLEAR                  - Calls the Clear() method.
+  DESTROY                - Call the destructor and remake an empty histogram.
+  PRINT_COPY             - Print a copy, thus testing the copy constructor.
+  ASSIGN                 - Use the assignment overload to make a copy.
+
+  QUIT                   - Quit.
+  ?                      - Print commands.
+UNIX> <font color=darkred><b>bin/ht_vector '-->'</b></font>
+--> SET_BIN 10                         <font color=blue> # We're using a bin size of ten.</font>
+--> ADD_VALUES 3 4 5 6 15 23 41 42     <font color=blue> # Four values into 0-10, one each into 10-20 and 20-30, </font>
+--> PRINT                              <font color=blue> # plus two values into 40-50</font>
+       0        4
+      10        1
+      20        1
+      40        2
+--> CLEAR                              <font color=blue> # This clears the histogram, but keeps the bin size at 10.</font>
+--> ADD_VALUES 101 4.5                 <font color=blue> # One value into 0-10 and one into 100-110</font>
+--> PRINT
+       0        1
+     100        1
+--> QUIT
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+<hr>
+<h3>Implementing the class with a double and a vector</h3>
+
+There are many ways that we can implement this class.  We will explore the different
+implementations in the <a href=index.html>Running Time Lecture Notes</a>.  In this lecture
+we focus on one implementation, which is in the file
+<b><a href=src/histogram_vector.cpp>src/histogram_vector.cpp</a></b>.
+In this implementation, we define a class called <b>Histo_Vector</b>:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+class Histo_Vector {
+  public:
+    vector &lt;int&gt; Elts;
+    double Bin_Size;
+};
+</pre></td></table></center><p>
+
+This will implement the <b>Histogram</b> class as follows:
+When I call <b>Add_Value(v)</b>, I will calculate the bin number from <b>v</b>, 
+I will use that as an index to the vector <b>Elts</b>.  If <b>Elts</b> isn't big enough,
+I will resize it (putting zeros in the new entries).  I will then increment <b>Elts[bin]</b>.
+<p>
+I can implement <b>Get_Data()</b> by traversing <b>Elts</b>, and calling <b>push_back()</b>
+on <b>ids</b> and <b>num_elts</b> whenever <b>Elts[i]</b> is greater than zero.
+<p>
+That's straightforward, but we'll get to that code later.  Instead, let's look at the constructor
+and destructor:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=blue>/* The constructor allocates an instance of
+   Histo_Vector, and then sets the state member
+   variable to that instance. */ </font>
+
+Histogram::Histogram()
+{
+  Histo_Vector *hv;
+
+  hv = new Histo_Vector;
+  hv-&gt;Bin_Size = -1;
+
+  state = (void *)</font> hv;
+}
+</pre></td><td valign=top><pre>
+<font color=blue>/* The destructor calls the Histo_Vector
+   destructor, which will clear out the Elts
+   vector, and release the memory of the instance.*/</font>
+
+Histogram::~Histogram()
+{
+  Histo_Vector *hv;
+
+  hv = (Histo_Vector *) state;
+  delete hv;
+}
+</pre></td></table></center><p>
+
+When the constructor for <b>Histogram</b> is called, the only variable that has been
+allocated it <b>state</b>, and it is uninitialized.  We need to create an instance of
+<b>Histo_Vector</b>, so we do that with <b>new</b>.  And then we store it in <b>state</b>.
+Whenever we call a method of the <b>Histogram</b> class, the very first thing we'll do is
+declare a pointer to a <b>Histo_Vector</b>, and then set it equal to <b>state</b>.  This is
+how the <b>Histogram</b> class only uses that one <b>(void *)</b>, that the users know is
+there, but they don't know what it contains.  
+In other words, we know what the <b>state</b> is, but the users don't.
+<p>
+As you can see above, the destructor does just what I said -- it declares a variable
+<b>hv</b>, which is  a pointer to a <b>Histo_Vector</b>, and it sets it equal to <b>state</b>.
+It then calls <b>delete</b>, which deallocates all of its memory.
+<p>
+Below, I show the implementations of the three easy methods: <b>Clear()</b>, 
+<b>Set_Bin_Size()</b> and <b>Get_Bin_Size()</b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=blue>/* Clear() gets rid of the data by 
+   clearint the Elts vector. */</font>
+
+
+
+
+void Histogram::Clear()
+{
+<font color=red>  Histo_Vector *hv;
+
+  hv = (Histo_Vector *) state;</font>
+  hv-&gt;Elts.clear();
+}
+</pre></td><td valign=top><pre>
+<font color=blue>/* Set_Bin_Size() error checks its argument,
+   and also error checks that there no data
+   (because it wouldn't make sense to change
+   the bin size if we have already assigned
+   data to bins).  It then sets the bin size. */</font>
+
+bool Histogram::Set_Bin_Size(double bs)
+{
+<font color=red>  Histo_Vector *hv;
+
+  hv = (Histo_Vector *) state;</font>
+
+  if (bs &lt;= 0) return false;
+  if (hv-&gt;Elts.size() != 0) return false;
+  hv-&gt;Bin_Size = bs;
+  return true;
+}
+</pre></td><td valign=top><pre>
+<font color=blue>/* Get_Bin_Size simply returns the bin size
+   from the Histo_Vector. */</font>
+
+
+
+
+double Histogram::Get_Bin_Size() const
+{
+<font color=red>  Histo_Vector *hv;
+
+  hv = (Histo_Vector *) state;</font>
+  return hv-&gt;Bin_Size;
+}
+</pre></td></table></center><p>
+
+The point of this code that I want to stress to you is how in each method, the very first thing
+that we do is declare a pointer to a <b>Histo_Vector</b>, and set it from <b>state</b>.  This
+is highlighted in red in each method above.  Once we have done this,
+we can work with the <b>(Histo_Vector *)</b>.
+
+<p>
+<b>Add_Value()</b> works as described above.  It error checks, then it figures out the bin,
+then it makes sure that the vector has the bin defined, and it adds one to the bin's element in
+the vector:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+bool Histogram::Add_Value(double d)
+{
+  Histo_Vector *hv;
+  int bin;
+
+  hv = (Histo_Vector *) state;
+
+  if (d &lt; 0) return false;                      <font color=blue>// Error check</font>
+  if (hv-&gt;Bin_Size &lt; 0) return false;
+
+  bin = (int) floor(d/hv-&gt;Bin_Size);            <font color=blue>// Calculate the bin and make sure there's room</font>
+  if (bin &gt;= (int) hv-&gt;Elts.size()) {           <font color=blue>// for it in the Elts vector.</font>
+    hv-&gt;Elts.resize(bin+1, 0);
+  }
+
+  hv-&gt;Elts[bin]++;                              <font color=blue>// Add one to the bin.</font>
+  return true;
+}
+</pre></td></table></center><p>
+
+And <b>Get_Data()</b> simply creates the <b>ids</b> and <b>num_elts</b> vectors from <b>Elts</b>.
+If <b>Elts[i]</b> is equal to zero, then we ignore that bin:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+bool Histogram::Get_Data(vector &lt;int&gt; &bin_ids, vector &lt;int&gt; &num_elts) const
+{
+  Histo_Vector *hv;
+  size_t i;
+
+  hv = (Histo_Vector *) state;
+
+  if (hv-&gt;Bin_Size &lt; 0) return false;       <font color=blue>// If we haven't set the bin size yet, return an error..</font>
+
+  bin_ids.clear();                          <font color=blue>// Clear out the vectors if they have any elements.</font>
+  num_elts.clear();
+
+  for (i = 0; i &lt; hv-&gt;Elts.size(); i++) {   <font color=blue>// Push the bins onto id's and Elts[bin] onto num_elts.</font>
+    if (hv-&gt;Elts[i] != 0) {
+      bin_ids.push_back(i);
+      num_elts.push_back(hv-&gt;Elts[i]);
+    }
+  }
+  return true;
+};
+</pre></td></table></center><p>
+
+Finally, the assignment overload simply copies the <b>Histo_Vector</b> from one <b>Histogram</b>
+to the other.  The copy constructor sets up the <b>state</b> and then uses the assignment overload
+to copy the <b>Histo_Vector</b>:
+
+<p><center><table border=3 cellpadding=3><td valign=top><pre>
+<font color=blue>/* The copy constructor creates a new 
+   Histo_Vector, and then uses the
+   assignment overload to copy from h. */</font>
+   
+Histogram::Histogram(const Histogram &h)
+{
+  Histo_Vector *hv;
+
+  hv = new Histo_Vector;
+  state = (void *)</font> hv;
+  *this = h;
+}
+</pre></td><td valign=top><pre>
+<font color=blue>/* The assignment overload allocates 
+   a new instance of Histo_Vector, and 
+   copies it from h's Histo_Vector. */</font>
+
+Histogram& Histogram::operator= (const Histogram &h)
+{
+  Histo_Vector *hv_original, *hv_copy;
+
+  hv_original = (Histo_Vector *) h.state;
+  hv_copy = (Histo_Vector *) state;
+  *hv_copy = *hv_original;   <font color=blue>// This copies Elts and Bin_Size.</font>
+  return *this;
+}
+</pre></td></table></center><p>
+
+There's more to this lecture 
+in the <a href=index.html>Running Time Lecture Notes</a>, where we implement
+the <b>Histogram</b> class in five different ways and then compare them.  All
+of them work like <b>src/histogram_vector.cpp</b>, creating their own classes, and
+then storing pointers to them in <b>state</b>.

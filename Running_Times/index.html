@@ -1,0 +1,500 @@
+<title>CS140 Lecture notes -- Running Times</title>
+<body bgcolor=ffffff>
+<h1>CS140 Lecture notes -- Running Times</h1>
+<UL>
+<LI><a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI>Directory: <b>/home/plank/cs140/Notes/Running_Time</b>
+<LI>Lecture notes:
+    <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Running_Time/index.html>
+    <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs140/Notes/Running_Time/index.html</b></a>
+<LI> Original notes: Fall, 2019
+<LI> Last modified: <i> 
+Fri Nov 22 11:08:25 EST 2019
+</i>
+</UL>
+<hr>
+
+This set of lecture notes is in two parts.  In the first, I go over an example of implementing
+a class in seven ways, using pretty much every data structure that we've learned in this class,
+and then evaluating the running time of each way.  That is in
+the "Histogram Example" below.
+<p>
+After that, I go through a bunch of Topcoder problems, discuss their solutions (without
+implementing them), and then discuss the running times of the solution.
+<p>
+The goal of this set of lecture notes is to help you be able to take a problem and its solution,
+and derive the running time of the solution in terms of big-O.
+
+<hr>
+<h2>Histogram Example</h2>
+
+Please read the lecture notes on
+<a href=voidstar.html>Using a Void * to implement a class</a>.  That lecture defines the
+<b>Histogram</b> class, some programs that use it, and one way to implement it.
+<p>
+I have implemented the class seven different ways, in seven different class implementations.
+They all work, but they all work differently.  They provide an excellent review of the data
+structures that we've learned in this class.  They are:
+
+<OL>
+<LI> <b><a href=src/histogram_vector.cpp>src/histogram_vector.cpp</a></b>:  This is the one
+described in the <a href=voidstar.html><b>(void *)</b> lecture</a>.  We maintain one vector,
+called <b>Elts</b>, such that <b>Elts[i]</b> contains the number of data points for bin <i>i</i>.
+We resize <b>Elts</b> when we need to insert a data point into a bin that is larger than
+<b>Elts</b> currently manages.  When we implement <b>Get_Data()</b>, we traverse <b>Elts</b>
+and ignore bins that don't have any data.
+<p>
+<LI> <b><a href=src/histogram_map.cpp>src/histogram_map.cpp</a></b>:  Instead of a vector,
+we now have a map whose keys and vals are both integers.  The keys are the bin numbers, and the
+vals are the number of data points in the bin.  Insertion of a data point is straightforward:
+simply use the associative array feature of a map to increment a bin's val.  If the bin wasn't
+in the map before, it will be in the map afterwards.  Implementing <b>Get_Data()</b> simply 
+traverses the map and creates the two vectors.
+<p>
+<LI> <b><a href=src/histogram_multiset.cpp>src/histogram_multiset.cpp</a></b>:  Instead of 
+using a map, we use a multiset, and whenever we call <b>Add_Value()</b>, we insert the
+bin of the value into the multiset.  <b>Get_Data()</b> now traverses the multiset and
+counts up the number of times you see each bin.  
+<p>
+<LI> <b><a href=src/histogram_list.cpp>src/histogram_list.cpp</a></b>:  Now we use a list,
+which tries to duplicate the functionality of the map above.  The list stores bin/number
+pairs, and we keep it sorted.  <b>Add_Value()</b> has to find the value, or where it needs
+to be inserted into the list.  Then it updates the number, or adds the pair to the list.
+<b>Get_Data()</b> simply traverses the list to create the vectors.
+<p>
+<LI> <b><a href=src/histogram_bad_vec.cpp>src/histogram_bad_vec.cpp</a></b>:  As the name
+implies, this is a bad implementation.  This works very similarly to the list implementation
+above, only now we 
+maintain two vectors, <b>Bins</b> and <b>Elts</b>, which hold the bins and numbers 
+respectively.
+We'll keep <b>Bins</b> sorted, and <b>Elts[i]</b> contains
+the number of data points for bin <b>Bins[i]</b>.   Since <b>Bins</b> is a vector, we can 
+use binary search to find a bin.  Unfortunately, though, to insert a value into the bin,
+we have to make room for it, which can involve copying each element of <b>Bins</b> (and
+<b>Elts</b>) over one.
+In this implementation, <b>Get_Data()</b>
+is super-simple: you just copy <b>Bins</b> and <b>Elts</b>, because they are exactly what
+you want.  This implementation is "bad", because similarly to the list implementation, 
+keeping <b>Bins</b> sorted is expensive.
+<p>
+
+<LI> <b><a href=src/histogram_deque.cpp>src/histogram_deque.cpp</a></b>:  This implementation
+is very much like <b>histogram_vector</b>, except we use a deque instead of a vector.  Moreover,
+instead of storing every bin starting from bin 0, we keep track of the minimum bin, and 
+<b>deque[index]</b> stores the vals for bin <i>index-minimum_bin</i>.  Now, when you add bins
+that are too big or too small, you either resize the deque (too big) or insert the proper 
+number of zero bins to the front of the deque (too small).  The insert operation has the
+same performance as resizing the deque.  That's one of the things that makes deques attractive.
+<p>
+Because I know this will be confusing to some, let me simple show <b>Minimum_Value</b> and
+<b>Elts</b> after a few <b>Add_Value()</b> calls.  We'll assume that the bin size is 10:
+<pre>
+Action         Minimum_Value  Elts
+-----------    -------------  ----
+Start:               -1       {}
+Add_Value(55)         5       { 1 }                     <font color=blue> # We resize the deque by 1</font>
+Add_Value(71)         5       { 1, 0, 1 }               <font color=blue> # We resize the deque by 2</font>
+Add_Value(58)         5       { 2, 0, 1 }
+Add_Value(15)         1       { 1, 0, 0, 0, 2, 0, 1 }   <font color=blue> # We insert four 0's to the front of the deque.</font>
+Add_Value(26)         1       { 1, 1, 0, 0, 2, 0, 1 }
+</pre>
+
+<LI> <b><a href=src/histogram_hash.cpp>src/histogram_hash.cpp</a></b>:  This implementation
+stores the bins and elements in a 500,009-element hash table, using double-hashing.  
+(500,009 is a prime number, so double-hashing will work nicely).
+This means that you can't store more than 500,009 bins.  So be it.  To implement
+<b>Get_Data()</b>, I run through the hash table and create the <b>bin_ids</b> vector from the
+bins.  I then sort it, and then for each bin, I find the bin in the hash table, and push the
+bin's value onto the back of <b>num_elts</b>.  
+<p>
+</OL>
+
+I'm not going to go through any of the code -- it's pretty straightforward, and it is commented.
+You'll note that all of the implementations use the <b>(void *)</b> as detailed in the
+<a href=voidstar.html><b>(void *)</b> lecture</a>. 
+
+<hr>
+<h3>Basic Running Times</h3>
+
+It's time for us to analyze running time, and memory consumption for the various implementation.
+I'm going to define the following quantities to help us:
+
+<UL>
+<LI> <i>n</i>: This is the number of data items added to the histogram.
+<LI> <i>bins</i>: This is the number of distinct bins that are in the histogram.
+<LI> <i>min</i>: This is the minimum bin number.
+<LI> <i>max</i>: This is the maximum bin number.
+<LI> <i>ts</i>: This is the size of the hash table.
+</UL>
+
+We're going to look at three quantities here -- two are running times, and one is
+memory consumption:
+
+<OL>
+<LI> <b>Create</b>: This is the time to create the histogram from <i>n</i> elements.
+     It is the time to perform <i>n</i> calls to <b>Add_Value()</b>.
+<LI> <b>Get_Data</b>: This is the time that it takes to call <b>Get_Data()</b> once you have
+     created the histogram.
+<LI> <b>Space</b>: This is the amount of memory consumed by the Histogram, once it has been
+     created.
+</OL>
+
+The following table summarizes these quantities for the seven implementations, all in terms
+of Big-O.  I will explain how I arrived at these numbers after you see the table.  It is a 
+goal of CS140 to teach you to do these calculations yourself, so study up here, and make
+sure you understand <i>everything</i> in this table and explanation.
+
+<p><center><table border=3 cellpadding=5>
+<tr>
+<td align=center></td>
+<td align=center>Vector</td>
+<td align=center>Map</td>
+<td align=center>Multiset</td>
+<td align=center>List</td>
+<td align=center>Bad_Vec</td>
+<td align=center>Deque</td>
+<td align=center>Hash</td>
+</tr>
+<tr>
+<td align=center><b>Create</b></td>
+<td align=center><i>O(n + max)</i></td>
+<td align=center><i>O(n log(bins))</i></td>
+<td align=center><i>O(n log(n))</i></td>
+<td align=center><i>O(n * bins)</i></td>
+<td align=center><i>O(n log(bins) + bins<sup>2</sup>)</i></td>
+<td align=center><i>O(n + (max-min))</i></td>
+<td align=center><i>O(ts + n)</i></td>
+</tr>
+<tr>
+<td align=center><b>Get_Data</b></td>
+<td align=center><i>O(max)</i></td>
+<td align=center><i>O(bins)</i></td>
+<td align=center><i>O(n)</i></td>
+<td align=center><i>O(bins)</i></td>
+<td align=center><i>O(bins)</i></td>
+<td align=center><i>O(max-min)</i></td>
+<td align=center><i>O(ts + bins log(bins))</i></td>
+</tr>
+<tr>
+<td align=center><b>Space</b></td>
+<td align=center><i>O(max)</i></td>
+<td align=center><i>O(bins)</i></td>
+<td align=center><i>O(n)</i></td>
+<td align=center><i>O(bins)</i></td>
+<td align=center><i>O(bins)</i></td>
+<td align=center><i>O(max-min)</i></td>
+<td align=center><i>O(ts)</i></td>
+</tr>
+</table></center><p>
+
+<hr>
+<h4>Explanation for the vector implementation</h4>
+
+<b>Create:</b> When you see a sum in a Big-O calculation, you can read it as "either-or, depending
+on which one is bigger."  In this case, the performance is either <i>O(n)</i> or <i>O(max)</i>,
+depending on which one is bigger.  For example, if I insert 10,000 items that are all in
+bin 0, then the performance is <i>O(n)</i>, because the vector resizing is minimal.  However, 
+if I insert one item into bin 1,000,000, then I have to create a vector with 1,000,001 elements,
+and the performance is <i>O(max)</i>.  
+<p>
+<b>Get_Data:</b> The vector has <i>max</i> elements, so traversing it is <i>O(max)</i>.  The
+size of the two resulting vectors will be <i>bins</i>, but clearly <i>bins &le; max</i>.
+That is why it is <i>O(max)</i>.
+<p>
+<b>Space:</b>: The space is the size of the vector, which is <i>max</i> elements.
+<p>
+
+<hr>
+<h4>Explanation for the map implementation</h4>
+
+<b>Create:</b> You are performing <i>n</i> find operations on the map, and <i>bins</i> insertions.
+The maximum size of the map is <i>bins</i> elements.
+Once the map starts filling up, each find and insert will be <i>O(log(bins))</i>, so the total
+running time is <i>O(n log(bins))</i>.
+<p>
+You may wonder -- shouldn't it be <i>O(n log(bins) + bins log(bins))</i>?  That would account 
+for the <i>n</i> find operations and the <i>bins</i> insertions.  The answer is no.  Why?
+because <i>bins</i> is clearly less than or equal to <i>n</i>.  So <i>(bins log(bins))</i> 
+is less than or equal to <i>(n log(bins))</i>.  Remember from our discourse on Big-O that constant
+factors don't matter with Big-O:
+<center>
+<i>O(n log(bins) + bins log(bins)) &le; O(2n log(bins)) = O(n log(bins))</i>.
+</center>
+This is why the answer is <i>O(n log(bins))</i>.
+
+<b>Get_Data:</b> The map has <i>bins</i> elements, so traversing it is <i>O(bins)</i>.  
+<p>
+<b>Space:</b>: The space is the size of the map, which is <i>bins</i> elements.  Maps are 
+implemented as balanced binary trees, and a tree with <i>bins</i> nodes consumes <i>O(bins)</i>
+space.  Now, the map with <i>bins</i> elements is a lot bigger than a vector with <i>bins</i>
+elements, because the vector is very space efficient.  However, they are both <i>O(bins)</i>,
+because constant factors don't matter with Big-O.
+
+<p>
+
+<hr>
+<h4>Explanation for the multiset implementation</h4>
+
+<b>Create:</b> You are performing <i>n</i> insertion operations on a multiset which will end
+up having <i>n</i> elements.  This is <i>O(n log(n))</i>, plain and simple.
+<p>
+You may wonder -- when we're filling up the multiset, it has fewer than <i>n</i> elements, so why
+not something smaller than <i>O(n log(n))</i>?  It's a good question, so let me prove to you
+that it is indeed <i>O(n log(n))</i>.  Let's just consider the second half of the insertions.
+There are <i>n/2</i> of these, and the multset contains at least <i>n/2</i> elements in each 
+insertion.  So, the performance of those <i>n/2</i> insertions is at least as big as
+<i>O(n/2 log(n/2)).</i>  The constant factor doesn't matter, so this is <i>O(n log(n/2))</I>.
+And what is <i>log(n/2)?</I>  It is <i>log(n)-1</i>.  We know that <i>O(x-1)</i> is <i>O(x)</i>,
+so <i>O(log(n/2))</I> is <i>O(log(n))</i>.  Therefore, the last <i>n/2</i> insertions are
+<i>O(n log(n))</i>.  The first <i>n/2</i> insertions will be quicker than the second <i>n/2</i>,
+so they are less than 
+<i>O(n log(n))</i>.  So the <i>n</i> insertions are indeed <i>O(n log(n))</i>.
+<p>
+<b>Get_Data:</b> The multiset has <i>n</i> elements, so traversing it is <i>O(n)</i>.  
+<p>
+<b>Space:</b>: The space is the size of the multiset, which is <i>n</i> elements.  
+
+<p>
+
+<hr>
+<h4>Explanation for the list implementation</h4>
+
+<b>Create:</b> You are performing <i>n</i> find operations on a list which will end up
+having <i>bins</i> elements.  On average, each find operation has to traverse half of the
+list, so this is <i>O(n*bins)</i> for the find operations.  The insertion operations are
+<i>O(1)</i>, because this is a linked list.  Thus, the insertions cost <i>O(bins)</i>, which 
+is clearly less than <i>O(n*bins)</i>.  For that reason, the total cost is <i>O(n*bins)</i>.
+<p>
+<b>Get_Data:</b> The list has <i>bins</i> elements, so traversing it is <i>O(bins)</i>.  
+<p>
+<b>Space:</b>: The space is the size of the list, which has <i>bins</i> elements.  
+
+<p>
+
+<hr>
+<h4>Explanation for the bad vector implementation</h4>
+
+<b>Create:</b> You are performing <i>bins</i> insertions, and <i>n</i> find operations.
+Since the find operations use binary search, each of them will be <i>O(log(bins))</i>.
+That's pretty cheap.  The insertions on the other hand, have to move half of the vector
+elements, on average, to make room for the new bin.  That's <i>O(bins)</i> for each bin,
+yielding <i>O(bins<sup>2</sup>)</i>.  We add the two quantities, because there may be
+times where <i>O(n log(bins))</i> is greater than <i>O(bins<sup>2</sup>)</i>, and vice versa.
+
+<p>
+<b>Get_Data:</b> The vectors have <i>bins</i> elements, so copying them is <i>O(bins)</i>.
+<p>
+<b>Space:</b>: The space is the size of the vectors, which is <i>bins</i> elements each.
+<i>O(2*bins)</i> is, of course, <i>O(bins)</i>.
+
+<p>
+
+<hr>
+<h4>Explanation for the deque implementation</h4>
+
+<b>Create:</b> This is very much like the vector implementation, only now, instead of
+having <i>max</i> elements, there are <i>(max-min)</i>.  We add <i>n</i>, because, like the
+vector implementation, this is an "either-or" situation.
+<p>
+
+<b>Get_Data:</b> The deque has <i>(max-min)</i> elements, so traversing it is <i>O(max-min)</i>.
+<p>
+<b>Space:</b>: The space is the size of the deque.
+
+<p>
+
+<hr>
+<h4>Explanation for the hash table implementation</h4>
+
+<b>Create:</b> We have to initialize the hash table, which is <i>O(ts)</i>.  Then, 
+assuming that the hash table doesn't fill up significantly, each find and insert is
+<i>O(1)</i>. That is why we have 
+<i>O(ts + n)</i>.  Then, 
+having <i>max</i> elements, there are <i>(max-min)</i>.  We add <i>n</i>, because, like the
+vector implementation, this is an "either-or" situation.
+<p>
+
+<b>Get_Data:</b> We traverse the hash table to create a vector of the bins.  That is
+<i>O(ts)</i>, and the vector size is <i>O(bins)</i>.  Then we sort it,
+which is <i>O(bins log(bins))</i>.  And then for each bin, we find it in the hash table, which 
+is <i>O(1)</i>.  That makes <i>O(bins)</i> find operations, but since sorting the vector
+is <i>O(bins log(bins))</i>, we don't need to include it in the Big-O calculation.
+<p>
+<b>Space:</b>: The space is the size of the hash table.
+<p>
+
+<hr>
+<h2>Empirical Evaluation</h2>
+
+Armed with this knowledge, we should be able to predict which implementation will do well
+in which scenario.  For example, if I feed the values 0 and 100,000,000 into 
+<b>data_to_histogram</b>, then <i>n</i> and <i>bins</i> are both equal to two, which is
+tiny.  However, <i>max</i>, <i>(max-min)</i> and <i>ts</i> are comparatively large.  For
+that reason, I expect the following:
+
+<UL>
+<LI> Map, multimap, list and bad_vec will all perform well.
+<LI> Hash will be slower.
+<LI> Vector and deque will be the slowest.
+</UL>
+
+Let's confirm:
+
+<pre>
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_vector 1"           <font color=blue> # Vector = 1 second</b></font></font>
+       0        1
+   1e+08        1
+1.008u 0.114s 0:01.12 99.1%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_map 1"              <font color=blue> # Map = negligible</b></font></font>
+       0        1
+   1e+08        1
+0.002u 0.003s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_multiset 1"         <font color=blue> # Multiset = negligible</b></font></font>
+       0        1
+   1e+08        1
+0.002u 0.004s 0:00.01 0.0%	0+0k 0+0io 10pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_list 1"             <font color=blue> # List = negligible</b></font></font>
+       0        1
+   1e+08        1
+0.002u 0.003s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_bad_vec 1"          <font color=blue> # Bad_Vec = negligible</b></font></font>
+       0        1
+   1e+08        1
+0.002u 0.003s 0:00.00 0.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_deque 1"            <font color=blue> # Deque = 2 seconds</b></font></font>
+       0        1
+   1e+08        1
+2.009u 0.147s 0:02.16 99.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b>time sh -c "echo 0 100000000 | bin/dth_hash 1"             <font color=blue> # Hash table = 0.01 seconds</b></font></font>
+       0        1
+   1e+08        1
+0.011u 0.004s 0:00.01 100.0%	0+0k 0+0io 0pf+0w
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+Let's use <b>src/range_tester.cpp</b> to test some other scenarios.  Let's remind ourselves
+how it works:
+
+<pre>
+UNIX> <font color=darkred><b>bin/range_vector</b></font>
+usage: range_tester bin_size n low high seed print(Y|N)
+UNIX>
+</pre>
+
+How about this:  Let's
+insert 10,000,000 data points and modify the maximum values of the data points so that we modify
+the number of bins.  You can see below that if we specify <i>high</i> as one, we get one bin,
+and if we specify <i>high</i> as 100,000, we get 100,000 bins:
+
+<pre>
+UNIX> <font color=darkred><b>bin/range_vector 1 10000000 0 1 5 Y           <font color=blue> # Here there's just one bin.</b></font></font>
+       0  10000000
+Time for Create:     0.234
+Time for Get_Data:   0.000
+UNIX> <font color=darkred><b>bin/range_vector 1 10000000 0 100000 5 Y | wc <font color=blue> # Here there are 100,000 bins.</b></font></font>
+  100002  200008 1800054                            <b><font color=blue> # (There are two lines for the timings)</font></b>
+UNIX> <font color=darkred><b>bin/range_vector 1 10000000 0 100000 5 N      <font color=blue> # The O(n) part of Create dominates.</b></font></font>
+Time for Create:     0.276
+Time for Get_Data:   0.005
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+
+Let's run an experiment.  For each of the implementations, I vary the number of
+bins, and plot the time to add 10,000,000 values.  I run over ten tests for each data
+point, and average the results.  This is on a mid-grade Linux box.  
+
+<p><center><table border=3><td><center><h4>Experiment to show the effect of modifying the
+number of bins when inserting 10,000,000 random elements</h4><hr><a href=jpg/experiment.jpg>
+<img src=jpg/experiment.jpg width=800></a></td></table></center><p>
+
+Let's see how this jibes with our understanding of the running times:
+
+<UL>
+<LI> <b>The vector, deque and hash implementations look like flat lines.</b>  
+That makes sense, because each of their Big-O equations is <i>O(n + x)</i>, and 
+in each case, <i>n</i> is greater than <i>x</i>.  In our experiments, we hold <i>n</i>
+constant.  That's why the lines are flat.
+<p>
+We can also conclude that vectors are more efficient data structures than deques.
+Let me quote from <a href=https://en.cppreference.com/w/cpp/container/deque>https://en.cppreference.com/w/cpp/container/deque</a>:
+<p>
+<p><center><table border=3 cellpadding=5><td width=600 align=center>
+"As opposed to <tt>std::vector</tt>, the elements of a deque are not stored contiguously: typical implementations use a sequence of individually allocated fixed-size arrays, with additional bookkeeping, which means indexed access to deque must perform two pointer dereferences, compared to vector's indexed access which performs only one."
+</td></table></center><p>
+<p>
+The hash implementation is indeed fast, but it still performs more work than the vector
+implementation.   It is slower by a factor of roughly 1.7.  I surmised that compiler optimization
+might shrink that gap, but when I compiled both vector and hash with compiler optimization,
+it sped both of them up by more than a factor of two; however, the hash implementation was
+still 1.7 times slower.
+<p>
+<LI> <b>The map implementation is slower in two ways -- Big-O and base implementation.</b>  
+Neither of these should come as a surprise to you.  First, we definitely expect
+<i>O(n log(bins))</i> to be slower than <i>O(n)</i>.  At the right edge of the graph above,
+<i>bins</i> is 40,000, which makes <i>log(bins)</i> roughly 15.  That's significant, and 
+the graph shows it.  
+<p>
+What do you think of the shape of the map curve?  Does it look like <i>n log(bins)</i> to you?
+Well, remember that we're holding <i>n</i> constant, so we should expect the curve to 
+look like <i>log (bins)</i>, and indeed it does.  I like it when things make sense.
+<p>
+Let's look at two sets of timings:
+<p><center><table border=3 cellpadding=5><td><pre>
+Implementation:      bins=10         bins=40,000
+---------------      -------         -----------
+vector                0.86 s            0.85 s  
+map                   2.57 s            7.12 s  
+ratio map/vector      2.99              8.38    
+</pre></td></table></center><p>
+The log of 10 is 3.32 and the log of 40,000 is 15.28.  So, the table above shows us that
+the map implementation is proportionally worse than the vector implementation when the number
+of bins is small (otherwise, we'd expect the ration when <i>bins</i> equals 40,000 to be
+15).  Can we make sense of that?  Yes -- what I surmise is that when you are calling <i>find()</i>
+on the map, its performance is <i>(x + log(bins))</i>, where <i>x</i> is some startup costs
+(maybe a few "if" statements).  When <i>bins</i> is small, the <i>x</i> term is significant.
+As <i>bins</i> grows, it becomes less significant.  
+<p>
+<LI> <b>Those other implementations are comparatively really bad.</b>  This is demonstrated in
+both the Big-O and in the graphs.  The multiset is horrible, but we should expect it from the
+Big-O: The log of 10,000,000 is 23.26, so the performance of the multiset is on par with
+expectations.
+<p>
+The list implementation's curve looks like a straight line, which also matches expectations.
+It's Big-O equation is <i>O(n * bins)</i>, and we're holding <i>n</i> constant, so we should
+expect a straight line!
+<p>
+The "bad" vector implementation has a Big-O of <i>O(n log(bins) + bins<sup>2</sup>)</i>.
+So, when we hold <i>n</i> constant, we expect the quadratic term to dominate, and indeed
+that curve looks quadratic.
+<p>
+<b>Question:</b> Why is the bad_vec curve better than the list's curve, when <i>O(n*bins)</i>
+is faster than <i>O(bins<sup>2</sup>)?</i> (remember, we're holding <i>n</i> constant?  
+Because the list
+implementation is performing <i>O(bins)</i> for every <b>Add_Value()</b> call, due to its linear
+lookup of the value.  The bad_vec implementation performs <i>O(log(bins))</i> for every 
+<b>Add_Value()</b> call, because it uses binary search to find the value, and only does
+an <i>O(bins)</i> operation when it has to insert a new value.  When <i>bins</i> is 40,000,
+the ratio of insertions to finds is 40,000/10,000,000, or 0.004.  This is why the bad_vec
+implementation is faster than the list implementation -- it does the slow operation very infrequently, while the list operation does it at every <b>Add_Value()</b> call.
+<p>
+<b>Question:</b> If we keep increasing the bin size, will the bad_vector implementation eventually
+become slower than the list implementation?  
+Well, the gap will keep closing, but in reality, the bad_vec implementation never becomes slower
+(try the shell script in <b><a href=scripts/list_vec.sh>scripts/list_vec.sh</a></b>).
+This is because we can't have more than <i>n</i> bins, so we can't keep increasing the bin 
+size until the <i>O(bins<sup>2</sup>)</i> term becomes bigger than <i>O(n*bins)</i>.
+</UL>
+<hr>
+<h3> So, which implementation is best?</h3>
+
+It depends.  They all have plusses and minuses.  I think that if I were writing a production 
+implementation of this that *had* to work well in all cases, I would use the 
+hash implementation with a resizable hash table, 
+such as <a href=https://en.wikipedia.org/wiki/Hopscotch_hashing>Hopscotch Hashing</a>.  
+This also has a nice feature that I can have negative bins (in fact, all of the implementations
+can do negative bins, with the exception of the vector implementation).
+<hr>
+<h3>Topcoder Problems with Running Time Analyses</h3>
+
+Not ready yet.
