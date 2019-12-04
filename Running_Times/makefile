@@ -10,6 +10,7 @@ ALL = bin/dth_vector bin/ht_vector bin/range_vector \
       bin/dth_list bin/ht_list bin/range_list  \
       bin/dth_multiset bin/ht_multiset bin/range_multiset  \
       bin/dth_hash bin/ht_hash bin/range_hash  \
+      bin/dth_hopscotch bin/ht_hopscotch bin/range_hopscotch  \
       bin/show_line
 
 all: $(ALL)
@@ -55,6 +56,9 @@ obj/histogram_multiset.o: src/histogram_multiset.cpp include/histogram.hpp
 
 obj/histogram_hash.o: src/histogram_hash.cpp include/histogram.hpp include/MOA.hpp
 	g++ $(CFLAGS) -c -o obj/histogram_hash.o src/histogram_hash.cpp
+
+obj/histogram_hopscotch.o: src/histogram_hopscotch.cpp include/histogram.hpp
+	g++ $(CFLAGS) -c -o obj/histogram_hopscotch.o src/histogram_hopscotch.cpp
 
 # -------------------------
 # Executables.  12 of them -- 3 mains, 4 implementations.
@@ -121,6 +125,15 @@ bin/ht_hash: obj/histogram_tester.o obj/histogram_hash.o
 
 bin/range_hash: obj/range_tester.o obj/histogram_hash.o
 	g++ $(CFLAGS) -o bin/range_hash obj/range_tester.o obj/histogram_hash.o
+
+bin/dth_hopscotch: obj/data_to_histogram.o obj/histogram_hopscotch.o
+	g++ $(CFLAGS) -o bin/dth_hopscotch obj/data_to_histogram.o obj/histogram_hopscotch.o
+
+bin/ht_hopscotch: obj/histogram_tester.o obj/histogram_hopscotch.o
+	g++ $(CFLAGS) -o bin/ht_hopscotch obj/histogram_tester.o obj/histogram_hopscotch.o
+
+bin/range_hopscotch: obj/range_tester.o obj/histogram_hopscotch.o
+	g++ $(CFLAGS) -o bin/range_hopscotch obj/range_tester.o obj/histogram_hopscotch.o
 
 bin/show_line: src/show_line.cpp
 	g++ $(CFLAGS) -o bin/show_line src/show_line.cpp
