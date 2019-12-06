@@ -324,6 +324,7 @@ if <i>c > e</i>.  For example, <i>20n*n - 100n > 19n*n + 60,000n</i>.
 
 <hr>
 <h2>Big-O</h2>
+
 Given the above, we can now define 
 Big-O:
 <p>
@@ -337,28 +338,65 @@ Given the definitions of <i>a(n)</i> through <i>j(n)</i>
 above:
 <UL>
 <LI> <i>a(n) = O(1)</i>.
-<LI> <i>b(n) = O(1)</i>.  This is because we can set <i>c</i> to 101.
-<LI> <i>b(n) = O(n)</i>.  Why?  Set <i>c</i> equal to 1 and <i>x<sub>0</sub></i> equal to 101. 
-Then, <b>b(x)</b> will equal 100, and <i>cx</i> will be greater than 100.
-<LI> <i>b(n) = O(n*n)</i>.  Set <i>c</i> equal to 1 -- you can demonstrate easily that <i>n*n > b(n)</i>.
-<LI> <i>b(n) = O(a(n))</i>. Set <i>c</i> equal to 101, and this is equivalent to the second case above.
-<LI> <i>a(n) = O(b(n))</i>. Set <i>c</i> equal to one.
-<LI> <i>e(n) = O(n)</i>.  Set <i>c</i> equal to three and <i>x<sub>0</sub></i> equal to 1.  
-<LI> <i>i(n) = O(log(n))</i>.  Set <i>c</i> equal to one and <i>x<sub>0</sub></i> equal to 1. 
+<LI> <i>b(n) = O(1)</i>.  This is because we can set <i>c</i> to 101.  If that confuses you,
+go back to the equation above: <i>c*f(N) = 101(1) = 101</i>.  On the flip side, <i>T(N) = 100</i>.
+Therefore for all <i>N, c*F(N) &ge; T(N)</i>, because 101 > 101.  
+<p>
+You should see that we can set <i>c</i> to any value &ge; 100.  I chose 101, because it's the 
+smallest value where <i>c*F(N) &gt; T(N)</i>, and I find "greater than" clearer than
+"greater than or equal to."  That's just me.
+<p>
+
+<LI> Let's ignore <i>c(n)</i>.  It's too weird.
+<p>
+<LI> <i>d(n) = O(n)</i>.  Why?  Set <i>c</i> equal to 2 and <i>x<sub>0</sub></i> equal to 1.  
+It's pretty easy to see that <i>2N &ge; N</i> for all <i>N</i> &gt; 1.
+<LI> <i>e(n) = O(n)</i> too.  Set <i>c</i> equal to 3 and 
+<i>x<sub>0</sub></i> equal to 1.  
+For all values of <i>N &ge; 1</i>, <i>3N</i> is indeed greater than <i>2N</i>.
+<LI> <i>f(n) = O(n)</i> too.  Set <i>c</i> equal to 3 and 
+now, you can set <i>x<sub>0</sub></i> equal to -4 if you want.  Why?  Because 3*(-4) is -12, 
+which is greater than 2*(-4)-5 = -13.  So, for all values of <i>N &ge; -4, 3N &ge; 2N-5.</i>.
+You don't have to set <i>x<sub>0</sub></i> to its smallest potential value.  Any legal value can do, so in 
+this case you can set <i>x<sub>0</sub></i> to any value &ge; -4.
+<p>
+<LI> <i>g(n) = O(n<sup>2</sup>)</i>.  Set <i>c</i> to 1 and <i>x<sub>0</sub></i> to anything.
+<LI> <i>i(n) = O(log(n))</i>.  These are getting pretty obvious, no?
 <LI> <i>j(n) = O(n*log(n))</i>. Ditto.
-<LI> <i>g(n) = O(n*n)</i>. Ditto.
 </UL>
 
 <hr>
-<H2>Big Omega and Big Theta</h2>
-Note that <i>O(f(N))</i> is an upper bound on <i>T(N)</i>.  That means
-that <i>T(N)</i> is definitely not bigger than <i>f(n)</i>.  Similarly,
-if <i>g(N) > f(N)</i> and <i>T(N) = O(f(N))</i>, then 
-<i>T(N) = O(g(n))</i> too.  That's inconvenient.  Why?  Well, if a program's running time is linear
-in the size of its input, then we'd like to say that the running time is <i>O(n)</i> and not 
-<i>O(n<sup>2</sup>)</i>.  Unfortunately, it is both.
+<h3>The Imprecision of Big-O</h3>
+
+<i>O(f(N))</i> is an upper bound on <i>T(N)</i>.  That means
+that <i>T(N)</i> is definitely not bigger than <i>f(n)</i>.  We'd like it to be a tight bound,
+but often that is too difficult to prove.  However, you should be aware of it.  For example,
+although we showed above that <i>b(n) = O(1)</i>, it is also true that <i>b(n) = O(n<sup>2</sup>).</i>  Why?  Well, set <i>c</i> equal to one, and <i>x<sub>0</sub></i> to 101, and you should
+see that for all values <i>n &ge; 101, 1*n &ge; 100</i>.
 <p>
-Big Omega and Bit Theta help make things more precise:
+So, in some respects, Big-O is imprecise, because <i>b(n)</i> above is 
+not only <i>O(1)</i>, but 
+<i>O(n)</i>, 
+<i>O(n<sup>2</sup>)</i>, 
+<i>O(n*log(n))</i>, 
+<i>O(2<sup>n</sup>)</i> and
+<i>O(n!)</i>.  In computer science, when we say that <i>a = O(f(n))</i>, what we really
+mean is that <i>f(n)</i> is the smallest known function for which 
+<i>a = O(f(n))</i>.
+<p>
+As an aside, don't use the imprecision as a way to get around test questions.  For example,
+if I ask for the Big-O complexity of sorting a vector with <i>n</i> elements, you shouldn't
+answer <i>O(n<sup>10</sup>),</i> because you know that it's technically correct, and 
+<i>n<sup>10</sup></i> is probably bigger than any function that we teach in this class.
+You will not get credit for that answer, and I will cite this text when you argue with
+me about it...
+
+
+
+<hr>
+<H2>Big Omega and Big Theta</h2>
+Big Omega and Big Theta are two more definitions that help to clean up the above imprecision
+with Big-O.
 <p>
 <UL>
 <LI> <b>Big-Omega</b>: <i>T(N) = &Omega;(f(N))</i> if <i>f(N) = O(T(N))</i>.  While Big-O says that
@@ -465,7 +503,10 @@ then <i>log<sub>2</sub>(n) = log<sub>2</sub>(10)*a</i>.  Since <i>log<sub>2</sub
 a constant (a little greater than three), for the purposes of Big-O, logarithms in base 10 and
 base 2 are equivalent.
 <p>
-Insertion, deletion, and finding elements in sets and maps are <i>O(log(n))</i> operations.
+Insertion, deletion, and finding elements in sets and maps with <i>n</i> elements 
+are <i>O(log(n))</i> operations.
+Binary search on a vector of <i>n</i> elements is also 
+<i>O(log(n))</i>.
 
 <p>
 <LI> <i>O(n*log(n))</i>: This is called "N log N."   Creating maps and sets are
