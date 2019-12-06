@@ -514,21 +514,18 @@ UNIX> <font color=darkred><b></b></font>
 <h3>The Copy Constructor</h3>
 
 <p>
-I implement the copy constructor by simply calling the assignment overload.  You'll note,
-though, that I have to set up the stack as an empty stack first, because the regular 
-constructor is not called:
+We're going to use the assignment overload to implement the copy constructor,
+but remember, when the copy constructor is called, all of the member variables
+(<b>size</b> and <b>top</b>) are uninitialized.  So, we need to set up enough of
+the member variables for the assignment overload to work.  The first thing
+that the assignment overload does is call Clear(), and you'll note that the only member variable
+that Clear() accesses is <b>top</b>.  So, setting up <b>top</b> to be NULL is the only
+thing that we need to do before calling the assignment overload.
 
 <p><center><table border=3 cellpadding=3><td><pre>
-<font color=blue>/* The copy constructor simply calls the assignment overload.
-   However, we need to initialize an empty stack, first, because the
-   regular constructor has not been called. */</font>
-
 Stack::Stack(const Stack &s)
 {
-  <font color=blue>/* Create an empty stack and call the assignment overload. */</font>
-
   top = NULL;
-  size = 0;
   *this = s;
 }
 </pre></td></table></center><p>
@@ -845,12 +842,16 @@ UNIX> <font color=darkred><b></b></font>
 </pre>
 
 As with the Stack data structure, we need to implement a copy constructor and assignment
-overload.  This one is more simple, because you can simply Push() each node on the queue,
-from front to back.
+overload.  This assignment overload is more simple, because you can simply 
+Push() each node on the queue,
+from front to back.  The copy constructor, like the one for stacks, uses the assignment
+overload.
 Here's the code:
 
+
 <p><center><table border=3 cellpadding=3><td><pre>
-<font color=blue>/* The assignment overload traverses the nodes and pushes each one. */</font>
+<font color=blue>/* The assignment overload first clears out any state that the queue has, so that
+   it's an empty queue.  Then it traverses q's nodes and pushes each one. */</font>
 
 Queue& Queue::operator= (const Queue &q)
 {
@@ -861,10 +862,17 @@ Queue& Queue::operator= (const Queue &q)
   return *this;
 }
 
-<font color=blue>/* The copy constructor calls the assignment overload. */</font>
+<font color=blue>/* We're going to use the assignment overload to implement the copy constructor, but
+   remember, when the copy constructor is called, all of the member variables (size, first
+   and last) are uninitialized.  So, we need to set up enough of the member variables for
+   the assignment overload to work.  The first thing that the assignment oveload does is
+   call Clear(), and you'll note that the only member variable that Clear() accesses is
+   first.  So, setting up first to be NULL is the only thing that we need to do before
+   calling the assignment overload.  */</font>
 
 Queue::Queue(const Queue &q)
 {
+  first = NULL;
   *this = q;
 }
 </pre></td></table></center><p>

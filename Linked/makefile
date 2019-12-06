@@ -5,6 +5,8 @@ CFLAGS ?= -std=c++98 -Wall -Wextra -Iinclude
 
 ALL = bin/stack_rev \
       bin/stack_overload \
+      bin/stack_overload_2 \
+      bin/stack_overload_2_bad \
       bin/stack_overload_naoc \
       bin/stack_copy \
       bin/queue_tail \
@@ -35,6 +37,9 @@ clean:
 obj/stack.o: src/stack.cpp include/stack.hpp
 	g++ $(CFLAGS) -c -o obj/stack.o src/stack.cpp
 
+obj/stack_bad_overload.o: src/stack_bad_overload.cpp include/stack.hpp
+	g++ $(CFLAGS) -c -o obj/stack_bad_overload.o src/stack_bad_overload.cpp
+
 obj/stack_no_ao_or_cc.o: src/stack_no_ao_or_cc.cpp include/stack_no_ao_or_cc.hpp
 	g++ $(CFLAGS) -c -o obj/stack_no_ao_or_cc.o src/stack_no_ao_or_cc.cpp
 
@@ -43,6 +48,9 @@ obj/stack_rev.o: src/stack_rev.cpp include/stack.hpp
 
 obj/stack_overload.o: src/stack_overload.cpp include/stack.hpp
 	g++ $(CFLAGS) -c -o obj/stack_overload.o src/stack_overload.cpp
+
+obj/stack_overload_2.o: src/stack_overload_2.cpp include/stack.hpp
+	g++ $(CFLAGS) -c -o obj/stack_overload_2.o src/stack_overload_2.cpp
 
 obj/stack_overload_naoc.o: src/stack_overload_naoc.cpp include/stack_no_ao_or_cc.hpp
 	g++ $(CFLAGS) -c -o obj/stack_overload_naoc.o src/stack_overload_naoc.cpp
@@ -92,6 +100,12 @@ bin/stack_rev: obj/stack_rev.o obj/stack.o
 
 bin/stack_overload: obj/stack_overload.o obj/stack.o
 	g++ $(CFLAGS) -o bin/stack_overload obj/stack_overload.o obj/stack.o
+
+bin/stack_overload_2: obj/stack_overload_2.o obj/stack.o
+	g++ $(CFLAGS) -o bin/stack_overload_2 obj/stack_overload_2.o obj/stack.o
+
+bin/stack_overload_2_bad: obj/stack_overload_2.o obj/stack_bad_overload.o
+	g++ $(CFLAGS) -o bin/stack_overload_2_bad obj/stack_overload_2.o obj/stack_bad_overload.o
 
 bin/stack_overload_naoc: obj/stack_overload_naoc.o obj/stack_no_ao_or_cc.o
 	g++ $(CFLAGS) -o bin/stack_overload_naoc obj/stack_overload_naoc.o obj/stack_no_ao_or_cc.o

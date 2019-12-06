@@ -1,3 +1,7 @@
+/* This file is identical to stack.cpp, except there's a bug in the assignment overload.
+   The bug is that we don't call clear, so if the stack isn't empty, it will be added to,
+   and not cleared out first. */
+
 #include <iostream>
 #include <cstdlib>
 #include "stack.hpp"
@@ -93,9 +97,7 @@ Stack& Stack::operator= (const Stack &s)
   Stack tmp;
   Stacknode *sn;
 
-  /* First we call clear, because the stack may already have elements in it. */
-
-  Clear();
+  /* We don't call clear here -- that's a bug */
 
   /* Next, we create the temporary stack */
 
@@ -107,16 +109,15 @@ Stack& Stack::operator= (const Stack &s)
   return *this;
 }
 
-/* We're going to use the assignment overload to implement the copy constructor,
-   but remember, when the copy constructor is called, all of the member variables
-   (size and top) are uninitialized.  So, we need to set up enough of
-   the member variables for the assignment overload to work.  The first thing
-   that it does is call Clear(), and you'll note that the only member variable
-   that Clear() accesses is top.  So, setting up top to be NULL is the only
-   thing that we need to do before calling the assignment overload. */
+/* The copy constructor simply calls the assignment overload.
+   However, we need to initialize an empty stack, first, because the
+   regular constructor has not been called. */
 
 Stack::Stack(const Stack &s)
 {
+  /* Create an empty stack and call the assignment overload. */
+
   top = NULL;
+  size = 0;
   *this = s;
 }
