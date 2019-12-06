@@ -2,7 +2,7 @@
 
 r=0
 while [ $r -lt 100 ]; do
-  for i in vector map multiset list bad_vec deque hash ; do
+  for i in hopscotch vector map multiset list bad_vec deque hash ; do
     bins=10
     t=no
     while [ $bins -le 100000 -a $t = no ]; do
