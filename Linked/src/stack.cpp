@@ -93,20 +93,25 @@ Stack& Stack::operator= (const Stack &s)
   Stack tmp;
   Stacknode *sn;
 
-  /* We need to set these, because the regular constructor is not called, so their
-     values are uninitialized.  This is a hard bug to find, btw. */
+  /* First, clear out any previous stack that you are holding. */
+  Clear();
 
-  size = 0;
-  top = NULL;
-
+  /* Now copy he stack. */
   for (sn = s.top; sn != NULL; sn = sn->next) tmp.Push(sn->s);
   while (!tmp.Empty()) Push(tmp.Pop());
   return *this;
 }
 
-/* The copy constructor simply calls the assignment overload. */
+/* We're going to use the assignment overload to implement the copy constructor,
+   but remember, when the copy constructor is called, all of the member variables
+   (size and top) are uninitialized.  So, we need to set up enough of
+   the member variables for the assignment overload to work.  The first thing
+   that it does is call Clear(), and you'll note that the only member variable
+   that Clear() accesses is top.  So, setting up top to be NULL is the only
+   thing that we need to do before calling the assignment overload. */
 
 Stack::Stack(const Stack &s)
 {
+  top = NULL;
   *this = s;
 }

@@ -110,17 +110,28 @@ string Queue::Pop()
   return rv;
 }
 
-/* The assignment overload traverses the nodes and pushes each one. */
+/* The assignment overload first clears out any state that the queue has, so that
+   it's an empty queue.  Then it traverses q's nodes and pushes each one. */
 
 Queue& Queue::operator= (const Queue &q)
 {
   Qnode *tmp;
+
   Clear();
   for (tmp = q.first; tmp != NULL; tmp = tmp->ptr) Push(tmp->s);
   return *this;
 }
 
+/* We're going to use the assignment overload to implement the copy constructor, but
+   remember, when the copy constructor is called, all of the member variables (size, first
+   and last) are uninitialized.  So, we need to set up enough of the member variables for
+   the assignment overload to work.  The first thing that the assignment oveload does is
+   call Clear(), and you'll note that the only member variable that Clear() accesses is
+   first.  So, setting up first to be NULL is the only thing that we need to do before
+   calling the assignment overload.  */
+
 Queue::Queue(const Queue &q)
 {
+  first = NULL;
   *this = q;
 }
