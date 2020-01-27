@@ -556,7 +556,7 @@ int main(int argc, char **argv)
   printf("Total: %12.4lf\n", total(v));
   printf("Avg:   %12.4lf\n", avg(v));
   printf("Max:   %12.4lf\n", max(v));
-  printf("Max:   %12.4lf\n", min(v));
+  printf("Min:   %12.4lf\n", min(v));
   return 0;
 }
 </pre></td></table></center><p>
@@ -573,7 +573,7 @@ UNIX> <font color=darkred><b>./total_etc_1 4</b></font>
 Total:       9.3690
 Avg:         2.3422
 Max:         4.1649
-Max:         1.4286
+Min:         1.4286
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
@@ -585,7 +585,7 @@ UNIX> <font color=darkred><b>time ./total_etc_1 50000000</b></font>
 Total: 195385228.1964
 Avg:         3.9077
 Max:        10.0000
-Max:         1.0000
+Min:         1.0000
 3.736u 0.808s 0:04.55 99.5%	0+0k 0+0io 0pf+0w
 UNIX> <font color=darkred><b></b></font>
 </pre>
@@ -630,7 +630,7 @@ UNIX> <font color=darkred><b>time ./total_etc_2 50000000</b></font>
 Total: 195385228.1964
 Avg:         3.9077
 Max:        10.0000
-Max:         1.0000
+Min:         1.0000
 2.212u 0.215s 0:02.44 99.1%	0+0k 0+0io 0pf+0w
 UNIX> <font color=darkred><b></b></font>
 </pre>

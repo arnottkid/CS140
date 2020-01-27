@@ -102,6 +102,6 @@ int main(int argc, char **argv)
   printf("Total: %12.4lf\n", total(v));
   printf("Avg:   %12.4lf\n", avg(v));
   printf("Max:   %12.4lf\n", max(v));
-  printf("Max:   %12.4lf\n", min(v));
+  printf("Min:   %12.4lf\n", min(v));
   return 0;
 }
