@@ -1,0 +1,81 @@
+<h3>In Class Problem #2</h3>
+This was question 4 from the CS140 midterm in Fall, 2019.
+<p>
+Below left, I have 17 names, and what each name hashes to with two different hash
+functions, H1 and H2.  The hash values are given in hexadecimal.
+<p>
+Below right, I have a hash table that has been filled in with some of these names.
+
+<p><center><table><td valign=top>
+
+<table border=3 cellpadding=3><td><pre>
+Name                       H1     H2
+---------------------    ------ ------
+Aidan Nepal              9bc6cc 42757b
+Alexander Aeronautic     4345ae 93249d
+Austin Prissy            20b849 8c1ef7
+Charlie Maiden           0d6fc1 e5855d
+Claire Tva               fe30bf 8124af
+Gavin Parallelepiped     0e9b65 db8914
+Hunter Fabric            b112a2 78d98d
+Isabelle Stack           4c30e6 f7193f
+Joshua Polonium          831e15 eeba38
+Madison Willoughby       1874dc 911d61
+Max Mere                 fc7e5b 8d1814
+Maya Paddy               107b1e 5e84ff
+Natalie Sober                 ?      ?
+Noah Porous              ae3e75 2dbc99
+Riley Predecessor        f001c1 385e34
+Savannah Tradesman       a3d7ee ab7176
+Sophia Keys              69147a 493120
+</pre></td></table>
+
+</td><td width=30></td><td valign=top>
+<table border=3 cellpadding=3><td><pre>
+
+0.  --------------------
+1.  Charlie Maiden
+2.  Hunter Fabric
+3.  --------------------
+4.  --------------------
+5.  Gavin Parallelepiped
+6.  Isabella Stack
+7.  --------------------
+8.  --------------------
+9.  --------------------
+10. Sophia Keys
+11. Max Mere
+12. Aiden Nepal
+13. Madison Willoughby
+14. Savannah Tradesman
+15. Claire Tva
+
+</pre></td></table>
+</td></table></center><p>
+
+Please answer the questions below.  Do not answer the questions as if one affects
+the other.  Answer them all with respect to the tables above.  For example, you 
+should not answer part <i>C</i> as if Austin Prissy were inserted into the table.
+Instead, you simply answer with respect to the table above.
+<p>
+In all of the questions, assume that hash function H1 is used to insert into the table,
+and if double-hashing is used, then hash function H2 is used as the second hash function.
+<p>
+
+<h4>For Class.  First, do parts <i>A</i>, <i>B</i> and <i>E</i>, and we'll go over the answers:</h4>
+
+<i>A.</i> What is the load factor of the table (you can give a fraction here)?<br>
+<i>B.</i> Into which index will Austin Prissy go into the table, using linear probing?<br>
+<i>E.</i> Into which index will Noah Porous go into the table, using linear probing?<br>
+
+<h4>Next, do parts <i>C</i> and <i>F</i>:</h4>
+
+<i>C.</i> Into which index will Joshua Polonium go into the table, using quadratic probing?<br>
+<i>F.</i> Into which index will Alexander Aeronautic go into the table, using quadratic probing?<br>
+
+<h4>Finally, do the remaining parts:</h4>
+
+<i>D.</i> Into which index will Maya Paddy go into the table, using double hashing?<br>
+<i>G.</i> Into which index will Riley Predecessor go into the table, using double hashing?<br>
+<i>H.</i> When using double hashing, Natalie Sober cannot be entered into the table.  Give me values of H1 ahd H2 that will make this happen.<br>
+<i>I.</i> How do we know that Madison Willoughby was inserted into the table after Aiden Nepal?
