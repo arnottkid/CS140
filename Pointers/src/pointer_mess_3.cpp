@@ -31,11 +31,8 @@ int main()
      I like to use that at method here, because it looks I think, than (*ivp)[i]. */
 
   ivp = &iv;
-  for (i = 0; i < ivp->size(); i++) printf("%2d ", ivp->at(i)); 
+  for (i = 0; i < ivp->size(); i++) printf("%2d ", ivp->at(i));
   printf("\n");
-
-  /* Since ivp "points to" iv, when you resize *ivp, it has the effect or resizing iv. 
-     "ivp->" is equivalent to "(*ivp)." */
 
   cout << endl << "Resizing ivp is reflecting by iv being resized." << endl << endl;
   ivp->resize(4);
@@ -79,6 +76,7 @@ int main()
     for (j = 0; j < jvp->size(); j++) printf(" %2d", jvp->at(j));
     printf("\n");
   }
+  return 0;
 
   /* Finally, I use new to allocate an instance of the VP class.  
      I use an arrow to get at vp's member variable.  However, since that member
