@@ -1168,8 +1168,8 @@ calls to <b>make_balanced_tree()</b>:
 <UL>
 <LI> The first call will be <b>make_balanced_tree(keys, vals, 0, 7).</b>
 <LI> That will call <b>make_balanced_tree(keys, vals, 0, 3)</b> and <b>make_balanced_tree(keys, vals, 4, 3)</b>.
-<LI> <b>make_balanced_tree(keys, vals, 0, 3)</b> will call <b>make_balanced_tree(keys, vals, 0, 0)</b> and <b>make_balanced_tree(keys, vals, 2, 0)</b>.
-<LI> <b>make_balanced_tree(keys, vals, 4, 3)</b> will call <b>make_balanced_tree(keys, vals, 4, 0)</b> and <b>make_balanced_tree(keys, vals, 6, 0)</b>.
+<LI> <b>make_balanced_tree(keys, vals, 0, 3)</b> will call <b>make_balanced_tree(keys, vals, 0, 1)</b> and <b>make_balanced_tree(keys, vals, 2, 1)</b>.
+<LI> <b>make_balanced_tree(keys, vals, 4, 3)</b> will call <b>make_balanced_tree(keys, vals, 4, 1)</b> and <b>make_balanced_tree(keys, vals, 6, 1)</b>.
 <LI> The rest of the <b>make_balanced_tree()</b> calls won't make recursive calls, because they 
      won't have any subtrees.
 </UL>
