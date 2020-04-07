@@ -6,6 +6,7 @@ CFLAGS ?= -std=c++98 -Wall -Wextra -Iinclude
 ALL = bin/pointer_mess_1 \
       bin/pointer_mess_3 \
       bin/pointer_mess_2 \
+      bin/in_class \
       bin/sortlines1 \
       bin/sortlines2 \
       bin/bacefook_server 
@@ -29,6 +30,9 @@ bin/pointer_mess_2: src/pointer_mess_2.cpp
 
 bin/pointer_mess_3: src/pointer_mess_3.cpp
 	g++ $(CFLAGS) -o bin/pointer_mess_3 src/pointer_mess_3.cpp
+
+bin/in_class: src/in_class.cpp
+	g++ $(CFLAGS) -o bin/in_class src/in_class.cpp
 
 bin/sortlines1: src/sortlines1.cpp
 	g++ $(CFLAGS) -o bin/sortlines1 src/sortlines1.cpp

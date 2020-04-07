@@ -398,10 +398,15 @@ This code demonstrates a pointer to a class whose member variable is a vector.
 UNIX> <font color=darkred><b></b></font>
 </pre>
 
+In class, I have you work through the following example problem to tell me its output:
+<b><a href=src/in_class.cpp>src/in_class.cpp</a></b>.
 
 <hr>
 <h2>Sorting using the STL</h2>
 
+This is a total aside to the pointer lecture.  I tell you this information in case you 
+need it with a lab or topcoder problem.
+<p>
 The standard template library supports sorting of a vector.  You need
 to include &lt;algorithm&gt;.
 Then, to sort <b>v</b>, just call <b>sort(v.begin(), v.end())</b>,
@@ -616,7 +621,7 @@ The output will be either "UNSUCCESSFUL", or the following lines of text:
 <h2>bacefook_server.cpp</h2>
 Let's write this one together.
 The code is in <b><a href=bacefook_server.cpp>bacefook_server.cpp</a></b>, and it's
-pretty straightforward.  I've even commented it!
+pretty straightforward.  
 The parts that I want you to pay attention to are the pointers.
 <h3>The two main data structures: A person, and the hash table</h3>
 <p>
@@ -638,7 +643,7 @@ data directly, and when it changes, you'll see the changes.
 In reality, our "database" is a 
 hash table that is accessed by names.  We'll use <b>djbhash</b>
 as the hash function, and separate chaining to resolve collisions.  Each vector in the hash table
-will hold a pointer to an instance of a <b>Person</b> class.  When we first insert that person
+will hold pointers to an instances of a <b>Person</b> class.  When we first insert a person
 into the hash table, that's when we create the instance using <b>new</b>.
 <p>
 Take a look at the function <b>find_person()</b>.  It takes a name and a hash table,
@@ -756,7 +761,7 @@ Let's test what we've done so far.  At the very least, we should be able to add 
 to the hash table, and if we try to add the same person twice, we'll be unsuccessful.
 
 <pre>
-UNIX> <font color=darkred><b>bacefook_server 100</b></font>
+UNIX> <font color=darkred><b>bin/bacefook_server 100</b></font>
 <font color=darkred><b>NEW-PERSON</b></font>
 <font color=darkred><b>Scarlett O'Hara</b></font>
 SUCCESSFUL
@@ -805,7 +810,7 @@ of "QUERY" that prints out the name and mood:
 Here we'll change Scarlett's mood:
 
 <pre>
-UNIX> <font color=darkred><b>bacefook_server 100</b></font>
+UNIX> <font color=darkred><b>bin/bacefook_server 100</b></font>
 <font color=darkred><b>NEW-PERSON</b></font>
 <font color=darkred><b>Scarlett O'Hara</b></font>
 SUCCESSFUL
@@ -870,7 +875,7 @@ To test this, let's change Scarlett's mood after Rhett has set his <b>InRelation
 Because we are using pointers, you see the mood change when you query Rhett:
 
 <pre>
-UNIX> <font color=darkred><b>bacefook_server 100</b></font>
+UNIX> <font color=darkred><b>bin/bacefook_server 100</b></font>
 <font color=darkred><b>NEW-PERSON</b></font>
 <font color=darkred><b>Scarlett O'Hara</b></font>
 SUCCESSFUL
@@ -1024,12 +1029,12 @@ FRIEND Scarlett O'Hara : Petulant, Angry
 END
 </pre></td></table></center><p>
 
-Now, suppose we want to see what all of these structures look in memory.  
+Now, suppose we want to see how all of these structures look in memory.  
 First, open another window and run <b>djbhash</b> from the
 hashing lecture notes:
 
 <pre>
-UNIX> <font color=darkred><b>djbhash</b></font>
+UNIX> <font color=darkred><b>bin/djbhash</b></font>
 <font color=darkred><b>Scarlett O'Hara</b></font>
 1585424537
 <font color=darkred><b>Rhett Butler</b></font>
@@ -1112,7 +1117,7 @@ then you can get at the methods and variables of
 the class with <b>"p->"</b>.  That is cleaner than doing <b>"(*p)."</b>.
 <p>
 <LI> The <b>new</b> command asks for memory, and returns a pointer that points to it.
-This memory will last until the program is over, of until <b>delete</b> is called on the pointer.
+This memory will last until the program is over, or until <b>delete</b> is called on the pointer.
 <p>
 <LI> A "memory leak," is where you change a pointer, and don't record its old value.  If it was
      pointing to memory allocated with <b>new</b>, and there's no record of it anywhere, then it

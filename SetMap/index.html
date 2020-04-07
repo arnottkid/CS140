@@ -961,12 +961,13 @@ UNIX> <font color=darkred><b></b></font>
 <hr>
 <h3> Step 5: Implementing Print_By_Name()</h3>
 
-With <b>Print_By_Name()</b>, we want to sort the quarterbacks by their last names, and then if
-two quarterbacks have the same last name, we sort them by their first names.  I'm going to 
-do this by having the following structure:
+With <b>Print_By_Name()</b>, we want to sort the quarterbacks by
+their last names, and then if two quarterbacks have the same last
+name, we sort them by their first names.  I'm going to do this by
+having the following structure:
 
 <UL>
-<LI> I will have a map keyed by first name, whose vals are also maps.
+<LI> I will have a map keyed by last name, whose vals are also maps.
 <LI> The maps in the vals are keyed by first name, and their vals are pointers to quarterbacks.
 <LI> When I print out the quarterbacks, I'm going to do a nested traversal.  At the first level, I
 traverse the last-name map.  Then for each of these nodes, we traverse the first-name map.
@@ -1191,7 +1192,7 @@ QBS::QBS(const QBS &qbs)
 
   for (i = 0; i &lt; qbs.QV.size(); i++) {
     q = new Quarterback;
-    q = qbs.QV[i];
+    *q = *(qbs.QV[i]);
     QV.push_back(q);
     QM[q-&gt;Name] = q;
   }

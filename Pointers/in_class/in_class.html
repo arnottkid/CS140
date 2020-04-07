@@ -1,0 +1,46 @@
+<title>CS140 In Class Work</title>
+<h1>CS140 In Class Work</h1>
+
+Tell me the output of the following program
+(in <b><a href=src/in_class.cpp>src/in_class.cpp</a></b>):
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main()
+{
+  vector &lt;int *&gt; v1;
+  vector &lt;int *&gt; v2;
+  vector &lt;int&gt; v3;
+  vector &lt;int&gt; *v4;
+  vector &lt;int *&gt; *v5;
+  size_t i;
+
+  for (i = 0; i &lt; 5; i++) {
+    v1.push_back(new int);
+    *v1[i] = i*10;
+  }
+
+  for (i = 0; i &lt; 5; i++) v2.push_back(v1[5-i-1]);
+  for (i = 0; i &lt; 5; i++) v3.push_back(*v1[i]);
+  
+  v4 = &v3;
+  v5 = &v1;
+
+  for (i = 0; i &lt; 5; i++) *v1[i] += 100;
+  v3[2] += 1000;
+  *(v5-&gt;at(2)) += 10000;
+
+  cout &lt;&lt; "V1";  for (i = 0; i &lt; 5; i++) cout &lt;&lt; " " &lt;&lt; *v1[i];  cout &lt;&lt; endl;
+  cout &lt;&lt; "V2";  for (i = 0; i &lt; 5; i++) cout &lt;&lt; " " &lt;&lt; *v2[i];  cout &lt;&lt; endl;
+  cout &lt;&lt; "V3";  for (i = 0; i &lt; 5; i++) cout &lt;&lt; " " &lt;&lt; v3[i];  cout &lt;&lt; endl;
+  cout &lt;&lt; "V4";  for (i = 0; i &lt; 5; i++) cout &lt;&lt; " " &lt;&lt; (*v4)[i];  cout &lt;&lt; endl;
+  cout &lt;&lt; "V5";  for (i = 0; i &lt; 5; i++) cout &lt;&lt; " " &lt;&lt; *((*v5)[i]);  cout &lt;&lt; endl;
+  return 0;
+} 
+</pre></td></table></center><p>
+
+

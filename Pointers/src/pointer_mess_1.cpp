@@ -20,6 +20,7 @@ int main()
 
   *ip1 = 10;
   printf("i: %2d    *ip1: %2d\n", i, *ip1);
+  return 0;
 
   /* This is like the first statement - changine i is reflected in both i and *ip1. */
 
